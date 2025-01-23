@@ -52,11 +52,11 @@ const LoginPage = () => {
       <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8  relative">
         {/* Header */}
         <div className="text-center mb-8 ">
-          <div className="flex justify-center mb-4">
-            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center  shadow-lg">
-              <GlobeAltIcon className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
+        <div className="flex justify-center mb-4">
+            <img src="nsfdc.png" alt="Logo" className="w-24 object-fill" />
+            <img src="ministry.png" alt="Logo" className="w-24 h-30 object-contain" />
+            <img src="src.jpg" alt="Logo" className="w-24 object-fill" />
+          </div>
           <h2 className="text-3xl font-display font-semibold text-gray-900">
             Welcome back
           </h2>

@@ -45,9 +45,7 @@ const Sidebar = ({
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-[var(--color-border)] relative flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-[var(--color-primary)]">
-            NSTFDS
-          </h1>
+        <img src="ministry.png" alt="Logo" className="w-32 object-cover" />
           <ThemeToggle />
         </div>
 
