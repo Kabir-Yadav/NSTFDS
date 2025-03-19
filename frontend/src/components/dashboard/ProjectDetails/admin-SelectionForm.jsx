@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AddDataModal from "./AddDataModel";
-import DeviceProcurementTable from "./Table";
+import DeviceProcurementTable from "./Table1";
 import TrainingForm from "./forms/training-form";
 import DeviceForm from "./forms/device-form";
 

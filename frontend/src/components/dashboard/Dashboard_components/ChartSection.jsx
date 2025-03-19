@@ -1,16 +1,8 @@
 import React from "react";
 import {
-  PieChart,
-  Pie,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
+  
   ResponsiveContainer,
-  Label,
-  LabelList,
+  
 } from "recharts";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -61,17 +53,94 @@ const ChartSection = () => {
 
   const districtData = {
     Maharashtra: [
-      { district: "Mumbai", progress: 90 },
-      { district: "Pune", progress: 85 },
-      { district: "Nagpur", progress: 75 },
+      { district: "Mumbai", progress: 93 },
+      { district: "Pune", progress: 88 },
+      { district: "Nagpur", progress: 82 },
+      { district: "Thane", progress: 86 },
+      { district: "Nashik", progress: 79 },
+      { district: "Aurangabad", progress: 74 },
+      { district: "Solapur", progress: 71 },
+      { district: "Kolhapur", progress: 77 },
+      { district: "Amravati", progress: 69 }
     ],
     Gujarat: [
-      { district: "Ahmedabad", progress: 82 },
-      { district: "Surat", progress: 75 },
-      { district: "Vadodara", progress: 80 },
+      { district: "Ahmedabad", progress: 85 },
+      { district: "Surat", progress: 81 },
+      { district: "Vadodara", progress: 77 },
+      { district: "Rajkot", progress: 73 },
+      { district: "Bhavnagar", progress: 68 },
+      { district: "Jamnagar", progress: 71 },
+      { district: "Gandhinagar", progress: 79 },
+      { district: "Junagadh", progress: 65 },
+      { district: "Kutch", progress: 62 }
     ],
-    // Add more district data for other states
-  };
+    Karnataka: [
+      { district: "Bangalore Urban", progress: 96 },
+      { district: "Mysore", progress: 89 },
+      { district: "Mangalore", progress: 87 },
+      { district: "Hubli-Dharwad", progress: 83 },
+      { district: "Belgaum", progress: 79 },
+      { district: "Gulbarga", progress: 75 },
+      { district: "Shimoga", progress: 81 },
+      { district: "Tumkur", progress: 77 },
+      { district: "Hassan", progress: 73 }
+    ],
+    "Tamil Nadu": [
+      { district: "Chennai", progress: 91 },
+      { district: "Coimbatore", progress: 87 },
+      { district: "Madurai", progress: 84 },
+      { district: "Salem", progress: 79 },
+      { district: "Trichy", progress: 82 },
+      { district: "Tirunelveli", progress: 75 },
+      { district: "Vellore", progress: 77 },
+      { district: "Erode", progress: 80 },
+      { district: "Thanjavur", progress: 73 }
+    ],
+    Rajasthan: [
+      { district: "Jaipur", progress: 79 },
+      { district: "Jodhpur", progress: 71 },
+      { district: "Udaipur", progress: 68 },
+      { district: "Kota", progress: 74 },
+      { district: "Ajmer", progress: 66 },
+      { district: "Bikaner", progress: 63 },
+      { district: "Alwar", progress: 69 },
+      { district: "Bharatpur", progress: 61 },
+      { district: "Sikar", progress: 58 }
+    ],
+    MP: [
+      { district: "Bhopal", progress: 73 },
+      { district: "Indore", progress: 71 },
+      { district: "Jabalpur", progress: 64 },
+      { district: "Gwalior", progress: 67 },
+      { district: "Ujjain", progress: 59 },
+      { district: "Sagar", progress: 55 },
+      { district: "Rewa", progress: 52 },
+      { district: "Satna", progress: 57 },
+      { district: "Dewas", progress: 61 }
+    ],
+    UP: [
+      { district: "Lucknow", progress: 76 },
+      { district: "Kanpur", progress: 71 },
+      { district: "Varanasi", progress: 73 },
+      { district: "Agra", progress: 67 },
+      { district: "Prayagraj", progress: 69 },
+      { district: "Meerut", progress: 65 },
+      { district: "Gorakhpur", progress: 61 },
+      { district: "Aligarh", progress: 58 },
+      { district: "Moradabad", progress: 63 }
+    ],
+    Bihar: [
+      { district: "Patna", progress: 67 },
+      { district: "Gaya", progress: 59 },
+      { district: "Muzaffarpur", progress: 57 },
+      { district: "Bhagalpur", progress: 55 },
+      { district: "Darbhanga", progress: 52 },
+      { district: "Purnia", progress: 48 },
+      { district: "Begusarai", progress: 54 },
+      { district: "Nalanda", progress: 58 },
+      { district: "Samastipur", progress: 51 }
+    ]
+};
 
   const chartTheme = {
     background: "var(--color-surface)",

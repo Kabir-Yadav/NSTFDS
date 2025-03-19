@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar_components";
 import SummaryCards from "./Dashboard_components/Summary";
-import ChartSection from "./Dashboard_components/ChartSection1";
+import ChartSection from "./Dashboard_components/ChartSection";
 import SelectionForm from "./ProjectDetails/SelectionForm2";
 
 const Dashboard = () => {

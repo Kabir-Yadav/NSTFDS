@@ -2,10 +2,16 @@ import React, { useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
-const DeviceProcurementTable = () => {
+const DeviceProcurementTable = ({
+  selectedState,
+  selectedDistrict,
+  selectedSchool,
+  selectedCategory,
+}) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // Device procurement data
   const deviceData = [
     {
       _id: "6790be47d674eed32c3edb34",
@@ -33,8 +39,6 @@ const DeviceProcurementTable = () => {
     },
     // Add 7 more entries as needed
   ];
-
-  // Filter data based on date range
   const filteredData = deviceData.filter((item) => {
     const itemDate = new Date(item.date);
     const start = startDate ? new Date(startDate) : null;
@@ -43,105 +47,149 @@ const DeviceProcurementTable = () => {
   });
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Device Procurement Report", 14, 10);
-
-    const tableColumn = ["ID", "Date", "Category", "Status", "Serial ID"];
-    const tableRows = filteredData.map((row) => [
-      row._id.slice(0, 6) + "...",
-      new Date(row.date).toLocaleDateString(),
-      row.device_category,
-      row.status,
-      row.serial_id,
-    ]);
-
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 20,
-    });
-
-    doc.save("DeviceProcurementReport.pdf");
-  };
+      const doc = new jsPDF();
+      doc.text("Device Procurement Report", 14, 10);
+  
+      const tableColumn = ["ID", "Date", "Category", "Status", "Serial ID"];
+      const tableRows = filteredData.map((row) => [
+        row._id.slice(0, 6) + "...",
+        new Date(row.date).toLocaleDateString(),
+        row.device_category,
+        row.status,
+        row.serial_id,
+      ]);
+  
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        startY: 20,
+      });
+  
+      doc.save("DeviceProcurementReport.pdf");
+    };
 
   return (
-    <div className="mt-6">
-      <h3 className="text-lg font-outfit font-medium mb-4">Device Procurement Table</h3>
-
-      {/* Date Filters */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-4 sm:space-y-0 sm:space-x-4">
-        <div>
-          <label className="text-sm font-medium text-gray-700 font-outfit block mb-1">
-            Start Date
-          </label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+      {/* Filter and Export Section */}
+      <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-gray-800 dark:to-gray-900 p-6 border-b border-purple-200 dark:border-gray-700">
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-6">
+            <div className="w-full md:w-auto">
+              <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-2">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full md:w-auto px-3 py-2 border border-purple-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div className="w-full md:w-auto">
+              <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-2">
+                End Date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full md:w-auto px-3 py-2 border border-purple-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+          </div>
+          <button
+            onClick={exportToPDF}
+            className="w-full md:w-auto flex items-center justify-center px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-colors shadow-md"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-9.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Export to PDF
+          </button>
         </div>
-        <div>
-          <label className="text-sm font-medium text-gray-700 font-outfit block mb-1">
-            End Date
-          </label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
-        </div>
-        <button
-          onClick={exportToPDF}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-redhat text-sm"
-        >
-          Export to PDF
-        </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 bg-gray-50 border-b border-gray-200 font-outfit font-medium text-sm text-gray-700">
-          <div>ID</div>
-          <div>Date</div>
-          <div>Category</div>
-          <div>Status</div>
-          <div>Serial ID</div>
-          <div>Image</div>
-        </div>
-
-        {filteredData.map((row, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border-b border-gray-200 font-redhat text-sm hover:bg-gray-50 transition-colors"
-          >
-            <div title={row._id}>{row._id.slice(0, 6)}...</div>
-            <div>{new Date(row.date).toLocaleDateString()}</div>
-            <div>{row.device_category}</div>
-            <div>
-              <span
-                className={`px-2 py-1 rounded-full text-xs ${
-                  row.status === "Delivered"
-                    ? "bg-green-100 text-green-800"
-                    : row.status === "In Transit"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-blue-100 text-blue-800"
-                }`}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-purple-50 dark:bg-gray-800 text-purple-800 dark:text-purple-200">
+            <tr>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                Date
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                Category
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                Serial ID
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                Image
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {deviceData.map((row, index) => (
+              <tr
+                key={index}
+                className={`${
+                  index % 2 === 0
+                    ? "bg-white dark:bg-gray-900"
+                    : "bg-purple-50/50 dark:bg-gray-800/50"
+                } hover:bg-purple-100/50 dark:hover:bg-gray-700/50 transition-colors`}
               >
-                {row.status}
-              </span>
-            </div>
-            <div>{row.serial_id}</div>
-            <div>
-              <img
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" title={row._id}>
+  {row._id.slice(0, 6)}...
+</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {new Date(row.date).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.device_category}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      row.status === "Delivered"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : row.status === "In Transit"
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                    }`}
+                  >
+                    {row.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.serial_id}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                <img
                 src={row.photo_url}
                 alt={row.device_category}
                 className="w-16 h-16 rounded-lg object-cover"
               />
-            </div>
-          </div>
-        ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          
+        </table>
       </div>
     </div>
   );
