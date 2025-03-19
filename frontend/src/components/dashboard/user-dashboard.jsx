@@ -12,13 +12,13 @@ const Dashboard = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-   // New states for Add Data form
-   const [showAddDataForm, setShowAddDataForm] = useState(false);
-   const [formDate, setFormDate] = useState("");
-   const [formDeviceCategory, setFormDeviceCategory] = useState("");
-   const [formStatus, setFormStatus] = useState("");
-   const [formSerialId, setFormSerialId] = useState("");
-   const [formPhoto, setFormPhoto] = useState(null);
+  // New states for Add Data form
+  const [showAddDataForm, setShowAddDataForm] = useState(false);
+  const [formDate, setFormDate] = useState("");
+  const [formDeviceCategory, setFormDeviceCategory] = useState("");
+  const [formStatus, setFormStatus] = useState("");
+  const [formSerialId, setFormSerialId] = useState("");
+  const [formPhoto, setFormPhoto] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -35,10 +35,13 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/digital-procurements/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:8000/digital-procurements/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to submit data");
@@ -156,7 +159,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] flex theme-transition">
+    <div className="min-h-screen w-screen bg-[var(--color-background)] 
+    flex theme-transition relative overflow-x-hidden">
       <Sidebar
         user={user}
         projects={projects}
@@ -177,7 +181,10 @@ const Dashboard = () => {
       )}
 
       {/* Main content area - Updated padding/margin for mobile */}
-      <div className="flex-1 flex flex-col px-4 md:px-0 md:ml-10  md:mr-10 mt-24 md:mt-10 transition-all duration-300">
+      <div
+        className="flex-1 flex flex-col px-4 md:px-6 lg:px-0 
+      md:ml-6 lg:ml-10 md:mr-6 lg:mr-10 mt-24 md:mt-10 overflow-x-hidden"
+      >
         {/* Mobile Header */}
 
         {/* Desktop Header */}
@@ -199,13 +206,13 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        <div className="theme-transition space-y-4 md:space-y-6">
+        <div className="theme-transition space-y-5 md:space-y-6">
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">
                 <SummaryCards stats={summaryStats} />
               </div>
-              <div className="mb-4 md:mb-6">
+              <div className="mb-4 md:mb-6 ">
                 <ChartSection />
               </div>
             </>
@@ -235,7 +242,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-
-

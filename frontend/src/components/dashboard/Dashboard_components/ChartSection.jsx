@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  
+
   ResponsiveContainer,
-  
+
 } from "recharts";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -140,7 +140,7 @@ const ChartSection = () => {
       { district: "Nalanda", progress: 58 },
       { district: "Samastipur", progress: 51 }
     ]
-};
+  };
 
   const chartTheme = {
     background: "var(--color-surface)",
@@ -196,10 +196,9 @@ const ChartSection = () => {
     bg-[var(--color-surface)] 
     p-6 
     rounded-xl 
-    ${
-      isDarkMode
-        ? "shadow-[0_10px_25px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)]"
-        : "shadow-2xl hover:shadow-3xl"
+    ${isDarkMode
+      ? "shadow-[0_10px_25px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)]"
+      : "shadow-2xl hover:shadow-3xl"
     } 
     transition-all 
     duration-300 
@@ -209,7 +208,7 @@ const ChartSection = () => {
   return (
     <>
       {/* Circular Charts Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className={elevatedCardClass}>
           <h3 className="text-lg font-outfit font-medium mb-4 text-[var(--color-text)]">
             Project Completion Rate
@@ -260,7 +259,7 @@ const ChartSection = () => {
           </div>
         </div>
 
-        <div className={elevatedCardClass}>
+        <div className={`${elevatedCardClass} col-span-1 sm:col-span-2 lg:col-span-1`}>
           <h3 className="text-lg font-outfit font-medium mb-4 text-[var(--color-text)]">
             School Implementation
           </h3>

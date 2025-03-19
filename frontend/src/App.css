@@ -32,10 +32,12 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
+
 /* Add this to your CSS file */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
