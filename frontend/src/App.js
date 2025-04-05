@@ -19,13 +19,6 @@ function App() {
         <Routes>
 
           {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
-          <Route path="/time" element={<GanttChart />} />
-          <Route path="/tier" element={<LoyaltyTiers />} />
-          <Route path="/pie" element={<CostDistributionChart />} />
-          <Route path="/risktable" element={<RiskTable_ />} />
-          <Route path="/risk" element={<RiskMatrix />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/user-dashboard" element={<Dashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />

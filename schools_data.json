@@ -1,0 +1,553 @@
+[
+    {
+        "S.No": "1.0",
+        "State": "Andhra Pradesh",
+        "Districts": [
+            {
+                "District": "Alluri Sitharama Raju",
+                "Schools": [
+                    {"EMRS School": "EMRS Addateegala", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Ananthagiri", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Araku Valley", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Balaram", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Chintala Veedhi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Chintapally", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Chintoor", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Dumbriguda", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS G Madugula", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS GK Veedhi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Hukumpeta", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Maredumilli", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Munchigaput", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Peda Bayalu", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Rajavommangi", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Rampachodavaram", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Y Ramavaram", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Manyam Paravathipuram",
+                "Schools": [
+                    {"EMRS School": "EMRS Anasabhadra", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Bhamini", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS GL Puram", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Kotikapenta", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kurupam", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Eluru",
+                "Schools": [
+                    {"EMRS School": "EMRS Buttayagudem", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Prakasam",
+                "Schools": [
+                    {"EMRS School": "EMRS Dornala", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "SPS Nellore",
+                "Schools": [
+                    {"EMRS School": "EMRS Kodavalur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Srikakulam",
+                "Schools": [
+                    {"EMRS School": "EMRS Meliaputti", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Tirupathi",
+                "Schools": [
+                    {"EMRS School": "EMRS Ozili", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Kandriga", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "2.0",
+        "State": "Dadra & Nagar Haveli and Daman & Diu",
+        "Districts": [
+            {
+                "District": "Dadra & Nagar Haveli",
+                "Schools": [
+                    {"EMRS School": "EMRS Shelti", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "3.0",
+        "State": "Gujarat",
+        "Districts": [
+            {
+                "District": "The Dangs",
+                "Schools": [
+                    {"EMRS School": "EMRS Ahwa", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Saputara", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Banas Kantha",
+                "Schools": [
+                    {"EMRS School": "EMRS Ambaji", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Amirgadh", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Jagana", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Navsari",
+                "Schools": [
+                    {"EMRS School": "EMRS Bartad", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Narmada",
+                "Schools": [
+                    {"EMRS School": "EMRS Gora (Nandod)", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Dediyapada", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Sagbara", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Tilkawada", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Bharuch",
+                "Schools": [
+                    {"EMRS School": "EMRS Jhagadia", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Wagalkhod", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Dahod",
+                "Schools": [
+                    {"EMRS School": "EMRS Jhalod", "Procurement Projects": []},
+                    {"EMRS School": "EMRS Kharedi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Garbada", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Khedbrahma", "Procurement Projects": []},
+                    {"EMRS School": "EMRS Lukhadiya", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Singvad", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Mahisagar",
+                "Schools": [
+                    {"EMRS School": "EMRS Kadana", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Santrampur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Tapi",
+                "Schools": [
+                    {"EMRS School": "EMRS Indu", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Khodada", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Ukai", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Surat",
+                "Schools": [
+                    {"EMRS School": "EMRS Mandavi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Mota", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Umarpada", "Procurement Projects": []}
+                ]
+            },
+            {
+                "District": "Chhota Udepur",
+                "Schools": [
+                    {"EMRS School": "EMRS Naswadi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kawant", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Puniyavant", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Valsad",
+                "Schools": [
+                    {"EMRS School": "EMRS Pardi", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Kaparada", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Dharamapur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Sabar Kantha",
+                "Schools": [
+                    {"EMRS School": "EMRS Poshina", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Vijaynagar", "Procurement Projects": []}
+                ]
+            },
+            {
+                "District": "Arvalli",
+                "Schools": [
+                    {"EMRS School": "EMRS Shamalaji - I", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Shamalaji 2", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Panch Mahals",
+                "Schools": [
+                    {"EMRS School": "EMRS Vejalpur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Vadodara",
+                "Schools": [
+                    {"EMRS School": "EMRS Waghodia 2", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "4.0",
+        "State": "Himachal Pradesh",
+        "Districts": [
+            {
+                "District": "Chamba",
+                "Schools": [
+                    {"EMRS School": "EMRS Brahmour", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Pangi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Kinnaur",
+                "Schools": [
+                    {"EMRS School": "EMRS Nichar", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Lahaul and Spiti",
+                "Schools": [
+                    {"EMRS School": "EMRS Lahaul", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "5.0",
+        "State": "Jammu & Kashmir",
+        "Districts": [
+            {
+                "District": "Anantnag",
+                "Schools": [
+                    {"EMRS School": "EMRS Salia", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Bandipora",
+                "Schools": [
+                    {"EMRS School": "EMRS Gurej", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Kulgam",
+                "Schools": [
+                    {"EMRS School": "EMRS Tangmarg", "Procurement Projects": []}
+                ]
+            },
+            {
+                "District": "Poonch",
+                "Schools": [
+                    {"EMRS School": "EMRS Poonch", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Rajouri",
+                "Schools": [
+                    {"EMRS School": "EMRS Koteranka", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Rajouri", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "6.0",
+        "State": "Kerala",
+        "Districts": [
+            {
+                "District": "Idukki",
+                "Schools": [
+                    {"EMRS School": "EMRS Idukki", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Palakkad",
+                "Schools": [
+                    {"EMRS School": "EMRS Attappady", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Kasargod",
+                "Schools": [
+                    {"EMRS School": "EMRS Karinthalam", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Wayanad",
+                "Schools": [
+                    {"EMRS School": "EMRS Pookode", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "7.0",
+        "State": "Rajasthan",
+        "Districts": [
+            {
+                "District": "Banswara",
+                "Schools": [
+                    {"EMRS School": "EMRS Abapura (Gamda)", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Sawai Madhopur",
+                "Schools": [
+                    {"EMRS School": "EMRS Bagidora", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Garhi Parkhela", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kushalgarh", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Padola", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Sundrav", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Barnala", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Jaipur",
+                "Schools": [
+                    {"EMRS School": "EMRS Biharipura", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Sirohi",
+                "Schools": [
+                    {"EMRS School": "EMRS Danvav", "Procurement Projects": ["Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Pratapgarh",
+                "Schools": [
+                    {"EMRS School": "EMRS Dhariawad", "Procurement Projects": []},
+                    {"EMRS School": "EMRS Arnod", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Peepalkhunt", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Timarwa", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Dungarpur",
+                "Schools": [
+                    {"EMRS School": "EMRS Dungarpur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Parda Chundawat", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Sagwara", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Simalwara", "Procurement Projects": ["Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Baran",
+                "Schools": [
+                    {"EMRS School": "EMRS Hanotiya", "Procurement Projects": ["Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Udaipur",
+                "Schools": [
+                    {"EMRS School": "EMRS Gogunda", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Jhadol", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kherwara", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Khandiovri", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Kotra", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Lasadiya", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Rishabdeo", "Procurement Projects": []},
+                    {"EMRS School": "EMRS Salumber", "Procurement Projects": ["Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Sarada", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Alwar",
+                "Schools": [
+                    {"EMRS School": "EMRS Mallana", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Patan", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Tonk",
+                "Schools": [
+                    {"EMRS School": "EMRS Niwai", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Karauli",
+                "Schools": [
+                    {"EMRS School": "EMRS Ranoli", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "8.0",
+        "State": "Tamil Nadu",
+        "Districts": [
+            {
+                "District": "Kalakuruchi (Villupuram)",
+                "Schools": [
+                    {"EMRS School": "EMRS Vellimalai", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Kanchipuram (Chengalpattu)",
+                "Schools": [
+                    {"EMRS School": "EMRS Pattipulam", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Namakkal",
+                "Schools": [
+                    {"EMRS School": "EMRS Sengarai", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Salem",
+                "Schools": [
+                    {"EMRS School": "EMRS Abinavam", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Yercaud", "Procurement Projects": ["Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "The Nilgiris",
+                "Schools": [
+                    {"EMRS School": "EMRS Kodapmundu", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Thiruvanna Malai",
+                "Schools": [
+                    {"EMRS School": "EMRS Athipattu", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Tirupattur",
+                "Schools": [
+                    {"EMRS School": "EMRS Vishamangalam", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "9.0",
+        "State": "Telangana",
+        "Districts": [
+            {
+                "District": "Kamareddy",
+                "Schools": [
+                    {"EMRS School": "EMRS (B) Gandhari", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Nagarkurnool",
+                "Schools": [
+                    {"EMRS School": "EMRS (B) Kalwakurthy", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Rajanna Sircilla",
+                "Schools": [
+                    {"EMRS School": "EMRS (B) Marrimadla", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS (G) Yellareddypet", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Adilabad",
+                "Schools": [
+                    {"EMRS School": "EMRS (B) Narnoor", "Procurement Projects": ["Sanitary Pad Devices"]},
+                    {"EMRS School": "EMRS Utnoor", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Indravelli", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Bhadradri Kothagudem",
+                "Schools": [
+                    {"EMRS School": "EMRS (G) Gandugulapally", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS (G) Palvancha", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Mulakalapalle", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Telukapally", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Cherla", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Dummugudem", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Gundala", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS (G) Kuravi", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS (G) Seerole", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Bayyaram", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Gudur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kothaguda", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Nizamabad",
+                "Schools": [
+                    {"EMRS School": "EMRS (G) Indalvai", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Mahabubnagar",
+                "Schools": [
+                    {"EMRS School": "EMRS (B) Balanagar", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Khammam",
+                "Schools": [
+                    {"EMRS School": "EMRS Singareni", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Komaram Bheem Asifabad",
+                "Schools": [
+                    {"EMRS School": "EMRS Sirpur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "10.0",
+        "State": "Uttar Pradesh",
+        "Districts": [
+            {
+                "District": "Bahraich",
+                "Schools": [
+                    {"EMRS School": "EMRS Bojhiya", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Kheri",
+                "Schools": [
+                    {"EMRS School": "EMRS Saunaha", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]}
+                ]
+            },
+            {
+                "District": "Sonbhadra",
+                "Schools": [
+                    {"EMRS School": "EMRS Piparkhand", "Procurement Projects": []}
+                ]
+            }
+        ]
+    },
+    {
+        "S.No": "11.0",
+        "State": "Uttarakhand",
+        "Districts": [
+            {
+                "District": "Dehradun",
+                "Schools": [
+                    {"EMRS School": "EMRS Chakrata", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Kalshi", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            },
+            {
+                "District": "Udam Singh Nagar",
+                "Schools": [
+                    {"EMRS School": "EMRS Bajpur", "Procurement Projects": ["Sanitary Pad Devices", "Desktop Computer", "UPS"]},
+                    {"EMRS School": "EMRS Khatima", "Procurement Projects": ["Sanitary Pad Devices"]}
+                ]
+            }
+        ]
+    }
+]
