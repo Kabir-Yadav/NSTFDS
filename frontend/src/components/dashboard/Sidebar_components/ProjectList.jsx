@@ -7,10 +7,9 @@ const ProjectList = ({ projects, selectedProject, onProjectSelect }) => (
         key={project.id}
         onClick={() => onProjectSelect(project)}
         className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center transition-colors
-          ${
-            selectedProject?.id === project.id
-              ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
-              : "text-[var(--color-text-secondary)] hover:bg-[var(--color-background)]"
+          ${selectedProject?.id === project.id
+            ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
+            : "text-[var(--color-text-secondary)] hover:bg-[var(--color-background)]"
           }`}
       >
         <span className="mr-3">{project.icon}</span>

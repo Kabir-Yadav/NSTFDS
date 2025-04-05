@@ -30,7 +30,11 @@ const SummaryCards = ({ stats }) => (
 );
 
 const SummaryCard = ({ title, value, icon, color }) => (
-  <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 flex items-center theme-transition">
+  <div
+    className={`rounded-xl p-6 flex items-center theme-transition shadow-xl hover:shadow-2xl 
+              bg-gradient-to-br from-[var(--color-surface)] to-[rgba(255,255,255,0.02)] 
+              backdrop-blur-[2px] border border-[rgba(255,255,255,0.05)] transition-all`}
+  >
     <div
       className={`w-12 h-12 rounded-lg ${color} flex items-center justify-center mr-4 opacity-80`}
     >
