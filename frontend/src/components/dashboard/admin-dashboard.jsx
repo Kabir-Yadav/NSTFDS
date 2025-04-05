@@ -157,7 +157,7 @@ const AdminDashboard = () => {
 
   return (
     <div
-      className="min-h-screen w-screen bg-[var(--color-background)] 
+      className="min-h-screen max-w-screen bg-[var(--color-background)] 
       flex theme-transition relative overflow-hidden"
     >
       <Sidebar
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        <div className="theme-transition space-y-5 md:space-y-6 z-40 mb-10 md:mb-12">
+        <div className="theme-transition space-y-5 z-0 md:space-y-6 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">

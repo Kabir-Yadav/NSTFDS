@@ -205,7 +205,7 @@ const Dashboard = () => {
             right: "auto",
             WebkitFilter: "blur(200px)",
             filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
             position: "absolute",
           }}
         />
@@ -220,12 +220,13 @@ const Dashboard = () => {
             height: "300px",
             WebkitFilter: "blur(200px)",
             filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
             position: "absolute",
           }}
         />
 
         <div className="mb-6 md:mb-8 md:block">
+          
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl md:text-2xl font-outfit font-semibold text-[var(--color-text)]">

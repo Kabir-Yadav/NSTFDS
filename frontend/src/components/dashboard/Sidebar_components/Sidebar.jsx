@@ -37,7 +37,7 @@ const Sidebar = ({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-[280px] bg-[var(--color-surface)] shadow-lg 
+        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[var(--color-surface)] shadow-lg 
           theme-transition sidebar-transition
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
           md:relative md:translate-x-0 md:w-64

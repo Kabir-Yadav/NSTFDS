@@ -1,7 +1,7 @@
 import React from "react";
 
 const MobileHeader = ({ onToggleSidebar, title }) => (
-  <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 py-3 flex items-center justify-between theme-transition">
+  <div className="md:hidden fixed top-0 left-0 right-0 z-10 bg-[var(--color-surface)] border-b border-[var(--color-border)] px-4 py-3 flex items-center justify-between theme-transition">
     <button
       onClick={onToggleSidebar}
       className="p-2 rounded-lg text-[var(--color-text)]"

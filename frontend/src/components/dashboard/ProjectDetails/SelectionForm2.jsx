@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AddDataModal from "./AddDataModel";
-import DeviceProcurementTable from "./Table";
+import DeviceProcurementTable from "./tables/Table";
+import SanitaryPadTable from "./tables/sanitary-pad-table";
 
 const SelectionForm = ({
   selectedProject,
@@ -46,7 +47,7 @@ const SelectionForm = ({
 
   return (
     <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 theme-transition">
-      
+
 
       {/* Selection Dropdowns */}
       {renderSelect({
@@ -87,7 +88,7 @@ const SelectionForm = ({
       {/* Device Procurement Table */}
       {(selectedProject?.name === "Digital Device Procurement" ||
         selectedProject?.name ==
-          "Residential Training Project for EMRS Teachers") &&
+        "Residential Training Project for EMRS Teachers") &&
         selectedCategory && (
           <DeviceProcurementTable
             selectedState={selectedState}
@@ -95,6 +96,12 @@ const SelectionForm = ({
             selectedSchool={selectedSchool}
             selectedCategory={selectedCategory}
           />
+        )}
+      {
+        selectedProject?.name ==
+        "Sanitary Pad Devices Procurement" &&
+        selectedCategory && (
+          <SanitaryPadTable/>
         )}
 
       {/* Add Data Modal */}

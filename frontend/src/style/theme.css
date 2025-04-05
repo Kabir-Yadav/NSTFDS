@@ -1,7 +1,7 @@
 :root {
   /* Light theme - Balanced Professional */
-  --color-primary: #5b7df4;
-  --color-primary-rgb: 91, 125, 244;
+  --color-primary: #835df4;
+  --color-primary-rgb: 129, 91, 244;
   --color-primary-hover: #4a6de6;
   --color-primary-light: #e8effd;
   --color-primary-dark: #3a5dc6;
@@ -19,11 +19,11 @@
   --color-border: #e0e4e8;
   --color-border-focus: rgba(91, 125, 244, 0.4);
   
-  --color-success: #4caf93;
+  --color-success: #4caf6d;
   --color-success-light: #e5f4f0;
-  --color-error: #e27474;
+  --color-error: #f46d6d;
   --color-error-light: #fbeaea;
-  --color-warning: #e2a93b;
+  --color-warning: #f0be5b;
   --color-warning-light: #faf2e2;
   --color-info: #5698d3;
   --color-info-light: #e8f2fa;
@@ -43,8 +43,8 @@
 
 :root[class~='dark'] {
   /* Dark theme - Balanced Professional */
-  --color-primary: #7890e7;
-  --color-primary-rgb: 120, 144, 231;
+  --color-primary: rgb(146, 120, 231);
+  --color-primary-rgb: 146, 120, 231;
   --color-primary-hover: #6780d8;
   --color-primary-light: #2a344e;
   --color-primary-dark: #a5b4ee;
