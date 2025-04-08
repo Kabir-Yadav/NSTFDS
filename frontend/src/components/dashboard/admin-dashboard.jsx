@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar_components";
+import Sidebar from "./Sidebar_components/Sidebar";
 import SummaryCards from "./Dashboard_components/Summary";
 import ChartSection from "./Dashboard_components/ChartSection";
 import AdminSelectionForm from "./ProjectDetails/admin-SelectionForm";
@@ -12,13 +12,13 @@ const AdminDashboard = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-   // New states for Add Data form
-   const [showAddDataForm, setShowAddDataForm] = useState(false);
-   const [formDate, setFormDate] = useState("");
-   const [formDeviceCategory, setFormDeviceCategory] = useState("");
-   const [formStatus, setFormStatus] = useState("");
-   const [formSerialId, setFormSerialId] = useState("");
-   const [formPhoto, setFormPhoto] = useState(null);
+  // New states for Add Data form
+  const [showAddDataForm, setShowAddDataForm] = useState(false);
+  const [formDate, setFormDate] = useState("");
+  const [formDeviceCategory, setFormDeviceCategory] = useState("");
+  const [formStatus, setFormStatus] = useState("");
+  const [formSerialId, setFormSerialId] = useState("");
+  const [formPhoto, setFormPhoto] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -156,7 +156,10 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] flex theme-transition">
+    <div
+      className="min-h-screen max-w-screen bg-[var(--color-background)] 
+      flex theme-transition relative overflow-hidden"
+    >
       <Sidebar
         user={user}
         projects={projects}
@@ -177,11 +180,43 @@ const AdminDashboard = () => {
       )}
 
       {/* Main content area - Updated padding/margin for mobile */}
-      <div className="flex-1 flex flex-col px-4 md:px-0 md:ml-10  md:mr-10 mt-24 md:mt-10 transition-all duration-300">
-        {/* Mobile Header */}
+      <div
+        className="flex-1 flex flex-col px-4
+        md:px-6 lg:px-0 md:ml-6 lg:ml-10 md:mr-6 lg:mr-10 mt-24 md:mt-10 
+        overflow-x-hidden"
+      >
+        <div
+          style={{
+            zindex: "-1",
+            top: "auto",
+            bottom: "10%",
+            width: "300px",
+            height: "300px",
+            right: "auto",
+            WebkitFilter: "blur(200px)",
+            filter: "blur(200px)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
+            position: "absolute",
+          }}
+        />
+        <div
+          style={{
+            zindex: "-1",
+            top: "13%",
+            bottom: "auto",
+            left: "auto",
+            right: "0%",
+            width: "300px",
+            height: "300px",
+            WebkitFilter: "blur(200px)",
+            filter: "blur(200px)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
+            position: "absolute",
+          }}
+        />
 
         {/* Desktop Header */}
-        <div className="mb-6 md:mb-8 hidden md:block">
+        <div className="mb-6 md:mb-8 md:block">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
@@ -199,7 +234,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        <div className="theme-transition space-y-4 md:space-y-6">
+        <div className="theme-transition space-y-5 z-0 md:space-y-6 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">

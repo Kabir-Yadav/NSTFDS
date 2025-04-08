@@ -1,8 +1,8 @@
 import React from "react";
 import {
-  
+
   ResponsiveContainer,
-  
+
 } from "recharts";
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
@@ -140,7 +140,7 @@ const ChartSection = () => {
       { district: "Nalanda", progress: 58 },
       { district: "Samastipur", progress: 51 }
     ]
-};
+  };
 
   const chartTheme = {
     background: "var(--color-surface)",
@@ -153,6 +153,14 @@ const ChartSection = () => {
         },
       },
     },
+    labels: {
+      text: {
+        fontSize: 16,
+        fontWeight: 700,
+        fill: "var(--color-text)",
+        fontFamily: "Red Hat Display",
+      },
+    },
     grid: {
       line: {
         stroke: isDarkMode ? "#374151" : "#e5e7eb",
@@ -160,20 +168,51 @@ const ChartSection = () => {
     },
   };
 
-  const pieData = [
+  const pieDataCompletion = [
     {
       id: "completed",
       label: "Completed",
       value: 75,
-      color: "var(--color-primary)",
+      color: 'var(--color-success)',
     },
     {
       id: "remaining",
       label: "Remaining",
       value: 25,
+      color: isDarkMode ? "#374151" : "#e5e7eb", 
+    },
+  ];
+  
+  const pieDataBudget = [
+    {
+      id: "utilized",
+      label: "Utilized",
+      value: 60,
+      color: 'var(--color-error)',
+    },
+    {
+      id: "unutilized",
+      label: "Unutilized",
+      value: 40,
+      color: isDarkMode ? "#374151" : "#e5e7eb", // warning yellow
+    },
+  ];
+  
+  const pieDataSchool = [
+    {
+      id: "done",
+      label: "Done",
+      value: 40,
+      color: 'var(--color-warning)',
+    },
+    {
+      id: "pending",
+      label: "Pending",
+      value: 60,
       color: isDarkMode ? "#374151" : "#e5e7eb",
     },
   ];
+  
   const pieChartProps = {
     motionConfig: "wobbly",
     animate: true,
@@ -196,11 +235,6 @@ const ChartSection = () => {
     bg-[var(--color-surface)] 
     p-6 
     rounded-xl 
-    ${
-      isDarkMode
-        ? "shadow-[0_10px_25px_rgba(0,0,0,0.3)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)]"
-        : "shadow-2xl hover:shadow-3xl"
-    } 
     transition-all 
     duration-300 
     transform 
@@ -209,7 +243,7 @@ const ChartSection = () => {
   return (
     <>
       {/* Circular Charts Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className={elevatedCardClass}>
           <h3 className="text-lg font-outfit font-medium mb-4 text-[var(--color-text)]">
             Project Completion Rate
@@ -218,7 +252,7 @@ const ChartSection = () => {
             <ResponsiveContainer width="100%" height="100%">
               <ResponsivePie
                 {...pieChartProps}
-                data={pieData}
+                data={pieDataCompletion}
                 margin={{ top: 25, right: 25, bottom: 25, left: 25 }}
                 innerRadius={0.6}
                 padAngle={3}
@@ -226,6 +260,7 @@ const ChartSection = () => {
                 activeOuterRadiusOffset={8}
                 colors={{ datum: "data.color" }}
                 theme={chartTheme}
+                
                 enableArcLinkLabels={false}
                 arcLinkLabelsColor={{ from: "color" }}
                 arcLabelsTextColor="white"
@@ -241,7 +276,7 @@ const ChartSection = () => {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ResponsivePie
-                data={pieData}
+                data={pieDataBudget}
                 margin={{ top: 25, right: 25, bottom: 25, left: 25 }}
                 innerRadius={0.1}
                 padAngle={3}
@@ -260,14 +295,14 @@ const ChartSection = () => {
           </div>
         </div>
 
-        <div className={elevatedCardClass}>
+        <div className={`${elevatedCardClass} col-span-1 sm:col-span-2 lg:col-span-1`}>
           <h3 className="text-lg font-outfit font-medium mb-4 text-[var(--color-text)]">
             School Implementation
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ResponsivePie
-                data={pieData}
+                data={pieDataSchool}
                 margin={{ top: 25, right: 25, bottom: 25, left: 25 }}
                 innerRadius={0.7}
                 padAngle={3}
@@ -305,7 +340,7 @@ const ChartSection = () => {
                           dur="1s"
                           repeatCount="1"
                         />
-                        <tspan>{pieData[0].value}%</tspan>
+                        <tspan>{pieDataSchool[0].value}%</tspan>
                       </text>
                     </g>
                   ),

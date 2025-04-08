@@ -1,8 +1,8 @@
 import React from "react";
-import UserProfile from "../Sidebar_components/UserProfile";
-import ProjectList from "../Sidebar_components/ProjectList";
+import UserProfile from "./UserProfile";
+import ProjectList from "./ProjectList";
 import ThemeToggle from "../Dashboard_components/ThemeToggle";
-import MobileHeader from "../Sidebar_components/MobileHeader";
+import MobileHeader from "./MobileHeader";
 
 const Sidebar = ({
   user,
@@ -37,15 +37,15 @@ const Sidebar = ({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-[280px] bg-[var(--color-surface)] shadow-lg 
-          transform transition-transform duration-300 ease-in-out theme-transition
+        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[var(--color-surface)] shadow-lg 
+          theme-transition sidebar-transition
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
           md:relative md:translate-x-0 md:w-64
           ${isSidebarOpen ? "touch-none" : ""} md:touch-auto`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-[var(--color-border)] relative flex items-center justify-between">
-        <img src="ministry.png" alt="Logo" className="w-32 object-cover" />
+          <img src="assets/ministry.png" alt="Logo" className="w-32 object-cover" />
           <ThemeToggle />
         </div>
 

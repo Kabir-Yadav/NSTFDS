@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   EyeSlashIcon,
@@ -12,10 +12,15 @@ const LoginPage = () => {
     password: "",
     rememberMe: false,
   });
-  const [error, setError] = useState(""); // Add this line to manage error state
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    general: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [wobble, setWobble] = useState(false);
+  const buttonRef = useRef(null);
   const navigate = useNavigate();
-
 
   // Hardcoded demo users
   const demoUsers = [
@@ -26,10 +31,52 @@ const LoginPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear validation errors when typing
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { email: "", password: "", general: "" };
+    
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      valid = false;
+    }
+    
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+    
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const triggerWobble = () => {
+    setWobble(true);
+    setTimeout(() => setWobble(false), 1000);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      triggerWobble();
+      return;
+    }
+    
     const user = demoUsers.find(
       (u) => u.email === formData.email && u.password === formData.password
     );
@@ -41,22 +88,21 @@ const LoginPage = () => {
         navigate("/user-dashboard");
       }
     } else {
-      setError("Invalid credentials. Please try again.");
+      setErrors((prev) => ({ ...prev, general: "Invalid credentials. Please try again." }));
+      triggerWobble();
     }
   };
 
-
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8  relative">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 relative">
         {/* Header */}
-        <div className="text-center mb-8 ">
-        <div className="flex justify-center mb-4">
-            <img src="nsfdc.png" alt="Logo" className="w-24 object-fill" />
-            <img src="ministry.png" alt="Logo" className="w-24 h-30 object-contain" />
-            <img src="src.jpg" alt="Logo" className="w-24 object-fill" />
-          </div>
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img src="assets/nsfdc.png" alt="Logo" className="w-24 object-fill" />
+            <img src="assets/ministry.png" alt="Logo" className="w-24 h-30 object-contain" />
+            <img src="assets/src.jpg" alt="Logo" className="w-24 object-fill" />
+          </div>
           <h2 className="text-3xl font-display font-semibold text-gray-900">
             Welcome back
           </h2>
@@ -64,6 +110,13 @@ const LoginPage = () => {
             Please enter your details to sign in
           </p>
         </div>
+
+        {/* Error display */}
+        {errors.general && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {errors.general}
+          </div>
+        )}
 
         {/* Login Form */}
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -80,9 +133,14 @@ const LoginPage = () => {
               id="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none shadow-sm hover:shadow-md transition-shadow"
+              className={`w-full px-4 py-3 border ${
+                errors.email ? "border-red-500" : "border-gray-200"
+              } rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none shadow-sm hover:shadow-md transition-shadow`}
               placeholder="Enter your email"
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
           </div>
 
           <div className="transform hover:translate-z-2 transition-transform">
@@ -99,7 +157,9 @@ const LoginPage = () => {
                 id="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none shadow-sm hover:shadow-md transition-shadow"
+                className={`w-full px-4 py-3 border ${
+                  errors.password ? "border-red-500" : "border-gray-200"
+                } rounded-xl focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none shadow-sm hover:shadow-md transition-shadow`}
                 placeholder="Enter your password"
               />
               <button
@@ -114,6 +174,9 @@ const LoginPage = () => {
                 )}
               </button>
             </div>
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            )}
           </div>
 
           <div className="flex items-center justify-between">
@@ -123,7 +186,12 @@ const LoginPage = () => {
                 name="rememberMe"
                 id="rememberMe"
                 checked={formData.rememberMe}
-                onChange={handleInputChange}
+                onChange={(e) => 
+                  setFormData((prev) => ({ 
+                    ...prev, 
+                    rememberMe: e.target.checked 
+                  }))
+                }
                 className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
               />
               <label
@@ -142,8 +210,11 @@ const LoginPage = () => {
           </div>
 
           <button
+            ref={buttonRef}
             type="submit"
-            className="w-full bg-purple-600 text-white py-3 px-4 rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300"
+            className={`w-full bg-purple-600 text-white py-3 px-4 rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ${
+              wobble ? "animate-wobble" : ""
+            }`}
           >
             Sign in
           </button>

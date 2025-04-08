@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar_components";
+import Sidebar from "./Sidebar_components/Sidebar";
 import SummaryCards from "./Dashboard_components/Summary";
 import ChartSection from "./Dashboard_components/ChartSection";
 import SelectionForm from "./ProjectDetails/SelectionForm2";
@@ -12,13 +12,13 @@ const Dashboard = () => {
   const [selectedSchool, setSelectedSchool] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-   // New states for Add Data form
-   const [showAddDataForm, setShowAddDataForm] = useState(false);
-   const [formDate, setFormDate] = useState("");
-   const [formDeviceCategory, setFormDeviceCategory] = useState("");
-   const [formStatus, setFormStatus] = useState("");
-   const [formSerialId, setFormSerialId] = useState("");
-   const [formPhoto, setFormPhoto] = useState(null);
+  // New states for Add Data form
+  const [showAddDataForm, setShowAddDataForm] = useState(false);
+  const [formDate, setFormDate] = useState("");
+  const [formDeviceCategory, setFormDeviceCategory] = useState("");
+  const [formStatus, setFormStatus] = useState("");
+  const [formSerialId, setFormSerialId] = useState("");
+  const [formPhoto, setFormPhoto] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -35,10 +35,13 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/digital-procurements/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:8000/digital-procurements/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to submit data");
@@ -124,6 +127,16 @@ const Dashboard = () => {
   const districts = ["District 1", "District 2", "District 3"];
   const schools = ["School 1", "School 2", "School 3"];
 
+  const statesData = [
+    { state: "Maharashtra", progress: 85 },
+    { state: "Gujarat", progress: 78 },
+    { state: "Karnataka", progress: 92 },
+    { state: "Tamil Nadu", progress: 88 },
+    { state: "Rajasthan", progress: 72 },
+    { state: "MP", progress: 65 },
+    { state: "UP", progress: 70 },
+    { state: "Bihar", progress: 60 },
+  ];
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setSelectedState(null);
@@ -156,7 +169,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] flex theme-transition">
+    <div
+      className="min-h-screen w-screen bg-[var(--color-background)] flex theme-transition relative overflow-hidden"
+    >
       <Sidebar
         user={user}
         projects={projects}
@@ -171,17 +186,47 @@ const Dashboard = () => {
       {/* Overlay for mobile when sidebar is open */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
+          className="fixed inset-0 opacity-50 z-20 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         ></div>
       )}
 
       {/* Main content area - Updated padding/margin for mobile */}
-      <div className="flex-1 flex flex-col px-4 md:px-0 md:ml-10  md:mr-10 mt-24 md:mt-10 transition-all duration-300">
-        {/* Mobile Header */}
+      <div
+        className="flex-1 flex flex-col px-4 md:px-6 lg:px-0 md:ml-6 lg:ml-10 md:mr-6 lg:mr-10 mt-24 md:mt-10 overflow-hidden"
+      >
+        <div
+          style={{
+            zindex: "-1",
+            top: "auto",
+            bottom: "10%",
+            width: "300px",
+            height: "300px",
+            right: "auto",
+            WebkitFilter: "blur(200px)",
+            filter: "blur(200px)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
+            position: "absolute",
+          }}
+        />
+        <div
+          style={{
+            zindex: "-1",
+            top: "13%",
+            bottom: "auto",
+            left: "auto",
+            right: "0%",
+            width: "300px",
+            height: "300px",
+            WebkitFilter: "blur(200px)",
+            filter: "blur(200px)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
+            position: "absolute",
+          }}
+        />
 
-        {/* Desktop Header */}
-        <div className="mb-6 md:mb-8 hidden md:block">
+        <div className="mb-6 md:mb-8 md:block">
+          
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-xl md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
@@ -199,13 +244,38 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        <div className="theme-transition space-y-4 md:space-y-6">
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <select
+              value={selectedState}
+              onChange={(e) => setSelectedState(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+                       bg-white dark:bg-gray-800 
+                       text-gray-900 dark:text-gray-100
+                       focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="" className="bg-white dark:bg-gray-800">
+                All States
+              </option>
+              {statesData.map((state) => (
+                <option
+                  key={state.state}
+                  value={state.state}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  {state.state}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="theme-transition space-y-5 md:space-y-6 z-20 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">
                 <SummaryCards stats={summaryStats} />
               </div>
-              <div className="mb-4 md:mb-6">
+              <div className="mb-4 md:mb-6 ">
                 <ChartSection />
               </div>
             </>
@@ -235,7 +305,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-
-

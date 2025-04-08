@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import AddDataModal from "./AddDataModel";
-import DeviceProcurementTable from "./Table1";
+import DeviceProcurementTable from "./tables/Table";
 import TrainingForm from "./forms/training-form";
 import DeviceForm from "./forms/device-form";
+import SanitaryPadForm from "./forms/sanitary-form";
+import SanitaryPadTable from "./tables/sanitary-pad-table";
 
 const AdminSelectionForm = ({
   selectedProject,
@@ -48,9 +50,7 @@ const AdminSelectionForm = ({
 
   return (
     <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 theme-transition">
-      {selectedProject?.name ==
-        "Residential Training Project for EMRS Teachers" ||
-      selectedProject?.name == "Digital Device Procurement" ? (
+      {["Residential Training Project for EMRS Teachers", "Digital Device Procurement", "Sanitary Pad Devices Procurement"].includes(selectedProject?.name) && (
         <div className="mb-6">
           <button
             onClick={() => setShowAddDataModal(true)}
@@ -62,13 +62,9 @@ const AdminSelectionForm = ({
             <span>Add Data</span>
           </button>
         </div>
-      ) : (
-        <></>
       )}
-      
-      {/* Device Procurement Table */}
-      {selectedProject?.name ===
-        "Residential Training Project for EMRS Teachers" && (
+
+      {selectedProject?.name === "Residential Training Project for EMRS Teachers" && (
         <TrainingForm
           isOpen={showAddDataModal}
           onClose={() => setShowAddDataModal(false)}
@@ -76,11 +72,24 @@ const AdminSelectionForm = ({
       )}
 
       {selectedProject?.name === "Digital Device Procurement" && (
-        <DeviceForm
-          isOpen={showAddDataModal}
-          onClose={() => setShowAddDataModal(false)}
-        />
+        <>
+          <DeviceForm isOpen={showAddDataModal} onClose={() => setShowAddDataModal(false)} />
+          <DeviceProcurementTable
+            selectedState={selectedState}
+            selectedDistrict={selectedDistrict}
+            selectedSchool={selectedSchool}
+            selectedCategory={selectedCategory}
+          />
+        </>
       )}
+
+      {selectedProject?.name === "Sanitary Pad Devices Procurement" && (
+        <>
+          <SanitaryPadForm isOpen={showAddDataModal} onClose={() => setShowAddDataModal(false)} />
+          <SanitaryPadTable />
+        </>
+      )}
+
     </div>
   );
 };
