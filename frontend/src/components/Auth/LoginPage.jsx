@@ -82,11 +82,16 @@ const LoginPage = () => {
     );
 
     if (user) {
-      if (user.role === "admin") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/user-dashboard");
+      if (user) {
+        localStorage.setItem("userRole", user.role); // Save role
+        localStorage.setItem("isAuthenticated", "true"); // Save auth status
+        if (user.role === "admin") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/user-dashboard");
+        }
       }
+      
     } else {
       setErrors((prev) => ({ ...prev, general: "Invalid credentials. Please try again." }));
       triggerWobble();

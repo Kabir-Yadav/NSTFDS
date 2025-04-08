@@ -5,7 +5,7 @@ import SummaryCards from "./Dashboard_components/Summary";
 import ChartSection from "./Dashboard_components/ChartSection";
 import SelectionForm from "./ProjectDetails/SelectionForm2";
 
-const Dashboard = () => {
+const UserDashboard = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedState, setSelectedState] = useState(null);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -19,8 +19,8 @@ const Dashboard = () => {
   const [formStatus, setFormStatus] = useState("");
   const [formSerialId, setFormSerialId] = useState("");
   const [formPhoto, setFormPhoto] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [toggleSidebar, setToggleSidebar] = useState(false);
   const navigate = useNavigate();
 
   const handleAddDataSubmit = async (e) => {
@@ -169,9 +169,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div
-      className="min-h-screen w-screen bg-[var(--color-background)] flex theme-transition relative overflow-hidden"
-    >
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--color-background)] transition-all duration-500 ease-in-out">
       <Sidebar
         user={user}
         projects={projects}
@@ -183,29 +181,19 @@ const Dashboard = () => {
         setIsSidebarOpen={setIsSidebarOpen}
       />
 
-      {/* Overlay for mobile when sidebar is open */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 opacity-50 z-20 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
+      <div className="flex-1 overflow-y-auto transition-all duration-500 ease-in-out px-4 md:px-6 lg:px-8 mt-24 md:mt-10">
 
-      {/* Main content area - Updated padding/margin for mobile */}
-      <div
-        className="flex-1 flex flex-col px-4 md:px-6 lg:px-0 md:ml-6 lg:ml-10 md:mr-6 lg:mr-10 mt-24 md:mt-10 overflow-hidden"
-      >
         <div
           style={{
             zindex: "-1",
             top: "auto",
             bottom: "10%",
-            width: "300px",
-            height: "300px",
+            width: "500px",
+            height: "350px",
             right: "auto",
             WebkitFilter: "blur(200px)",
             filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.1)",
             position: "absolute",
           }}
         />
@@ -220,16 +208,25 @@ const Dashboard = () => {
             height: "300px",
             WebkitFilter: "blur(200px)",
             filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.4)",
+            backgroundColor: "rgba(var(--color-primary-rgb), 0.2)",
             position: "absolute",
           }}
         />
 
         <div className="mb-6 md:mb-8 md:block">
-          
+          <div
+            className="hidden md:flex mb-4 p-1 bg-[var(--color-secondary)] dark:bg-[var(--color-accent)] rounded-full w-12 h-12 items-center justify-center shadow-md cursor-pointer hover:shadow-lg transition-all"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar state
+          >
+            <div className="space-y-1">
+              <div className="bg-gray-300 dark:bg-gray-500 rounded-sm w-5 h-[3px]" />
+              <div className="bg-gray-400 dark:bg-gray-600 rounded-sm w-7 h-[3px]" />
+              <div className="bg-gray-300 dark:bg-gray-500 rounded-sm w-4 h-[3px]" />
+            </div>
+          </div>
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
+              <h2 className="text-xl hidden md:block md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
                 {selectedProject
                   ? selectedProject.name
                   : "Welcome to NSTFDS Dashboard"}
@@ -244,31 +241,32 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <select
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+        {!selectedProject ? (<div className="flex items-center justify-between mb-4">
+          <select
+            value={selectedState}
+            onChange={(e) => setSelectedState(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                        bg-white dark:bg-gray-800 
                        text-gray-900 dark:text-gray-100
                        focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="" className="bg-white dark:bg-gray-800">
-                All States
+          >
+            <option value="" className="bg-white dark:bg-gray-800">
+              All States
+            </option>
+            {statesData.map((state) => (
+              <option
+                key={state.state}
+                value={state.state}
+                className="bg-white dark:bg-gray-800"
+              >
+                {state.state}
               </option>
-              {statesData.map((state) => (
-                <option
-                  key={state.state}
-                  value={state.state}
-                  className="bg-white dark:bg-gray-800"
-                >
-                  {state.state}
-                </option>
-              ))}
-            </select>
-          </div>
+            ))}
+          </select>
         </div>
+        ) :
+          <></>
+        }
         <div className="theme-transition space-y-5 md:space-y-6 z-20 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
@@ -304,4 +302,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default UserDashboard;

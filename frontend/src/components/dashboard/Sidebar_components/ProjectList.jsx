@@ -1,19 +1,22 @@
 import React from "react";
 
-const ProjectList = ({ projects, selectedProject, onProjectSelect }) => (
-  <nav className="p-4">
+const ProjectList = ({ projects, selectedProject, onProjectSelect, isOpen }) => (
+  <nav>
     {projects.map((project) => (
       <button
         key={project.id}
         onClick={() => onProjectSelect(project)}
-        className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center transition-colors
+        className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center transition-all duration-300 ease-in-out rounded-r-full
           ${selectedProject?.id === project.id
-            ? "bg-[var(--color-primary-light)] text-[var(--color-primary)]"
-            : "text-[var(--color-text-secondary)] hover:bg-[var(--color-background)]"
+            ? "dark:bg-[var(--color-accent-dark)] dark:text-[var(--color-primary-dark)] text-white bg-[var(--color-secondary)]"
+            : "text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] dark:hover:bg-[var(--color-accent-light)] hover:bg-[var(--color-secondary-light)]"
           }`}
+        style={{
+          transform: selectedProject?.id === project.id ? "scale(1.05)" : "scale(1)",
+        }}
       >
-        <span className="mr-3">{project.icon}</span>
-        <span className="font-redhat text-sm">{project.name}</span>
+        <span className={`mr-3 ${!isOpen ? "mx-auto" : ""}`}>{project.icon}</span>
+        {isOpen && (<span className="font-redhat text-sm">{project.name}</span>)}
       </button>
     ))}
   </nav>

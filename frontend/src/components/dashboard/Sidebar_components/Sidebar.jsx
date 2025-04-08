@@ -30,37 +30,37 @@ const Sidebar = ({
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity"
-          onClick={handleOverlayClick}
+          onClick={() => setIsSidebarOpen(false)}
           aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-[var(--color-surface)] shadow-lg 
-          theme-transition sidebar-transition
-          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-          md:relative md:translate-x-0 md:w-64
-          ${isSidebarOpen ? "touch-none" : ""} md:touch-auto`}
+        className={`absolute md:relative h-full bg-[var(--color-surface)] shadow-lg transition-all duration-500 ease-in-out z-50
+          lg:bg-transparent md:bg-transparent
+    ${isSidebarOpen ? "w-[280px]" : "w-[0px] md:w-[80px]"} overflow-hidden`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-[var(--color-border)] relative flex items-center justify-between">
           <img src="assets/ministry.png" alt="Logo" className="w-32 object-cover" />
-          <ThemeToggle />
+          {isSidebarOpen && (<ThemeToggle />)}
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="h-[calc(100vh-64px)] overflow-y-auto">
-          <UserProfile user={user} />
-
-          <ProjectList
-            projects={projects}
-            selectedProject={selectedProject}
-            onProjectSelect={(project) => {
-              onProjectSelect(project);
-              setIsSidebarOpen(false);
-            }}
-          />
+        <div className="h-[calc(100vh-64px)] overflow-y-hidden">
+          <UserProfile user={user} isOpen={isSidebarOpen} />
+          <div className="mt-2">
+            <ProjectList
+              projects={projects}
+              isOpen={isSidebarOpen}
+              selectedProject={selectedProject}
+              onProjectSelect={(project) => {
+                onProjectSelect(project);
+                setIsSidebarOpen(false);
+              }}
+            />
+          </div>
 
           <div className="p-4 border-t border-[var(--color-border)]">
             <button
@@ -69,11 +69,11 @@ const Sidebar = ({
                 setIsSidebarOpen(false);
               }}
               className="w-full px-4 py-2 text-sm text-[var(--color-text-secondary)] 
-                hover:bg-[var(--color-background)] rounded-lg flex items-center 
+                hover:bg-[var(--color-accent)] dark:hover:text-[var(--color-primary-dark)] rounded-lg flex items-center 
                 transition-colors active:scale-95 transform"
             >
               <span className="mr-2">🏠</span>
-              <span className="font-redhat">Return to Home</span>
+              {isSidebarOpen && (<span className="font-redhat">Return to Home</span>)}
             </button>
           </div>
 
@@ -84,12 +84,12 @@ const Sidebar = ({
                 onLogout();
                 setIsSidebarOpen(false);
               }}
-              className="w-full px-4 py-2 text-sm text-[var(--color-error)] 
-                hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg flex items-center 
+              className="w-full px-4 py-2 text-sm text-[var(--color-error)] dark:hover:text-[var(--color-primary-dark)]
+                hover:bg-[var(--color-error)] rounded-lg flex items-center 
                 transition-colors active:scale-95 transform"
             >
               <span className="mr-2">🚪</span>
-              <span className="font-redhat">Logout</span>
+              {isSidebarOpen && (<span className="font-redhat">Logout</span>)}
             </button>
           </div>
         </div>

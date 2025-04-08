@@ -1,24 +1,33 @@
 :root {
-  /* Light theme - Balanced Professional */
-  --color-primary: #835df4;
-  --color-primary-rgb: 129, 91, 244;
-  --color-primary-hover: #4a6de6;
-  --color-primary-light: #e8effd;
-  --color-primary-dark: #3a5dc6;
-  
-  --color-background: #f5f7fa;
+  --color-primary: #265073;
+  --color-primary-rgb: 38, 80, 115;
+  --color-primary-hover: #d8e7f2;
+  --color-primary-light: #e8f1f8;
+  --color-primary-dark: #1b3e5a;
+
+  --color-secondary: #2d9596;
+  --color-secondary-rgb: 45, 149, 150;
+  --color-secondary-hover: #d5efef;
+  --color-secondary-light: #ccf9f9;
+  --color-secondary-dark: #1f6e6f;
+
+  --color-accent: #9ad0c2;
+  --color-accent-light: #d2f8ef;
+  --color-accent-dark: #6fb8a6;
+
+  --color-background: #f4f6f8;
   --color-surface: #ffffff;
   --color-surface-hover: #f0f2f5;
   --color-surface-secondary: #f8f9fb;
-  
-  --color-text: #2c353d;
+
+  --color-text: #050c11;
   --color-text-secondary: #5e6a75;
   --color-text-tertiary: #798590;
   --color-text-disabled: #a5adb5;
-  
+
   --color-border: #e0e4e8;
   --color-border-focus: rgba(91, 125, 244, 0.4);
-  
+
   --color-success: #4caf6d;
   --color-success-light: #e5f4f0;
   --color-error: #f46d6d;
@@ -42,26 +51,35 @@
 }
 
 :root[class~='dark'] {
-  /* Dark theme - Balanced Professional */
-  --color-primary: rgb(146, 120, 231);
-  --color-primary-rgb: 146, 120, 231;
-  --color-primary-hover: #6780d8;
-  --color-primary-light: #2a344e;
-  --color-primary-dark: #a5b4ee;
-  
-  --color-background: #1a2030;
+  --color-primary: #7fb2d1;
+  --color-primary-rgb: 127, 178, 209;
+  --color-primary-hover: #4b90b9;
+  --color-primary-light: #273442;
+  --color-primary-dark: #1b3e5a;
+
+  --color-secondary: #6fd0d1;
+  --color-secondary-rgb: 111, 208, 209;
+  --color-secondary-hover: #368c8d;
+  --color-secondary-light: #233839;
+  --color-secondary-dark: #99e7e7;
+
+  --color-accent: #b5e9dc;
+  --color-accent-light: #2e3e3a;
+  --color-accent-dark: #dbf9f1;
+
+  --color-background: #181d2c;
   --color-surface: #242b3d;
   --color-surface-hover: #2e3649;
   --color-surface-secondary: #2a3241;
-  
+
   --color-text: #e3e8f0;
   --color-text-secondary: #b0b8c4;
   --color-text-tertiary: #8c97a6;
   --color-text-disabled: #646e7d;
-  
+
   --color-border: #3a4256;
   --color-border-focus: rgba(120, 144, 231, 0.4);
-  
+
   --color-success: #5cba9f;
   --color-success-light: #223c35;
   --color-error: #e28989;
@@ -78,12 +96,12 @@
 }
 
 /* Theme transition effects */
-.theme-transition, 
+.theme-transition,
 .theme-transition * {
-  transition: background-color 0.3s ease, 
-              color 0.3s ease, 
-              border-color 0.3s ease,
-              box-shadow 0.3s ease;
+  transition: background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 /* Utility classes for background colors */
@@ -308,13 +326,33 @@
 
 /* Animation for wobble effect */
 @keyframes wobble {
-  0% { transform: translateX(0); }
-  15% { transform: translateX(-8px) rotate(-4deg); }
-  30% { transform: translateX(6px) rotate(3deg); }
-  45% { transform: translateX(-4px) rotate(-2deg); }
-  60% { transform: translateX(3px) rotate(1deg); }
-  75% { transform: translateX(-2px) rotate(-0.5deg); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(-8px) rotate(-4deg);
+  }
+
+  30% {
+    transform: translateX(6px) rotate(3deg);
+  }
+
+  45% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+
+  60% {
+    transform: translateX(3px) rotate(1deg);
+  }
+
+  75% {
+    transform: translateX(-2px) rotate(-0.5deg);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .animate-wobble {

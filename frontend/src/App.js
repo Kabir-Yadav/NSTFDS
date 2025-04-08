@@ -4,8 +4,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import './style/theme.css';
 import LoginPage from './components/Auth/LoginPage';
 import RegisterPage from './components/Auth/RegisterPage';
-import Dashboard from './components/dashboard/user-dashboard';
+import UserDashboard from './components/dashboard/user-dashboard';
 import AdminDashboard from './components/dashboard/admin-dashboard';
+import ProtectedRoute from './protected_routes';
 
 function App() {
   return (
@@ -14,10 +15,29 @@ function App() {
         <Routes>
           {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
           <Route path="/login" element={<LoginPage />} />
+
+          <Route path="/login" element={<LoginPage />} />
+
+          <Route
+            path="/user-dashboard"
+            element={
+              <ProtectedRoute allowedRole="user">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/user-dashboard" element={<Dashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
         </Routes>
       </Router>
     </ThemeProvider>
