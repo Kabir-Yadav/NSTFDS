@@ -179,10 +179,10 @@ const ChartSection = () => {
       id: "remaining",
       label: "Remaining",
       value: 25,
-      color: isDarkMode ? "#374151" : "#e5e7eb", 
+      color: isDarkMode ? "#374151" : "#e5e7eb",
     },
   ];
-  
+
   const pieDataBudget = [
     {
       id: "utilized",
@@ -197,7 +197,7 @@ const ChartSection = () => {
       color: isDarkMode ? "#374151" : "#e5e7eb", // warning yellow
     },
   ];
-  
+
   const pieDataSchool = [
     {
       id: "done",
@@ -212,7 +212,7 @@ const ChartSection = () => {
       color: isDarkMode ? "#374151" : "#e5e7eb",
     },
   ];
-  
+
   const pieChartProps = {
     motionConfig: "wobbly",
     animate: true,
@@ -260,7 +260,7 @@ const ChartSection = () => {
                 activeOuterRadiusOffset={8}
                 colors={{ datum: "data.color" }}
                 theme={chartTheme}
-                
+
                 enableArcLinkLabels={false}
                 arcLinkLabelsColor={{ from: "color" }}
                 arcLabelsTextColor="white"
@@ -360,7 +360,7 @@ const ChartSection = () => {
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-               bg-white dark:bg-gray-800 
+               bg-white dark:bg-gray-800 z-0
                text-gray-900 dark:text-gray-100
                focus:outline-none focus:ring-2 focus:ring-purple-500"
           >

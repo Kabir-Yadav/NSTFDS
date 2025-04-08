@@ -60,7 +60,16 @@ const AdminDashboard = () => {
   const handlePhotoChange = (e) => {
     setFormPhoto(e.target.files[0]);
   };
-
+  const statesData = [
+    { state: "Maharashtra", progress: 85 },
+    { state: "Gujarat", progress: 78 },
+    { state: "Karnataka", progress: 92 },
+    { state: "Tamil Nadu", progress: 88 },
+    { state: "Rajasthan", progress: 72 },
+    { state: "MP", progress: 65 },
+    { state: "UP", progress: 70 },
+    { state: "Bihar", progress: 60 },
+  ];
   // Dummy user profile
   const user = {
     name: "Arun Kumar",
@@ -156,10 +165,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div
-      className="min-h-screen max-w-screen bg-[var(--color-background)] 
-      flex theme-transition relative overflow-hidden"
-    >
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--color-background)] transition-all duration-500 ease-in-out">
       <Sidebar
         user={user}
         projects={projects}
@@ -171,23 +177,12 @@ const AdminDashboard = () => {
         setIsSidebarOpen={setIsSidebarOpen}
       />
 
-      {/* Overlay for mobile when sidebar is open */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black opacity-50 z-20 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
 
       {/* Main content area - Updated padding/margin for mobile */}
-      <div
-        className="flex-1 flex flex-col px-4
-        md:px-6 lg:px-0 md:ml-6 lg:ml-10 md:mr-6 lg:mr-10 mt-24 md:mt-10 
-        overflow-x-hidden"
-      >
+      <div className="flex-1 overflow-y-auto transition-all duration-500 ease-in-out px-4 md:px-6 lg:px-8 mt-24 md:mt-10">
         <div
           style={{
-            zindex: "-1",
+            zindex: "-99",
             top: "auto",
             bottom: "10%",
             width: "300px",
@@ -201,7 +196,7 @@ const AdminDashboard = () => {
         />
         <div
           style={{
-            zindex: "-1",
+            zindex: "-99",
             top: "13%",
             bottom: "auto",
             left: "auto",
@@ -217,9 +212,19 @@ const AdminDashboard = () => {
 
         {/* Desktop Header */}
         <div className="mb-6 md:mb-8 md:block">
+          <div
+            className="hidden md:flex mb-4 p-1 bg-[var(--color-secondary)] dark:bg-[var(--color-accent)] rounded-full w-12 h-12 items-center justify-center shadow-md cursor-pointer hover:shadow-lg transition-all"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar state
+          >
+            <div className="space-y-1">
+              <div className="bg-gray-300 dark:bg-gray-500 rounded-sm w-5 h-[3px]" />
+              <div className="bg-gray-400 dark:bg-gray-600 rounded-sm w-7 h-[3px]" />
+              <div className="bg-gray-300 dark:bg-gray-500 rounded-sm w-4 h-[3px]" />
+            </div>
+          </div>
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
+              <h2 className="text-xl hidden md:block md:text-2xl font-outfit font-semibold text-[var(--color-text)]">
                 {selectedProject
                   ? selectedProject.name
                   : "Welcome to NSTFDS Dashboard"}
@@ -234,6 +239,34 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
+        {!selectedProject ?
+          (
+            <div className="flex items-center justify-between mb-4">
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+                       bg-white dark:bg-gray-800 
+                       text-gray-900 dark:text-gray-100
+                       focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="" className="bg-white dark:bg-gray-800">
+                  All States
+                </option>
+                {statesData.map((state) => (
+                  <option
+                    key={state.state}
+                    value={state.state}
+                    className="bg-white dark:bg-gray-800"
+                  >
+                    {state.state}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) :
+          <></>
+        }
         <div className="theme-transition space-y-5 z-0 md:space-y-6 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
