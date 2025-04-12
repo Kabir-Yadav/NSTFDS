@@ -5,7 +5,7 @@ import {
   uploadProofImage,
 } from "../../../../action/supabase_actions";
 
-const DeviceForm = ({ isOpen, data, categories }) => {
+const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
   const [formDate, setFormDate] = useState("");
   const [formDeviceCategory, setFormDeviceCategory] = useState("");
   const [formStatus, setFormStatus] = useState("");
@@ -32,7 +32,7 @@ const DeviceForm = ({ isOpen, data, categories }) => {
     }
   }, [selectedState, selectedDistrict, selectedSchool]);
 
-  const onClose = () => {
+  const handleClose = () => {
     setFormDate("");
     setSelectedState("");
     setSelectedDistrict("");
@@ -41,6 +41,7 @@ const DeviceForm = ({ isOpen, data, categories }) => {
     setFormStatus("");
     setFormCost("");
     setFormPhoto(null);
+    onClose();
   };
   
   const handleSubmit = async (e) => {
@@ -261,7 +262,7 @@ const DeviceForm = ({ isOpen, data, categories }) => {
             <div className="flex justify-end space-x-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel

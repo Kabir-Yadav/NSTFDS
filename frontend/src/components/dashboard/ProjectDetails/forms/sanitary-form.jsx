@@ -5,7 +5,7 @@ import {
   uploadProofImage,
 } from "../../../../action/supabase_actions";
 
-const SanitaryPadForm = ({ isOpen, data }) => {
+const SanitaryPadForm = ({ isOpen, data, onClose }) => {
   const [formDate, setFormDate] = useState("");
   const [formStatus, setFormStatus] = useState("");
   const [formCost, setFormCost] = useState("");
@@ -31,7 +31,7 @@ const SanitaryPadForm = ({ isOpen, data }) => {
     }
   }, [selectedState, selectedDistrict, selectedSchool]);
 
-  const onClose = () => {
+  const handleClose = () => {
     setFormDate("");
     setSelectedState("");
     setSelectedDistrict("");
@@ -39,6 +39,7 @@ const SanitaryPadForm = ({ isOpen, data }) => {
     setFormStatus("");
     setFormCost("");
     setFormPhoto(null);
+    onClose();
   };
 
   const handleSubmit = async (e) => {
@@ -247,7 +248,7 @@ const SanitaryPadForm = ({ isOpen, data }) => {
             <div className="flex justify-end space-x-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Cancel
