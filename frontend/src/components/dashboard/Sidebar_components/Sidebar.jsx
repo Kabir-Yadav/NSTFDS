@@ -1,7 +1,7 @@
 import React from "react";
 import UserProfile from "./UserProfile";
 import ProjectList from "./ProjectList";
-import ThemeToggle from "../Dashboard_components/ThemeToggle";
+import ThemeToggle from "../components/ThemeToggle";
 import MobileHeader from "./MobileHeader";
 
 const Sidebar = ({
@@ -43,12 +43,16 @@ const Sidebar = ({
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-[var(--color-border)] relative flex items-center justify-between">
-          <img src="assets/ministry.png" alt="Logo" className="w-32 object-cover" />
-          {isSidebarOpen && (<ThemeToggle />)}
+          <img
+            src="assets/ministry.png"
+            alt="Logo"
+            className="w-32 object-cover"
+          />
+          {isSidebarOpen && <ThemeToggle />}
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="h-[calc(100vh-64px)] overflow-y-hidden">
+        <div className="h-full overflow-hidden">
           <UserProfile user={user} isOpen={isSidebarOpen} />
           <div className="mt-2">
             <ProjectList
@@ -73,7 +77,9 @@ const Sidebar = ({
                 transition-colors active:scale-95 transform"
             >
               <span className="mr-2">🏠</span>
-              {isSidebarOpen && (<span className="font-redhat">Return to Home</span>)}
+              {isSidebarOpen && (
+                <span className="font-redhat">Return to Home</span>
+              )}
             </button>
           </div>
 
@@ -89,7 +95,7 @@ const Sidebar = ({
                 transition-colors active:scale-95 transform"
             >
               <span className="mr-2">🚪</span>
-              {isSidebarOpen && (<span className="font-redhat">Logout</span>)}
+              {isSidebarOpen && <span className="font-redhat">Logout</span>}
             </button>
           </div>
         </div>

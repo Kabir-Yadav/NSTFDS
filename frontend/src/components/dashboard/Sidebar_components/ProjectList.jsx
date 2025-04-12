@@ -11,9 +11,6 @@ const ProjectList = ({ projects, selectedProject, onProjectSelect, isOpen }) => 
             ? "dark:bg-[var(--color-accent-dark)] dark:text-[var(--color-primary-dark)] text-white bg-[var(--color-secondary)]"
             : "text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] dark:hover:bg-[var(--color-accent-light)] hover:bg-[var(--color-secondary-light)]"
           }`}
-        style={{
-          transform: selectedProject?.id === project.id ? "scale(1.05)" : "scale(1)",
-        }}
       >
         <span className={`mr-3 ${!isOpen ? "mx-auto" : ""}`}>{project.icon}</span>
         {isOpen && (<span className="font-redhat text-sm">{project.name}</span>)}

@@ -2,7 +2,7 @@
   --color-primary: #265073;
   --color-primary-rgb: 38, 80, 115;
   --color-primary-hover: #d8e7f2;
-  --color-primary-light: #e8f1f8;
+  --color-primary-light: #dbecf8;
   --color-primary-dark: #1b3e5a;
 
   --color-secondary: #2d9596;
@@ -54,7 +54,7 @@
   --color-primary: #7fb2d1;
   --color-primary-rgb: 127, 178, 209;
   --color-primary-hover: #4b90b9;
-  --color-primary-light: #273442;
+  --color-primary-light: #1f3348;
   --color-primary-dark: #1b3e5a;
 
   --color-secondary: #6fd0d1;
@@ -71,6 +71,7 @@
   --color-surface: #242b3d;
   --color-surface-hover: #2e3649;
   --color-surface-secondary: #2a3241;
+  --color-surface-dark: #242b3d;
 
   --color-text: #e3e8f0;
   --color-text-secondary: #b0b8c4;

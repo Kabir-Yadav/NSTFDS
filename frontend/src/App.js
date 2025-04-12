@@ -19,7 +19,7 @@ function App() {
         if (error) {
           console.error('Error fetching data from Supabase:', error.message);
         } else {
-          console.log('Supabase connection successful. Data:', data);
+          console.log('Supabase connection successful. Data:');
         }
       } catch (err) {
         console.error('Unexpected error:', err);

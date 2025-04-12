@@ -1,86 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar_components/Sidebar";
-import SummaryCards from "./Dashboard_components/Summary";
-import ChartSection from "./Dashboard_components/ChartSection";
+import SummaryCards from "./components/Summary";
+import ChartSection from "./components/ChartSection";
+import {
+  fetchHierarchicalData,
+  useStatsWithStateFilter,
+} from "../../action/supabase_actions";
+import { BarChartSection } from "./components/BarChart";
+import {
+  DashboardBackground1,
+  DashboardBackground2,
+} from "./components/background";
+
 import AdminSelectionForm from "./ProjectDetails/admin-SelectionForm";
 
 const AdminDashboard = () => {
   const [selectedProject, setSelectedProject] = useState(null);
-  const [selectedState, setSelectedState] = useState(null);
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [selectedSchool, setSelectedSchool] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  // const [selectedDistrict, setSelectedDistrict] = useState(null);
+  // const [selectedSchool, setSelectedSchool] = useState(null);
+  // const [selectedCategory, setSelectedCategory] = useState(null);
+  const [data, setData] = useState(null);
 
-  // New states for Add Data form
-  const [showAddDataForm, setShowAddDataForm] = useState(false);
-  const [formDate, setFormDate] = useState("");
-  const [formDeviceCategory, setFormDeviceCategory] = useState("");
-  const [formStatus, setFormStatus] = useState("");
-  const [formSerialId, setFormSerialId] = useState("");
-  const [formPhoto, setFormPhoto] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleAddDataSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("date", formDate);
-    formData.append("device_category", formDeviceCategory);
-    formData.append("status", formStatus);
-    formData.append("serial_id", formSerialId);
-    if (formPhoto) {
-      formData.append("photo", formPhoto);
-    }
+  const { stats, loading, statesList, selectedState, setSelectedState } =
+    useStatsWithStateFilter();
 
-    try {
-      const response = await fetch("http://localhost:8000/digital-procurements/", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit data");
-      }
-      const data = await response.json();
-      console.log("Data submitted:", data);
-      // Reset form fields
-      setFormDate("");
-      setFormDeviceCategory("");
-      setFormStatus("");
-      setFormSerialId("");
-      setFormPhoto(null);
-      setShowAddDataForm(false);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
-  const handlePhotoChange = (e) => {
-    setFormPhoto(e.target.files[0]);
-  };
-  const statesData = [
-    { state: "Maharashtra", progress: 85 },
-    { state: "Gujarat", progress: 78 },
-    { state: "Karnataka", progress: 92 },
-    { state: "Tamil Nadu", progress: 88 },
-    { state: "Rajasthan", progress: 72 },
-    { state: "MP", progress: 65 },
-    { state: "UP", progress: 70 },
-    { state: "Bihar", progress: 60 },
-  ];
-  // Dummy user profile
   const user = {
     name: "Arun Kumar",
     image:
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmnWamWQaGg46q1S3u0uMMgK3SZDBh1nBk-Q&s",
-  };
-  const summaryStats = {
-    totalStates: 28,
-    totalDistricts: 156,
-    totalSchools: 892,
-    activeProjects: 5,
   };
 
   // Mock data - In a real application, this would come from an API
@@ -129,25 +81,19 @@ const AdminDashboard = () => {
     },
   ];
 
-  const states = ["Maharashtra", "Gujarat", "Karnataka"];
-  const districts = ["District 1", "District 2", "District 3"];
-  const schools = ["School 1", "School 2", "School 3"];
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchHierarchicalData();
+      setData(data);
+    };
+    fetchData();
+  }, []);
 
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setSelectedState(null);
-    setSelectedDistrict(null);
-    setSelectedSchool(null);
-    setSelectedCategory(null);
     // Close sidebar on mobile after selecting a project
     setIsSidebarOpen(false);
-  };
-
-  const handleStateSelect = (state) => {
-    setSelectedState(state);
-    setSelectedDistrict(null);
-    setSelectedSchool(null);
-    setSelectedCategory(null);
   };
 
   const handleLogout = () => {
@@ -157,15 +103,14 @@ const AdminDashboard = () => {
   const handleReturnHome = () => {
     setSelectedProject(null);
     setSelectedState(null);
-    setSelectedDistrict(null);
-    setSelectedSchool(null);
-    setSelectedCategory(null);
     // Optionally close sidebar on mobile
     setIsSidebarOpen(false);
   };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[var(--color-background)] transition-all duration-500 ease-in-out">
+      <DashboardBackground1 />
+      <DashboardBackground2 />
       <Sidebar
         user={user}
         projects={projects}
@@ -176,45 +121,12 @@ const AdminDashboard = () => {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-
-
       {/* Main content area - Updated padding/margin for mobile */}
-      <div className="flex-1 overflow-y-auto transition-all duration-500 ease-in-out px-4 md:px-6 lg:px-8 mt-24 md:mt-10">
-        <div
-          style={{
-            zindex: "-99",
-            top: "auto",
-            bottom: "10%",
-            width: "300px",
-            height: "300px",
-            right: "auto",
-            WebkitFilter: "blur(200px)",
-            filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
-            position: "absolute",
-          }}
-        />
-        <div
-          style={{
-            zindex: "-99",
-            top: "13%",
-            bottom: "auto",
-            left: "auto",
-            right: "0%",
-            width: "300px",
-            height: "300px",
-            WebkitFilter: "blur(200px)",
-            filter: "blur(200px)",
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.3)",
-            position: "absolute",
-          }}
-        />
-
-        {/* Desktop Header */}
+      <div className=" relative flex-1 overflow-y-auto transition-all duration-500 ease-in-out px-4 md:px-6 lg:px-8 mt-24 md:mt-10">
         <div className="mb-6 md:mb-8 md:block">
           <div
             className="hidden md:flex mb-4 p-1 bg-[var(--color-secondary)] dark:bg-[var(--color-accent)] rounded-full w-12 h-12 items-center justify-center shadow-md cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)} // Toggle sidebar state
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
             <div className="space-y-1">
               <div className="bg-gray-300 dark:bg-gray-500 rounded-sm w-5 h-[3px]" />
@@ -239,60 +151,51 @@ const AdminDashboard = () => {
         </div>
 
         {/* Main Content - Added spacing for mobile */}
-        {!selectedProject ?
-          (
-            <div className="flex items-center justify-between mb-4">
-              <select
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+        {!selectedProject ? (
+          <div className="flex items-center justify-between mb-4">
+            <select
+              onChange={(e) => setSelectedState(e.target.value)}
+              value={selectedState}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg z-0 
                        bg-white dark:bg-gray-800 
                        text-gray-900 dark:text-gray-100
                        focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                <option value="" className="bg-white dark:bg-gray-800">
-                  All States
+            >
+              <option value="" className="bg-white dark:bg-gray-800">
+                All States
+              </option>
+              {statesList.map((state) => (
+                <option
+                  key={state}
+                  value={state}
+                  className="bg-white dark:bg-gray-800"
+                >
+                  {state}
                 </option>
-                {statesData.map((state) => (
-                  <option
-                    key={state.state}
-                    value={state.state}
-                    className="bg-white dark:bg-gray-800"
-                  >
-                    {state.state}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) :
+              ))}
+            </select>
+          </div>
+        ) : (
           <></>
-        }
-        <div className="theme-transition space-y-5 z-0 md:space-y-6 mb-10 md:mb-12">
+        )}
+        <div className="theme-transition space-y-5 md:space-y-6 z-20 mb-10 md:mb-12">
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">
-                <SummaryCards stats={summaryStats} />
+                <SummaryCards stats={stats} loading={loading} />
               </div>
-              <div className="mb-4 md:mb-6">
-                <ChartSection />
+              <div className="mb-4 md:mb-6 ">
+                <ChartSection selectedState={selectedState} />
+                <BarChartSection stateList={statesList} />
               </div>
             </>
           ) : (
             <div className="mt-4 md:mt-0">
               <AdminSelectionForm
-                selectedProject={selectedProject} // Make sure this is passed
-                selectedState={selectedState}
-                selectedDistrict={selectedDistrict}
-                selectedSchool={selectedSchool}
-                selectedCategory={selectedCategory}
-                states={states}
-                districts={districts}
-                schools={schools}
-                categories={selectedProject.categories}
-                onStateSelect={setSelectedState}
-                onDistrictSelect={setSelectedDistrict}
-                onSchoolSelect={setSelectedSchool}
-                onCategorySelect={setSelectedCategory}
+               key={selectedProject.id}
+               selectedProject={selectedProject}
+               data={data}
+               categories={selectedProject.categories}
               />
             </div>
           )}
@@ -303,7 +206,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-
-
-
