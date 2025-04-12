@@ -5,7 +5,7 @@ import {
   uploadProofImage,
 } from "../../../../action/supabase_actions";
 
-const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
+const DeviceForm = ({ isOpen, data, onClose, categories }) => {
   const [formDate, setFormDate] = useState("");
   const [formDeviceCategory, setFormDeviceCategory] = useState("");
   const [formStatus, setFormStatus] = useState("");
@@ -18,6 +18,7 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
 
   const [isProcurementAllowed, setIsProcurementAllowed] = useState(false);
   const [checkedStatus, setCheckedStatus] = useState(false);
+  const [loading, setLoading] = useState(false); // Added loading state
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -41,9 +42,11 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
     setFormStatus("");
     setFormCost("");
     setFormPhoto(null);
+    setErrorMessage("");
+    setLoading(false); // Reset loading state
     onClose();
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,40 +65,43 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
     }
 
     setErrorMessage("");
+    setLoading(true); // Set loading to true
 
-    // ⬆️ Upload image to bucket
-    const uploadedUrl = await uploadProofImage(formPhoto);
-    if (!uploadedUrl) {
-      setErrorMessage("Image upload failed.");
-      return;
-    }
+    try {
+      // ⬆️ Upload image to bucket
+      const uploadedUrl = await uploadProofImage({
+        file: formPhoto,
+        device: true,
+      });
+      if (!uploadedUrl) {
+        setErrorMessage("Image upload failed.");
+        setLoading(false); // Reset loading state
+        return;
+      }
 
-    // 📤 Insert into digital_device_procurement
-    const formData = {
-      state_name: selectedState,
-      district_name: selectedDistrict,
-      school_name: selectedSchool,
-      item_name: formDeviceCategory,
-      cost: Number(formCost),
-      status: formStatus,
-      delivery_date: formDate,
-      proof_image_url: uploadedUrl,
-    };
-    
-    const result = await insertDigitalProcurement(formData);
-    if (result.success) {
-      // Reset form
-      setFormDate("");
-      setSelectedState("");
-      setSelectedDistrict("");
-      setSelectedSchool("");
-      setFormDeviceCategory("");
-      setFormStatus("");
-      setFormCost("");
-      setFormPhoto(null);
-      onClose();
-    } else {
-      setErrorMessage("Error saving data to database.");
+      // 📤 Insert into digital_device_procurement
+      const formData = {
+        state_name: selectedState,
+        district_name: selectedDistrict,
+        school_name: selectedSchool,
+        item_name: formDeviceCategory,
+        cost: Number(formCost),
+        status: formStatus,
+        delivery_date: formDate,
+        proof_image_url: uploadedUrl,
+      };
+
+      const result = await insertDigitalProcurement(formData);
+      if (result.success) {
+        // Reset form
+        handleClose();
+      } else {
+        setErrorMessage("Error saving data to database.");
+      }
+    } catch (error) {
+      setErrorMessage("An unexpected error occurred.");
+    } finally {
+      setLoading(false); // Reset loading state
     }
   };
 
@@ -132,7 +138,8 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border px-3 py-2 rounded-lg disabled:bg-[var(--color-text-secondary)] bg-white"
+        className="w-full border px-3 py-2 rounded-lg dark:disabled:bg-[var(--color-text-secondary)] 
+          disabled:bg-[var(--color-text-disabled)] bg-white"
         disabled={disabled}
         required
       >
@@ -155,8 +162,8 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
 
   return (
     <div className="min-h-screen fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-7 relative">
-        <div className="max-h-full overflow-y-auto w-full">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl relative">
+        <div className="max-h-full overflow-y-auto w-full p-7">
           <h2 className="text-3xl font-display font-semibold text-gray-900 mb-6">
             Add Digital Device Data
           </h2>
@@ -225,7 +232,7 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
                       placeholder: "Select status",
                     })}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 mt-2">
                         Cost
                       </label>
                       <input
@@ -237,7 +244,7 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1 mt-2">
                         Proof Photo
                       </label>
                       <input
@@ -270,10 +277,37 @@ const DeviceForm = ({ isOpen, data,onClose ,categories }) => {
               {isProcurementAllowed && (
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                  disabled={!checkedStatus}
+                  className={`px-4 py-2 rounded-lg transition-colors flex items-center justify-center ${
+                    loading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
+                  disabled={!checkedStatus || loading}
                 >
-                  Submit
+                  {loading ? (
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
+                    </svg>
+                  ) : (
+                    "Submit"
+                  )}
                 </button>
               )}
             </div>

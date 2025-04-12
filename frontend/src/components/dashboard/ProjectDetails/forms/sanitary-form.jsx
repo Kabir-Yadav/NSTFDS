@@ -39,6 +39,7 @@ const SanitaryPadForm = ({ isOpen, data, onClose }) => {
     setFormStatus("");
     setFormCost("");
     setFormPhoto(null);
+    setErrorMessage('')
     onClose();
   };
 
@@ -61,7 +62,7 @@ const SanitaryPadForm = ({ isOpen, data, onClose }) => {
     setErrorMessage("");
 
     // ⬆️ Upload image to bucket
-    const uploadedUrl = await uploadProofImage(formPhoto);
+    const uploadedUrl = await uploadProofImage({file:formPhoto,sanitary:true});
     if (!uploadedUrl) {
       setErrorMessage("Image upload failed.");
       return;

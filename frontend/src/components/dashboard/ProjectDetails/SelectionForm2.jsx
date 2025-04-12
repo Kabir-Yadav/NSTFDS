@@ -177,6 +177,15 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
                         {loading ? "Fetching..." : "Fetch Data"}
                       </button>
                     </div>
+                    {selectedSchool &&
+                      selectedDistrict &&
+                      selectedState &&
+                      hasFetched && (
+                        <h2 className="font-bold text-xl text-[var(--color-text)] mb-3">
+                          {selectedProject?.name} of {selectedSchool},{" "}
+                          {selectedDistrict}, {selectedState}
+                        </h2>
+                      )}
                     {hasFetched &&
                       selectedProject?.name === "Digital Device Procurement" &&
                       fetchedData.length > 0 && (
@@ -206,16 +215,6 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
                 <p className="text-gray-500 mt-4">Checking permission...</p>
               )
             ) : null}
-
-            {selectedSchool &&
-              selectedDistrict &&
-              selectedState &&
-              hasFetched && (
-                <h2 className="font-bold text-xl text-[var(--color-text)] mb-3">
-                  {selectedProject?.name} of {selectedSchool},{" "}
-                  {selectedDistrict}, {selectedState}
-                </h2>
-              )}
           </div>
         </>
       )}

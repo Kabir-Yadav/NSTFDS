@@ -467,63 +467,66 @@ export async function fetchStateProgress(options = {}) {
 
 export async function fetchDistrictProgressByState(stateName, options = {}) {
   if (options.onLoadingStart) options.onLoadingStart();
+
   try {
-    // 1. Get the state_id based on state name
+    // Step 1: Get the state_id using stateName
     const { data: stateData, error: stateError } = await supabase
-      .from("states")
-      .select("state_id")
-      .eq("state_name", stateName)
+      .from('states')
+      .select('state_id')
+      .eq('state_name', stateName)
       .single();
+
     if (stateError) throw stateError;
     const stateId = stateData.state_id;
 
-    // 2. Get all districts for that state
+    // Step 2: Get all districts under that state
     const { data: districts, error: districtError } = await supabase
-      .from("districts")
-      .select("district_id, district_name")
-      .eq("state_id", stateId);
+      .from('districts')
+      .select('district_id, district_name')
+      .eq('state_id', stateId);
+
     if (districtError) throw districtError;
 
-    // 3. For each district, count schools and completed schools in parallel.
-    const districtProgress = await Promise.all(
+    // Step 3: Calculate progress per district
+    const results = await Promise.all(
       districts.map(async (district) => {
-        const { district_id, district_name } = district;
+        // Get total schools in the district
+        const { data: schools, error: schoolError } = await supabase
+          .from('schools')
+          .select('school_name')
+          .eq('district_id', district.district_id)
+          .eq('digital_device_procurement_active', true); // only count eligible ones
 
-        // Count total schools in this district.
-        const { count: totalSchools, error: schoolCountError } = await supabase
-          .from("schools")
-          .select("*", { count: "exact", head: true })
-          .eq("district_id", district_id);
-        if (schoolCountError) throw schoolCountError;
+        if (schoolError) throw schoolError;
 
-        // Count distinct completed schools in this district from digital_device_procurement.
-        // We assume a school is complete if it has at least one record.
-        // Since the digital_device_procurement table stores school_name and district_name,
-        // we filter by both.
-        const { count: completedCount, error: completedCountError } =
-          await supabase
-            .from("digital_device_procurement")
-            .select("*", { count: "exact", head: true })
-            .eq("district_name", district_name)
-            .eq("state_name", stateName);
-        if (completedCountError) throw completedCountError;
+        const totalSchools = schools.length;
 
-        let progress = 0;
-        if (totalSchools > 0) {
-          progress = Number(((completedCount / totalSchools) * 100).toFixed(2));
-        }
+        // Get completed entries from digital_device_procurement (unique schools only)
+        const { data: completedEntries, error: completedError } = await supabase
+          .from('digital_device_procurement')
+          .select('school_name')
+          .eq('district_name', district.district_name)
+          .eq('state_name', stateName);
+
+        if (completedError) throw completedError;
+
+        const completedSchools = new Set(completedEntries.map(e => e.school_name));
+
+        // Progress %
+        const progress = totalSchools > 0
+          ? Number(((completedSchools.size / totalSchools) * 100).toFixed(2))
+          : 0;
+
         return {
-          district: district_name,
-          total_schools: totalSchools,
-          completed_schools: completedCount,
-          progress, // completion percentage of this district
+          district: district.district_name,
+          progress
         };
       })
     );
 
-    return districtProgress;
-  } catch (error) {
-    console.error("Error fetching district progress by state:", error);
+    return results;
+  } catch (err) {
+    console.error("Error fetching district progress:", err);
     return [];
   } finally {
     if (options.onLoadingEnd) options.onLoadingEnd();
@@ -599,17 +602,17 @@ export async function fetchSanitaryProcurements(filters = {}) {
 //-----------------------------------------------------------------------------------------------------
 
 export async function isDigitalProcurementActive(schoolName) {
-  console.log(schoolName)
+  console.log(schoolName);
   const { data, error } = await supabase
-    .from('schools')
-    .select('digital_device_procurement_active')
+    .from("schools")
+    .select("digital_device_procurement_active")
     .match({
-      school_name: schoolName
+      school_name: schoolName,
     })
     .single();
 
   if (error) {
-    console.error('Failed to fetch procurement status:', error);
+    console.error("Failed to fetch procurement status:", error);
     return false;
   }
 
@@ -619,17 +622,17 @@ export async function isDigitalProcurementActive(schoolName) {
 //-----------------------------------------------------------------------------------------------------
 
 export async function isSanitaryProcurementActive(schoolName) {
-  console.log(schoolName)
+  console.log(schoolName);
   const { data, error } = await supabase
-    .from('schools')
-    .select('sanitary_pad_procurement_active')
+    .from("schools")
+    .select("sanitary_pad_procurement_active")
     .match({
-      school_name: schoolName
+      school_name: schoolName,
     })
     .single();
 
   if (error) {
-    console.error('Failed to fetch procurement status:', error);
+    console.error("Failed to fetch procurement status:", error);
     return false;
   }
 
@@ -660,8 +663,11 @@ export async function insertSanitaryProcurement(formData) {
   return { success: true };
 }
 
-
-export async function uploadProofImage(file, device = false, sanitary = false) {
+export async function uploadProofImage({
+  file,
+  device = false,
+  sanitary = false,
+}) {
   if (!file) return null;
 
   const fileExt = file.name.split(".").pop();
