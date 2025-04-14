@@ -23,7 +23,6 @@ const UserDashboard = () => {
 
   const { stats, loading, statesList, selectedState, setSelectedState } =
     useStatsWithStateFilter();
-
   // Dummy user profile
   const user = {
     name: "Arun Kumar",
@@ -177,7 +176,7 @@ const UserDashboard = () => {
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">
-                <SummaryCards stats={stats} loading={loading} />
+                <SummaryCards stats={stats} loading={loading} selectedState={selectedState} />
               </div>
               <div className="mb-4 md:mb-6 ">
                 <ChartSection

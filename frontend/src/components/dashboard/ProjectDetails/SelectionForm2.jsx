@@ -45,6 +45,12 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
       selectedCategory) &&
     isProcurementAllowed;
 
+    useEffect(() => {
+      // Whenever state, district, school, or category changes, reset the fetch results.
+      setFetchedData([]);
+      setHasFetched(false);
+    }, [selectedState, selectedDistrict, selectedSchool, selectedCategory]);
+    
   // Check procurement status dynamically
   useEffect(() => {
     const checkStatus = async () => {
@@ -95,6 +101,20 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
     setLoading(false);
   };
 
+  const handleDistrictChange = (value) => {
+    setSelectedDistrict(value);
+    // Clear selected school when district changes
+    setSelectedSchool(null);
+  };
+  
+  const handleStateChange = (value) => {
+    setSelectedState(value);
+    // Clear selected school when district changes
+    setSelectedSchool(null);
+    setSelectedDistrict(null)
+  };
+
+  
   const renderSelect = ({ label, value, options, onChange, placeholder }) => (
     <div className="mb-4">
       <label className="block text-sm font-medium text-[var(--color-text)] mb-1 font-outfit">
@@ -127,7 +147,7 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
               label: "Select State",
               value: selectedState,
               options: stateOptions,
-              onChange: setSelectedState,
+              onChange: handleStateChange,
               placeholder: "Choose a state",
             })}
 
@@ -136,7 +156,7 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
                 label: "Select District",
                 value: selectedDistrict,
                 options: districtOptions,
-                onChange: setSelectedDistrict,
+                onChange: handleDistrictChange,
                 placeholder: "Choose a district",
               })}
 

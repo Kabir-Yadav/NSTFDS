@@ -182,7 +182,7 @@ const AdminDashboard = () => {
           {!selectedProject ? (
             <>
               <div className="mb-4 md:mb-6">
-                <SummaryCards stats={stats} loading={loading} />
+                <SummaryCards stats={stats} loading={loading} selectedState={selectedState}/>
               </div>
               <div className="mb-4 md:mb-6 ">
                 <ChartSection selectedState={selectedState} />

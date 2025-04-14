@@ -1,21 +1,23 @@
 import React from "react";
 
-const SummaryCards = ({ stats,loading }) => (
+const SummaryCards = ({ stats, loading, selectedState }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <SummaryCard
-      title="Total States"
-      value={stats.totalStates}
-      icon="🏛️"
-      color="bg-[var(--color-info)]"
-      loading={loading}
-    />
+    {selectedState ===
+      '' &&(
+        <SummaryCard
+          title="Total States"
+          value={stats.totalStates}
+          icon="🏛️"
+          color="bg-[var(--color-info)]"
+          loading={loading}
+        />
+      )}
     <SummaryCard
       title="Total Districts"
       value={stats.totalDistricts}
       icon="📍"
       color="bg-[var(--color-primary)]"
       loading={loading}
-
     />
     <SummaryCard
       title="Total Schools"
@@ -23,7 +25,6 @@ const SummaryCards = ({ stats,loading }) => (
       icon="🏫"
       color="bg-[var(--color-success)]"
       loading={loading}
-
     />
     <SummaryCard
       title="Active Projects"
@@ -31,7 +32,6 @@ const SummaryCards = ({ stats,loading }) => (
       icon="📊"
       color="bg-[var(--color-warning)]"
       loading={loading}
-
     />
   </div>
 );

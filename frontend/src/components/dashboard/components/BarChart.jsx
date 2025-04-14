@@ -8,7 +8,7 @@ import { useTheme } from "../../../context/ThemeContext";
 
 const BarChartSection = ({ stateList }) => {
   const { isDarkMode } = useTheme();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedState, setSelectedState] = useState("");
   const [districtProgressData, setDistrictProgressData] = useState([]);
 
@@ -99,7 +99,11 @@ const BarChartSection = ({ stateList }) => {
         <h3 className="text-lg font-outfit font-medium mb-4 text-[var(--color-text)]">
           {selectedState ? `${selectedState} Progress` : "State-wise Progress"}
         </h3>
-        <div className="h-96">
+        {loading ? (
+          <div className="animate-pulse h-64 bg-[var(--color-surface-hover)] rounded-xl"></div>
+          
+        ) : (
+          <div className="h-96">
           <div style={{ height: isMobile ? "100%" : "100%" }}>
             <ResponsiveBar
               data={chartData}
@@ -108,7 +112,7 @@ const BarChartSection = ({ stateList }) => {
               margin={{
                 top: 20,
                 right: 20,
-                bottom: isMobile ? 30 : 70,
+                bottom: isMobile ? 50 : 100, // Increased bottom margin
                 left: isMobile ? 70 : 60,
               }}
               padding={0.3}
@@ -120,11 +124,15 @@ const BarChartSection = ({ stateList }) => {
               axisBottom={{
                 tickSize: 5,
                 tickPadding: 5,
-                tickRotation: isMobile ? 0 : -45,
+                tickRotation: isMobile ? 0 : -45, // Rotate labels for desktop
+                format: (value) => {
+                  const label = value || "";
+                  return label.length > 12 ? `${label.slice(0, 12)}...` : label;
+                },
                 legend: isMobile ? "Progress (%)" : "",
                 legendPosition: "middle",
                 legendOffset: 40,
-                truncateTickAt: 0,
+                // You can remove truncateTickAt if it conflicts with your custom format
               }}
               enableGridY={true}
               enableGridX={false}
@@ -153,6 +161,8 @@ const BarChartSection = ({ stateList }) => {
             />
           </div>
         </div>
+        )}
+        
       </div>
     </div>
   );

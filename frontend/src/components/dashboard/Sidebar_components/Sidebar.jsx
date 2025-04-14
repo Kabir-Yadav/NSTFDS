@@ -90,8 +90,8 @@ const Sidebar = ({
                 onLogout();
                 setIsSidebarOpen(false);
               }}
-              className="w-full px-4 py-2 text-sm text-[var(--color-error)] dark:hover:text-[var(--color-primary-dark)]
-                hover:bg-[var(--color-error)] rounded-lg flex items-center 
+              className="w-full px-4 py-2 text-sm text-[var(--color-error)] 
+                hover:bg-[var(--color-error-light)] rounded-lg flex items-center 
                 transition-colors active:scale-95 transform"
             >
               <span className="mr-2">🚪</span>
