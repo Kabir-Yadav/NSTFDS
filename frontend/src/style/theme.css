@@ -1,8 +1,8 @@
 :root {
   --color-primary: #265073;
   --color-primary-rgb: 38, 80, 115;
-  --color-primary-hover: #d8e7f2;
-  --color-primary-light: #dbecf8;
+  --color-primary-hover: rgba(204, 227, 243, 0.5);
+  --color-primary-light: #c9ddee;
   --color-primary-dark: #1b3e5a;
 
   --color-secondary: #2d9596;
@@ -15,9 +15,9 @@
   --color-accent-light: #d2f8ef;
   --color-accent-dark: #6fb8a6;
 
-  --color-background: #f4f6f8;
+  --color-background: #f8f4f3;
   --color-surface: #ffffff;
-  --color-surface-hover: #f0f2f5;
+  --color-surface-hover: #e9ebee;
   --color-surface-secondary: #f8f9fb;
 
   --color-text: #050c11;
@@ -53,7 +53,7 @@
 :root[class~='dark'] {
   --color-primary: #7fb2d1;
   --color-primary-rgb: 127, 178, 209;
-  --color-primary-hover: #4b90b9;
+  --color-primary-hover: rgba(32, 52, 73, 0.6);
   --color-primary-light: #1f3348;
   --color-primary-dark: #1b3e5a;
 
@@ -67,10 +67,10 @@
   --color-accent-light: #2e3e3a;
   --color-accent-dark: #dbf9f1;
 
-  --color-background: #181d2c;
+  --color-background: #141921;
   --color-surface: #242b3d;
   --color-surface-hover: #2e3649;
-  --color-surface-secondary: #2a3241;
+  --color-surface-secondary: rgba(29, 36, 50, 1);
   --color-surface-dark: #242b3d;
 
   --color-text: #e3e8f0;

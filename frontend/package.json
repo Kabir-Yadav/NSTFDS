@@ -16,6 +16,7 @@
     "@testing-library/user-event": "^13.2.1",
     "classnames": "^2.5.1",
     "cra-template": "1.2.0",
+    "framer-motion": "^12.10.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",

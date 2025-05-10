@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar_components/Sidebar";
 import SummaryCards from "./components/Summary";
 import ChartSection from "./components/ChartSection";
-import SelectionForm from "./ProjectDetails/SelectionForm2";
+import SelectionForm from "./ProjectDetails/user_ProjectSelectionForm";
 import {
   fetchHierarchicalData,
   useStatsWithStateFilter,

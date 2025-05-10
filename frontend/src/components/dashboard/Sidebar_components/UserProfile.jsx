@@ -1,15 +1,15 @@
 import React from "react";
 
-const UserProfile = ({ user,isOpen }) => (
-  <div className="flex items-center p-4 border-b border-[var(--color-border)] space-x-4 theme-transition">
+const UserProfile = ({ user, isOpen }) => (
+  <div className="flex items-center theme-transition">
     <img
       src={user.image}
       alt="User Profile"
-      className="w-10 h-10 rounded-full object-cover"
+      className=" h-10 rounded-full object-cover"
     />
-    {isOpen&&(<span className="font-redhat text-[var(--color-text)] font-medium">
+    <span className="font-redhat text-[var(--color-text)] font-normal text-sm">
       {user.name}
-    </span>)}
+    </span>
   </div>
 );
 

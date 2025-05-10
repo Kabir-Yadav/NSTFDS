@@ -45,12 +45,12 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
       selectedCategory) &&
     isProcurementAllowed;
 
-    useEffect(() => {
-      // Whenever state, district, school, or category changes, reset the fetch results.
-      setFetchedData([]);
-      setHasFetched(false);
-    }, [selectedState, selectedDistrict, selectedSchool, selectedCategory]);
-    
+  useEffect(() => {
+    // Whenever state, district, school, or category changes, reset the fetch results.
+    setFetchedData([]);
+    setHasFetched(false);
+  }, [selectedState, selectedDistrict, selectedSchool, selectedCategory]);
+
   // Check procurement status dynamically
   useEffect(() => {
     const checkStatus = async () => {
@@ -106,26 +106,40 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
     // Clear selected school when district changes
     setSelectedSchool(null);
   };
-  
+
   const handleStateChange = (value) => {
     setSelectedState(value);
     // Clear selected school when district changes
     setSelectedSchool(null);
-    setSelectedDistrict(null)
+    setSelectedDistrict(null);
   };
 
-  
   const renderSelect = ({ label, value, options, onChange, placeholder }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-[var(--color-text)] mb-1 font-outfit">
+    <div
+      className="
+        mb-4
+      "
+    >
+      <label
+        className="
+          block
+          mb-1
+          text-sm font-medium text-[var(--color-text)] font-outfit
+        "
+      >
         {label}
       </label>
       <select
         onChange={(e) => onChange(e.target.value)}
         value={value || ""}
-        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg w-full
-                 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
-                 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        className="
+          w-full
+          px-3 py-2
+          text-gray-900
+          bg-white
+          border border-gray-300 rounded-lg
+          dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500
+        "
       >
         <option value="">{placeholder}</option>
         {options.map((option) => (
@@ -142,7 +156,15 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
       {(selectedProject?.name === "Sanitary Pad Devices Procurement" ||
         selectedProject?.name === "Digital Device Procurement") && (
         <>
-          <div className="bg-[var(--color-surface)] rounded-xl shadow-sm p-6 theme-transition">
+          <div
+            className="
+              p-6
+              bg-[var(--color-surface)]
+              rounded-xl
+              shadow-sm
+              theme-transition
+            "
+          >
             {renderSelect({
               label: "Select State",
               value: selectedState,
@@ -184,15 +206,27 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
               checkedStatus ? (
                 isProcurementAllowed ? (
                   <div>
-                    <div className="mt-4 mb-4">
+                    <div
+                      className="
+                        mt-4 mb-4
+                      "
+                    >
                       <button
                         onClick={handleFetchData}
                         disabled={!isReadyToFetch || loading}
-                        className={`w-full py-2 px-4 font-semibold rounded-lg text-white dark:text-[var(--color-primary-dark)] transition-colors ${
-                          !isReadyToFetch || loading
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-dark)]"
-                        }`}
+                        className={`
+                          w-full
+                          py-2 px-4
+                          font-semibold text-white
+                          rounded-lg
+                          transition-colors
+                          dark:text-[var(--color-primary-dark)]
+                          ${
+                            !isReadyToFetch || loading
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-[var(--color-secondary)] hover:bg-[var(--color-secondary-dark)]"
+                          }
+                        `}
                       >
                         {loading ? "Fetching..." : "Fetch Data"}
                       </button>
@@ -201,7 +235,12 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
                       selectedDistrict &&
                       selectedState &&
                       hasFetched && (
-                        <h2 className="font-bold text-xl text-[var(--color-text)] mb-3">
+                        <h2
+                          className="
+                            mb-3
+                            font-bold text-xl text-[var(--color-text)]
+                          "
+                        >
                           {selectedProject?.name} of {selectedSchool},{" "}
                           {selectedDistrict}, {selectedState}
                         </h2>
@@ -220,19 +259,37 @@ const SelectionForm = ({ selectedProject, data, categories }) => {
                       )}
 
                     {hasFetched && fetchedData.length === 0 && !loading && (
-                      <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
+                      <p
+                        className="
+                          mt-4
+                          text-center text-gray-500
+                          dark:text-gray-400
+                        "
+                      >
                         No records found for the selected criteria.
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-red-600 text-sm mt-4">
+                  <p
+                    className="
+                      mt-4
+                      text-red-600 text-sm
+                    "
+                  >
                     Procurement is not active for this school. You cannot fetch
                     data.
                   </p>
                 )
               ) : (
-                <p className="text-gray-500 mt-4">Checking permission...</p>
+                <p
+                  className="
+                    mt-4
+                    text-gray-500
+                  "
+                >
+                  Checking permission...
+                </p>
               )
             ) : null}
           </div>

@@ -8,11 +8,11 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg bg-[var(--color-surface)] hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      className="p-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
       aria-label="Toggle theme"
     >
       {isDarkMode ? (
-        <Sun className="w-5 h-5 text-[var(--color-text-secondary)]" />
+        <Sun className="w-5 h-5 text-[var(--color-error)]" />
       ) : (
         <Moon className="w-5 h-5 text-[var(--color-text-secondary)]" />
       )}
