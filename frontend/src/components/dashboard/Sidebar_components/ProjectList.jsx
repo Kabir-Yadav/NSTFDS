@@ -31,7 +31,7 @@ const ProjectList = ({
           dark:text-[#c7bebc] dark:hover:text-[var(--color-primary)]
           ${
             selectedProject
-              ? `border-l-[5px] border-[var(--color-primary)]
+              ? `${isOpen?'border-l-[5px]':'md:border-l-[5px]'} border-[var(--color-primary)]
               bg-[var(--color-primary-hover)] text-[var(--color-primary)] dark:text-[var(--color-primary)]`
               : "border-l-[5px] border-transparent"
           }`}

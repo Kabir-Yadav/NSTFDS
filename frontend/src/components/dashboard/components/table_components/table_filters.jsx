@@ -1,21 +1,24 @@
 const TableFilters = ({
   startDate,
-  setStartDate,
   endDate,
-  setEndDate,
+  selectedPsu,
   selectedState,
-  setSelectedState,
-  selectedDistrict,
-  setSelectedDistrict,
   selectedSchool,
-  setSelectedSchool,
-  selectedCategory,
-  setSelectedCategory,
-  stateOptions = [],
-  districtOptions = [],
-  schoolOptions = [],
-  categories = [],
   selectedProject,
+  selectedDistrict,
+  selectedCategory,
+  setEndDate,
+  setStartDate,
+  setSelectedPsu,
+  setSelectedState,
+  setSelectedSchool,
+  setSelectedDistrict,
+  setSelectedCategory,
+  psuOptions = [],
+  categories = [],
+  stateOptions = [],
+  schoolOptions = [],
+  districtOptions = [],
 }) => {
   return (
     <div
@@ -180,6 +183,37 @@ const TableFilters = ({
           {schoolOptions.map((school) => (
             <option key={school} value={school}>
               {school}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label
+          className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+        >
+          PSU
+        </label>
+        <select
+          value={selectedPsu}
+          onChange={(e) => setSelectedSchool(e.target.value)}
+          className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:disabled:bg-[var(--color-text-secondary)] disabled:bg-[var(--color-text-disabled)] dark:bg-gray-900 dark:text-white dark:disabled:text-gray-800
+            "
+        >
+          <option value="">All PSUs</option>
+          {psuOptions.map((psu) => (
+            <option key={psu} value={psu}>
+              {psu}
             </option>
           ))}
         </select>

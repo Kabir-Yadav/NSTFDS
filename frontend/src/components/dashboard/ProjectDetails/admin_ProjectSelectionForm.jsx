@@ -5,12 +5,11 @@ import {
   fetchDeviceProcurements,
   fetchSanitaryProcurements,
 } from "../../../action/supabase_actions";
-import DeviceForm from "./forms/device-form";
-import SanitaryPadForm from "./forms/sanitary-form";
 import { SortAscIcon, SortDescIcon } from "lucide-react";
 import HeaderButtons from "../components/table_components/header_buttons";
 import TableFilters from "../components/table_components/table_filters";
 import TablePageNavButton from "../components/table_components/table_pageNav_button";
+import EnhancedAddDataDialog from "./forms/Add_Data_Dialog/add_dataDialog";
 
 const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const [tableData, setTableData] = useState([]);
@@ -22,19 +21,22 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const [selectedSchool, setSelectedSchool] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showAddDataModal, setShowAddDataModal] = useState(false);
+  const [selectedpsu, setSelectedpsu] = useState("");
   const [sortAsc, setsortAsc] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
+  const recordsPerPage = 10;
   const [exportType, setExportType] = useState("PDF");
+  const [showEnhancedAddDataDialog, setShowEnhancedAddDataDialog] =
+    useState(false);
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const paginatedData = filteredData.slice(
     indexOfFirstRecord,
-    indexOfLastRecord,
+    indexOfLastRecord
   );
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredData.length / recordsPerPage),
+    Math.ceil(filteredData.length / recordsPerPage)
   );
 
   useEffect(() => {
@@ -51,7 +53,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
 
     // Sort data by delivery_date (ascending)
     result.sort(
-      (a, b) => new Date(a.delivery_date) - new Date(b.delivery_date),
+      (a, b) => new Date(a.delivery_date) - new Date(b.delivery_date)
     );
 
     setTableData(result);
@@ -89,7 +91,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
     filtered.sort((a, b) =>
       sortAsc
         ? new Date(a.delivery_date) - new Date(b.delivery_date)
-        : new Date(b.delivery_date) - new Date(a.delivery_date),
+        : new Date(b.delivery_date) - new Date(a.delivery_date)
     );
 
     setFilteredData(filtered);
@@ -101,10 +103,11 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
 
     const tableColumn = [
       "ID",
-      "Date",
+      "Delivery_Date",
       "State",
       "District",
       "School",
+      "PSU",
       ...(selectedProject?.name === "Digital Device Procurement"
         ? ["Category"]
         : []),
@@ -117,6 +120,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
       row.state_name,
       row.district_name,
       row.school_name,
+      row.psu ?? "BPCL",
       ...(selectedProject?.name === "Digital Device Procurement"
         ? [row.item_name]
         : []),
@@ -136,10 +140,11 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const exportToCSV = () => {
     const headers = [
       "ID",
-      "Date",
+      "Delivery_Date",
       "State",
       "District",
       "School",
+      "PSU",
       ...(selectedProject?.name === "Digital Device Procurement"
         ? ["Category"]
         : []),
@@ -153,6 +158,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
       row.state_name,
       row.district_name,
       row.school_name,
+      row.psu ?? "BPCL",
       ...(selectedProject?.name === "Digital Device Procurement"
         ? [row.item_name]
         : []),
@@ -169,7 +175,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `${selectedProject?.name || "Procurement"}Report.csv`,
+      `${selectedProject?.name || "Procurement"}Report.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -183,28 +189,6 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const handleCloseModal = () => {
     setShowAddDataModal(false);
     fetchData(); // Refresh data after adding a new entry
-  };
-
-  const renderAddDataForm = () => {
-    if (selectedProject?.name === "Digital Device Procurement") {
-      return (
-        <DeviceForm
-          isOpen={showAddDataModal}
-          data={data}
-          categories={categories}
-          onClose={handleCloseModal}
-        />
-      );
-    } else if (selectedProject?.name === "Sanitary Pad Devices Procurement") {
-      return (
-        <SanitaryPadForm
-          isOpen={showAddDataModal}
-          data={data}
-          onClose={handleCloseModal}
-        />
-      );
-    }
-    return null;
   };
 
   const stateOptions = tableData
@@ -225,7 +209,9 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
         ?.districts.find((d) => d.district_name === selectedDistrict)
         ?.schools.sort()) ||
     [];
-
+  const psuOptions = tableData
+    ? Array.from(new Set(tableData.map((item) => item.psu)))
+    : [];
   return (
     <div
       className="
@@ -249,7 +235,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
           exportType={exportType}
           setExportType={setExportType}
           handleExport={handleExport}
-          setShowAddDataModal={setShowAddDataModal}
+          setShowAddDataModal={() => setShowEnhancedAddDataDialog(true)} // Open Enhanced Dialog
         />
 
         {/* {Filters} */}
@@ -272,6 +258,9 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
           schoolOptions={schoolOptions}
           categories={categories}
           selectedProject={selectedProject}
+          selectedPsu={selectedpsu}
+          setSelectedPsu={setSelectedpsu}
+          psuOptions={psuOptions}
         />
       </div>
 
@@ -493,12 +482,12 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
                         row.status.toLowerCase() === "shipped"
                           ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                           : row.status.toLowerCase() === "pending"
-                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                            : row.status.toLowerCase() === "just deployed"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                              : row.status.toLowerCase() === "arrived"
-                                ? "bg-indigo-100 text-green-800 dark:bg-green-500 dark:text-green-100"
-                                : ""
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : row.status.toLowerCase() === "just deployed"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : row.status.toLowerCase() === "arrived"
+                          ? "bg-indigo-100 text-green-800 dark:bg-green-500 dark:text-green-100"
+                          : ""
                       }
                     `}
                   >
@@ -524,7 +513,21 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
       />
-      {renderAddDataForm()}
+      <EnhancedAddDataDialog
+        isOpen={showEnhancedAddDataDialog}
+        onClose={() => setShowEnhancedAddDataDialog(false)}
+        selectedProject={selectedProject}
+        data={data}
+        categories={categories}
+        onSubmitSingle={(entry) => {
+          setTableData((prev) => [...prev, entry]);
+          setFilteredData((prev) => [...prev, entry]);
+        }}
+        onSubmitMultiple={(entries) => {
+          setTableData((prev) => [...prev, ...entries]);
+          setFilteredData((prev) => [...prev, ...entries]);
+        }}
+      />
     </div>
   );
 };
