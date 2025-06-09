@@ -3,6 +3,7 @@ const HeaderButtons = ({
   setExportType,
   handleExport,
   setShowAddDataModal,
+  isAdmin = false,
 }) => {
   return (
     <div
@@ -14,9 +15,10 @@ const HeaderButtons = ({
       "
     >
       {/* Add New Entry Button */}
-      <button
-        onClick={() => setShowAddDataModal(true)}
-        className="
+      {isAdmin && (
+        <button
+          onClick={() => setShowAddDataModal(true)}
+          className="
             px-6 py-2
             text-white
             bg-green-600
@@ -24,9 +26,10 @@ const HeaderButtons = ({
             transition-colors shadow-md
             hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600
           "
-      >
-        + Add New Entry
-      </button>
+        >
+          + Add New Entry
+        </button>
+      )}
 
       <div
         className="
@@ -36,6 +39,23 @@ const HeaderButtons = ({
             sm:flex-row sm:space-y-0
           "
       >
+        {!isAdmin && (
+          <button
+            onClick={handleExport}
+            className="
+                w-full
+                ml-0 px-6 py-2
+                text-white font-medium
+                bg-[var(--color-primary)]
+                rounded-lg
+                transition-colors shadow-md
+                dark:bg-[var(--color-secondary)] hover:bg-[var(--color-primary-dark)] dark:hover:bg-[var(--color-secondary-dark)] dark:text-[var(--color-primary-light)]
+                md:w-auto
+              "
+          >
+            Export to {exportType}
+          </button>
+        )}
         {/* Segmented Control for Export Type */}
         <div
           className="
@@ -69,9 +89,10 @@ const HeaderButtons = ({
         </div>
 
         {/* Export Button */}
-        <button
-          onClick={handleExport}
-          className="
+        {isAdmin && (
+          <button
+            onClick={handleExport}
+            className="
                 w-full
                 ml-0 px-6 py-2
                 text-white font-medium
@@ -81,9 +102,10 @@ const HeaderButtons = ({
                 dark:bg-[var(--color-secondary)] hover:bg-[var(--color-primary-dark)] dark:hover:bg-[var(--color-secondary-dark)] dark:text-[var(--color-primary-light)]
                 md:w-auto md:ml-2
               "
-        >
-          Export to {exportType}
-        </button>
+          >
+            Export to {exportType}
+          </button>
+        )}
       </div>
     </div>
   );

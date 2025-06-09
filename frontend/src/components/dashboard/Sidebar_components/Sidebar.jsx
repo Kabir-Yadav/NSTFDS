@@ -10,8 +10,10 @@ const Sidebar = ({
   projects,
   psu,
   selectedPsu,
-  onPsuSelect,
   selectedProject,
+  selectedpsuProject,
+  onPsuProjectSelect,
+  onPsuSelect,
   onProjectSelect,
   onReturnHome,
   onLogout,
@@ -39,7 +41,6 @@ const Sidebar = ({
         lg:bg-transparent md:bg-transparent md:border-r-4 border-[var(--color-surface)]
         ${isSidebarOpen ? "w-[280px]" : "w-[0px] md:w-[80px]"} 
         h-screen`}
-
         style={{
           scrollbarColor: "transparent",
         }}
@@ -60,14 +61,13 @@ const Sidebar = ({
           </div>
           <div className="">
             <PSUList
-              projects={psu}
+              psu={psu}
               isOpen={isSidebarOpen}
-              selectedPsu={selectedPsu} // Pass selectedPsu
-              setIsSidebarOpen={setIsSidebarOpen}
-              onProjectSelect={(psu) => {
-                onPsuSelect(psu); // Use the PSU select handler
-                setIsSidebarOpen(false);
+              onPsuProjectSelect={(project) => {
+                onPsuProjectSelect(project);
               }}
+              selectedPsuProject={selectedpsuProject}
+              setIsSidebarOpen={setIsSidebarOpen}
             />
           </div>
 

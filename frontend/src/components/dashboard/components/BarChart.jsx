@@ -248,276 +248,285 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
           <div
             style={{
               width: `${chartWidth}px`,
-              height: chartHeight,
+              height: data.length > 1 ? chartHeight : "200px",
               position: "relative",
               minHeight: "100px",
             }}
             className="inline-block"
           >
-            <AnimatePresence mode="wait">
-              {!loading && (
-                <motion.div
-                  key="chart"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="h-full w-full"
-                >
-                  <ResponsiveBar
-                    data={data}
-                    keys={keys}
-                    indexBy={getIndexBy()}
-                    margin={{
-                      top: 30,
-                      right: isSmallMobile ? 15 : 20,
-                      bottom: isSmallMobile ? 50 : isMobile ? 30 : 70,
-                      left: isSmallMobile ? 60 : isMobile ? 80 : 75,
-                    }}
-                    padding={isMobile ? 0.15 : 0.3}
-                    layout={isMobile ? "horizontal" : "vertical"}
-                    groupMode={groupMode}
-                    colors={({ id }) =>
-                      id === "progress"
-                        ? "var(--color-primary)"
-                        : id === "allocatedBudget"
-                        ? "var(--color-primary)"
-                        : "var(--color-secondary)"
-                    }
-                    animate={true}
-                    motionConfig="gentle"
-                    enableLabel={false} // Disable bar labels to reduce clutter when showing all data
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      // Removed axis rotation in small mobile
-                      format: formatAxisLabel,
-                      // On mobile with lots of data, limit the number of ticks shown
-                      tickValues:
-                        isMobile && data.length > 8
-                          ? Math.min(8, data.length)
-                          : undefined,
+            {data.length > 1 ? (
+              <AnimatePresence mode="wait">
+                {!loading && (
+                  <motion.div
+                    key="chart"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="h-full w-full"
+                  >
+                    <ResponsiveBar
+                      data={data}
+                      keys={keys}
+                      indexBy={getIndexBy()}
+                      margin={{
+                        top: 30,
+                        right: isSmallMobile ? 15 : 20,
+                        bottom: isSmallMobile ? 50 : isMobile ? 30 : 70,
+                        left: isSmallMobile ? 60 : isMobile ? 80 : 75,
+                      }}
+                      padding={isMobile ? 0.15 : 0.3}
+                      layout={isMobile ? "horizontal" : "vertical"}
+                      groupMode={groupMode}
+                      colors={({ id }) =>
+                        id === "progress"
+                          ? "var(--color-primary)"
+                          : id === "allocatedBudget"
+                          ? "var(--color-primary)"
+                          : "var(--color-secondary)"
+                      }
+                      animate={true}
+                      motionConfig="gentle"
+                      enableLabel={false} // Disable bar labels to reduce clutter when showing all data
+                      axisBottom={{
+                        tickSize: 5,
+                        tickPadding: 5,
+                        // Removed axis rotation in small mobile
+                        format: formatAxisLabel,
+                        // On mobile with lots of data, limit the number of ticks shown
+                        tickValues:
+                          isMobile && data.length > 8
+                            ? Math.min(8, data.length)
+                            : undefined,
 
-                      renderTick: (tick) => {
-                        // For mobile with many items, show fewer ticks for clarity
-                        return (
-                          <g transform={`translate(${tick.x},${tick.y})`}>
-                            <line
-                              stroke="var(--color-text)"
-                              strokeWidth={1.5}
-                              y2={6}
-                            />
-                            <text
-                              textAnchor={isMobile ? "middle" : "end"}
-                              dominantBaseline="text-before-edge"
-                              transform={`translate(0,${
-                                isMobile ? 8 : 8
-                              }) rotate(${isMobile ? -30 : -35})`}
-                              style={{
-                                fontSize: isSmallMobile ? 10 : 12,
-                                fill: "var(--color-text)",
-                              }}
-                            >
-                              {/* Check if value is numerical and format accordingly */}
-                              {isNaN(tick.value)
-                                ? isMobile
-                                  ? tick.value?.toString().length > 10
-                                    ? tick.value.toString().slice(0, 8) + "..."
-                                    : tick.value
-                                  : formatAxisLabel(tick.value)
-                                : formatNumber(tick.value)}
-                            </text>
-                          </g>
-                        );
-                      },
-                    }}
-                    axisLeft={{
-                      // Remove legend in mobile
-                      legend: isMobile
-                        ? ""
-                        : keys.length > 1
-                        ? "Budget (₹)"
-                        : "Progress (%)",
-                      legendPosition: "middle",
-                      legendOffset: -55,
-                      tickValues: isSmallMobile ? 5 : undefined,
-                      renderTick: (tick) => {
-                        return (
-                          <g transform={`translate(${tick.x},${tick.y})`}>
-                            <line
-                              stroke="var(--color-text)"
-                              strokeWidth={1.5}
-                              x2={-6}
-                            />
-                            <text
-                              textAnchor="end"
-                              dominantBaseline="middle"
-                              transform={`translate(-10,0)`} // Adjusted for left axis
-                              style={{
-                                fontSize: isSmallMobile ? 10 : 12,
-                                fill: "var(--color-text)",
-                              }}
-                            >
-                              {/* Check if value is numerical and format accordingly */}
-                              {isNaN(tick.value)
-                                ? formatAxisLabel(tick.value)
-                                : formatNumber(tick.value)}
-                            </text>
-                          </g>
-                        );
-                      },
-                    }}
-                    enableGridY={true}
-                    enableGridX={false}
-                    labelSkipWidth={12}
-                    labelSkipHeight={12}
-                    labelTextColor={{
-                      from: "color",
-                      modifiers: [["darker", 2.5]],
-                    }}
-                    borderRadius={3}
-                    innerPadding={isMobile ? 1 : 4}
-                    // More responsive tooltip
-                    tooltip={({ id, value, color, indexValue }) => (
-                      <div
-                        className={`bg-[var(--color-surface)] shadow-lg ${
-                          isSmallMobile ? "p-2" : "p-3"
-                        } rounded-md border border-[var(--color-border)]`}
-                      >
-                        <strong
-                          className={`block text-[var(--color-text)] ${
-                            isSmallMobile ? "text-xs" : ""
-                          }`}
+                        renderTick: (tick) => {
+                          // For mobile with many items, show fewer ticks for clarity
+                          return (
+                            <g transform={`translate(${tick.x},${tick.y})`}>
+                              <line
+                                stroke="var(--color-text)"
+                                strokeWidth={1.5}
+                                y2={6}
+                              />
+                              <text
+                                textAnchor={isMobile ? "middle" : "end"}
+                                dominantBaseline="text-before-edge"
+                                transform={`translate(0,${
+                                  isMobile ? 8 : 8
+                                }) rotate(${isMobile ? -30 : -35})`}
+                                style={{
+                                  fontSize: isSmallMobile ? 10 : 12,
+                                  fill: "var(--color-text)",
+                                }}
+                              >
+                                {/* Check if value is numerical and format accordingly */}
+                                {isNaN(tick.value)
+                                  ? isMobile
+                                    ? tick.value?.toString().length > 10
+                                      ? tick.value.toString().slice(0, 8) +
+                                        "..."
+                                      : tick.value
+                                    : formatAxisLabel(tick.value)
+                                  : formatNumber(tick.value)}
+                              </text>
+                            </g>
+                          );
+                        },
+                      }}
+                      axisLeft={{
+                        // Remove legend in mobile
+                        legend: isMobile
+                          ? ""
+                          : keys.length > 1
+                          ? "Budget (₹)"
+                          : "Progress (%)",
+                        legendPosition: "middle",
+                        legendOffset: -55,
+                        tickValues: isSmallMobile ? 5 : undefined,
+                        renderTick: (tick) => {
+                          return (
+                            <g transform={`translate(${tick.x},${tick.y})`}>
+                              <line
+                                stroke="var(--color-text)"
+                                strokeWidth={1.5}
+                                x2={-6}
+                              />
+                              <text
+                                textAnchor="end"
+                                dominantBaseline="middle"
+                                transform={`translate(-10,0)`} // Adjusted for left axis
+                                style={{
+                                  fontSize: isSmallMobile ? 10 : 12,
+                                  fill: "var(--color-text)",
+                                }}
+                              >
+                                {/* Check if value is numerical and format accordingly */}
+                                {isNaN(tick.value)
+                                  ? formatAxisLabel(tick.value)
+                                  : formatNumber(tick.value)}
+                              </text>
+                            </g>
+                          );
+                        },
+                      }}
+                      enableGridY={true}
+                      enableGridX={false}
+                      labelSkipWidth={12}
+                      labelSkipHeight={12}
+                      labelTextColor={{
+                        from: "color",
+                        modifiers: [["darker", 2.5]],
+                      }}
+                      borderRadius={3}
+                      innerPadding={isMobile ? 1 : 4}
+                      // More responsive tooltip
+                      tooltip={({ id, value, color, indexValue }) => (
+                        <div
+                          className={`bg-[var(--color-surface)] shadow-lg ${
+                            isSmallMobile ? "p-2" : "p-3"
+                          } rounded-md border border-[var(--color-border)]`}
                         >
-                          {indexValue}
-                        </strong>
-                        <div className="flex items-center mt-1">
-                          <span
-                            className="w-2 h-2 rounded-full mr-2"
-                            style={{ backgroundColor: color }}
-                          ></span>
-                          <span
-                            className={`text-[var(--color-text)] ${
+                          <strong
+                            className={`block text-[var(--color-text)] ${
                               isSmallMobile ? "text-xs" : ""
                             }`}
                           >
-                            {id === "progress"
-                              ? `${value}%`
-                              : id === "allocatedBudget"
-                              ? `${isMobile ? "₹" : "Allocated: ₹"}${
-                                  isMobile
-                                    ? value >= 1e6
-                                      ? (value / 1e6).toFixed(1) + "M"
-                                      : value >= 1e3
-                                      ? (value / 1e3).toFixed(0) + "K"
-                                      : value
-                                    : value.toLocaleString()
-                                }`
-                              : `${isMobile ? "₹" : "Used: ₹"}${
-                                  isMobile
-                                    ? value >= 1e6
-                                      ? (value / 1e6).toFixed(1) + "M"
-                                      : value >= 1e3
-                                      ? (value / 1e3).toFixed(0) + "K"
-                                      : value
-                                    : value.toLocaleString()
-                                }`}
-                          </span>
+                            {indexValue}
+                          </strong>
+                          <div className="flex items-center mt-1">
+                            <span
+                              className="w-2 h-2 rounded-full mr-2"
+                              style={{ backgroundColor: color }}
+                            ></span>
+                            <span
+                              className={`text-[var(--color-text)] ${
+                                isSmallMobile ? "text-xs" : ""
+                              }`}
+                            >
+                              {id === "progress"
+                                ? `${value}%`
+                                : id === "allocatedBudget"
+                                ? `${isMobile ? "₹" : "Allocated: ₹"}${
+                                    isMobile
+                                      ? value >= 1e6
+                                        ? (value / 1e6).toFixed(1) + "M"
+                                        : value >= 1e3
+                                        ? (value / 1e3).toFixed(0) + "K"
+                                        : value
+                                      : value.toLocaleString()
+                                  }`
+                                : `${isMobile ? "₹" : "Used: ₹"}${
+                                    isMobile
+                                      ? value >= 1e6
+                                        ? (value / 1e6).toFixed(1) + "M"
+                                        : value >= 1e3
+                                        ? (value / 1e3).toFixed(0) + "K"
+                                        : value
+                                      : value.toLocaleString()
+                                  }`}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    // Simplified legend on mobile
-                    legends={
-                      keys.length > 1
-                        ? [
-                            {
-                              dataFrom: "keys",
-                              anchor: "top", // ← move legend to top
-                              direction: "row",
-                              // push it down from the very top a bit:
-                              translateY: isSmallMobile
-                                ? -10
-                                : isMobile
-                                ? -28
-                                : -30,
-                              itemsSpacing: isSmallMobile
-                                ? 50
-                                : isMobile
-                                ? 40
-                                : 15,
-                              itemWidth: isSmallMobile
-                                ? 60
-                                : isMobile
-                                ? 80
-                                : 100,
-                              itemHeight: isSmallMobile ? 16 : 20,
-                              symbolSize: isSmallMobile ? 8 : 12,
-                              symbolShape: "circle",
-                              itemTextColor: "var(--color-text)",
-                              itemDirection: "left-to-right",
-                              itemOpacity: ".7",
+                      )}
+                      // Simplified legend on mobile
+                      legends={
+                        keys.length > 1
+                          ? [
+                              {
+                                dataFrom: "keys",
+                                anchor: "top", // ← move legend to top
+                                direction: "row",
+                                // push it down from the very top a bit:
+                                translateY: isSmallMobile
+                                  ? -10
+                                  : isMobile
+                                  ? -28
+                                  : -30,
+                                itemsSpacing: isSmallMobile
+                                  ? 50
+                                  : isMobile
+                                  ? 40
+                                  : 15,
+                                itemWidth: isSmallMobile
+                                  ? 60
+                                  : isMobile
+                                  ? 80
+                                  : 100,
+                                itemHeight: isSmallMobile ? 16 : 20,
+                                symbolSize: isSmallMobile ? 8 : 12,
+                                symbolShape: "circle",
+                                itemTextColor: "var(--color-text)",
+                                itemDirection: "left-to-right",
+                                itemOpacity: ".7",
 
-                              effects: [
-                                {
-                                  on: "hover",
-                                  style: {
-                                    itemTextColor: "var(--color-primary)",
+                                effects: [
+                                  {
+                                    on: "hover",
+                                    style: {
+                                      itemTextColor: "var(--color-primary)",
+                                    },
                                   },
-                                },
-                              ],
+                                ],
+                              },
+                            ]
+                          : []
+                      }
+                      theme={{
+                        axis: {
+                          ticks: {
+                            text: {
+                              fill: "var(--color-text)",
+                              fontSize: isSmallMobile ? 10 : 12,
+                              fontWeight: isMobile ? 500 : 400,
+                              fontFamily: "outfit",
                             },
-                          ]
-                        : []
-                    }
-                    theme={{
-                      axis: {
-                        ticks: {
-                          text: {
-                            fill: "var(--color-text)",
+                          },
+                          legend: {
+                            text: {
+                              fill: "var(--color-text)",
+                              fontSize: isMobile ? 12 : 14,
+                              fontWeight: 500,
+                              fontFamily: "redhat",
+                            },
+                          },
+                        },
+                        grid: {
+                          // Reduce grid lines on mobile for cleaner look
+                          line: {
+                            stroke: isDarkMode
+                              ? `rgba(55, 65, 81, ${isMobile ? 0.4 : 0.6})`
+                              : `rgba(229, 231, 235, ${isMobile ? 0.6 : 0.8})`,
+                            strokeDasharray: isMobile ? "2 4" : "4 4",
+                          },
+                        },
+                        tooltip: {
+                          container: {
+                            background: "var(--color-surface)",
+                            color: "var(--color-text)",
                             fontSize: isSmallMobile ? 10 : 12,
-                            fontWeight: isMobile ? 500 : 400,
-                            fontFamily: "outfit",
+                            // Reduce padding on mobile
+                            padding: isSmallMobile ? "6px" : "12px",
                           },
                         },
-                        legend: {
+                        // Reduce label sizes on mobile
+                        labels: {
                           text: {
-                            fill: "var(--color-text)",
-                            fontSize: isMobile ? 12 : 14,
-                            fontWeight: 500,
-                            fontFamily: "redhat",
+                            fontSize: isSmallMobile ? 9 : isMobile ? 10 : 11,
+                            fontWeight: isMobile ? 600 : 500,
                           },
                         },
-                      },
-                      grid: {
-                        // Reduce grid lines on mobile for cleaner look
-                        line: {
-                          stroke: isDarkMode
-                            ? `rgba(55, 65, 81, ${isMobile ? 0.4 : 0.6})`
-                            : `rgba(229, 231, 235, ${isMobile ? 0.6 : 0.8})`,
-                          strokeDasharray: isMobile ? "2 4" : "4 4",
-                        },
-                      },
-                      tooltip: {
-                        container: {
-                          background: "var(--color-surface)",
-                          color: "var(--color-text)",
-                          fontSize: isSmallMobile ? 10 : 12,
-                          // Reduce padding on mobile
-                          padding: isSmallMobile ? "6px" : "12px",
-                        },
-                      },
-                      // Reduce label sizes on mobile
-                      labels: {
-                        text: {
-                          fontSize: isSmallMobile ? 9 : isMobile ? 10 : 11,
-                          fontWeight: isMobile ? 600 : 500,
-                        },
-                      },
-                    }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <h3 className="text-center text-gray-500 dark:text-gray-400">
+                  No data available
+                </h3>
+              </div>
+            )}
           </div>
         </div>
       </div>

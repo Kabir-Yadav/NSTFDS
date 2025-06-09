@@ -1,122 +1,205 @@
 // src/components/ProjectDetails/TableSanitaryPad.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { SortAscIcon, SortDescIcon } from "lucide-react";
+import HeaderButtons from "../../components/table_components/header_buttons";
+import TableFilters from "../../components/table_components/table_filters";
+import TablePageNavButton from "../../components/table_components/table_pageNav_button";
 
 const SanitaryPadTable = ({ data }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [filteredData, setFilteredData] = useState(data);
+  const [selectedpsu, setSelectedpsu] = useState("");
+  const [sortAsc, setsortAsc] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [exportType, setExportType] = useState("PDF");
+  const recordsPerPage = 10;
+  const selectedProject = "Sanitary Pad Procurement";
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const paginatedData = filteredData.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredData.length / recordsPerPage)
+  );
 
   useEffect(() => {
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const filtered = data.filter((item) => {
-        const itemDate = new Date(item.delivery_date);
-        return itemDate >= start && itemDate <= end;
-      });
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(data);
-    }
-  }, [startDate, endDate, data]);
+    filterData();
+  }, [startDate, endDate, selectedpsu, data, sortAsc]);
+
+  const filterData = () => {
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    const filtered = data.filter((item) => {
+      const itemDate = new Date(item.delivery_date);
+      return (
+        (!start || itemDate >= start) &&
+        (!end || itemDate <= end) &&
+        (!selectedpsu || item.psu === selectedpsu)
+      );
+    });
+
+    filtered.sort((a, b) =>
+      sortAsc
+        ? new Date(a.delivery_date) - new Date(b.delivery_date)
+        : new Date(b.delivery_date) - new Date(a.delivery_date)
+    );
+
+    setFilteredData(filtered);
+  };
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    doc.text("Sanitary Pad Procurement Report", 14, 10);
+    doc.text(`${selectedProject} Report`, 14, 10);
 
     const tableColumn = [
+      "ID",
+      "Delivery_Date",
       "State",
       "District",
       "School",
-      "Cost",
+      "PSU",
       "Status",
-      "Date",
+      "Cost",
+      "Proof_Image",
     ];
-    const tableRows = data.map((row) => [
+    const tableRows = filteredData.map((row) => [
+      row.id,
+      new Date(row.delivery_date).toLocaleDateString(),
       row.state_name,
       row.district_name,
       row.school_name,
-      `₹${row.cost}`,
+      row.psu ?? "BPCL",
       row.status,
-      new Date(row.delivery_date).toLocaleDateString(),
+      row.cost,
+      row.proof_image_url ? row.proof_image_url : "No Image",
     ]);
 
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 20,
+      columnStyles: {
+        8: { cellWidth: 35 },
+      },
+      styles: {
+        fontSize: 8,
+      },
     });
 
-    doc.save("SanitaryPadProcurementReport.pdf");
+    doc.save(`${selectedProject}Report.pdf`);
   };
 
+  const exportToCSV = () => {
+    const headers = [
+      "ID",
+      "Date",
+      "State",
+      "District",
+      "School",
+      "PSU",
+      "Status",
+      "Cost",
+      "Proof_Image",
+    ];
+    const rows = filteredData.map((row) => [
+      row.id,
+      new Date(row.delivery_date).toLocaleDateString(),
+      row.state_name,
+      row.district_name,
+      row.school_name,
+      row.psu ?? "BPCL",
+      row.status,
+      row.cost,
+      row.proof_image_url ? row.proof_image_url : "No Image",
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "SanitaryPadProcurementReport.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExport = () => {
+    exportType === "PDF" ? exportToPDF() : exportToCSV();
+  };
+
+  const psuOptions = Array.from(new Set(data.map((item) => item.psu))).sort();
+
   return (
-    <div className="rounded-2xl shadow-lg overflow-hidden">
-      <div
-        className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-gray-800 dark:to-gray-900
-       p-6 border-b border-purple-200 dark:border-gray-700"
-      >
-        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-6">
-            <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-2">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full md:w-auto px-3 py-2 border border-purple-300 dark:border-gray-600 rounded-lg
-                 bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-purple-800 dark:text-purple-200 mb-2">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full md:w-auto px-3 py-2 border border-purple-300 dark:border-gray-600 rounded-lg
-                 bg-white dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-          <button
-            onClick={exportToPDF}
-            className="w-full md:w-auto flex items-center justify-center px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 transition-colors shadow-md"
-          >
-            Export to PDF
-          </button>
-        </div>
+    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+      <div className="p-6 border-b border-purple-200 dark:border-gray-700">
+        <HeaderButtons
+          exportType={exportType}
+          setExportType={setExportType}
+          handleExport={handleExport}
+        />
+
+        <TableFilters
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          selectedProject={selectedProject}
+          selectedPsu={selectedpsu}
+          setSelectedPsu={setSelectedpsu}
+          psuOptions={psuOptions}
+        />
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full table-fixed border-collapse">
-          <thead className="bg-purple-50 dark:bg-gray-800 text-purple-800 dark:text-purple-200">
+        <table className="w-full">
+          <thead className="text-purple-800 bg-purple-50 dark:bg-gray-800 dark:text-purple-200">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/5">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/5">
-                Date
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                <div className="flex justify-start items-center">
+                  Delivery Date
+                  <button onClick={() => setsortAsc(!sortAsc)} className="ml-2">
+                    {sortAsc ? <SortAscIcon /> : <SortDescIcon />}
+                  </button>
+                </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/5">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                State
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                District
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                School
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                PSU
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/5">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                 Cost
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider w-1/5">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
                 Image
               </th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, index) => (
+            {paginatedData.map((row, index) => (
               <tr
                 key={index}
                 className={`${
@@ -125,17 +208,26 @@ const SanitaryPadTable = ({ data }) => {
                     : "bg-purple-50/50 dark:bg-gray-800/50"
                 } hover:bg-purple-100/50 dark:hover:bg-gray-700/50 transition-colors`}
               >
-                <td
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
-                  title={row.id}
-                >
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   {row.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                   {new Date(row.delivery_date).toLocaleDateString()}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.state_name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.district_name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.school_name}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                  {row.psu ?? "BPCL"}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                <span
+                  <span
                     className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       row.status.toLowerCase() === "shipped"
                         ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
@@ -157,7 +249,7 @@ const SanitaryPadTable = ({ data }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                   <img
                     src={row.proof_image_url}
-                    alt={row.item_name}
+                    alt="Proof"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
                 </td>
@@ -166,6 +258,12 @@ const SanitaryPadTable = ({ data }) => {
           </tbody>
         </table>
       </div>
+
+      <TablePageNavButton
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };

@@ -13,7 +13,6 @@ const ProjectList = ({
     setIsExpanded(!isExpanded); // Toggle the dropdown
     setIsSidebarOpen(true); // Ensure the sidebar is open
   };
-
   // Automatically expand the dropdown if a project is selected
   useEffect(() => {
     if (selectedProject) {
@@ -31,7 +30,9 @@ const ProjectList = ({
           dark:text-[#c7bebc] dark:hover:text-[var(--color-primary)]
           ${
             selectedProject
-              ? `${isOpen?'border-l-[5px]':'md:border-l-[5px]'} border-[var(--color-primary)]
+              ? `${
+                  isOpen ? "border-l-[5px]" : "md:border-l-[5px]"
+                } border-[var(--color-primary)]
               bg-[var(--color-primary-hover)] text-[var(--color-primary)] dark:text-[var(--color-primary)]`
               : "border-l-[5px] border-transparent"
           }`}

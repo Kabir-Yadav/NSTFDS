@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import TablePageNavButton from "../components/table_components/table_pageNav_button";
 
-const AdminPsuSelectionForm = ({ selectedPsuProject }) => {
+const UserPsuSelectionForm = ({ selectedPsuProject }) => {
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
@@ -655,4 +655,4 @@ const AdminPsuSelectionForm = ({ selectedPsuProject }) => {
   );
 };
 
-export default AdminPsuSelectionForm;
+export default UserPsuSelectionForm;

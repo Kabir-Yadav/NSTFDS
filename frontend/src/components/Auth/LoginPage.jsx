@@ -31,7 +31,7 @@ const LoginPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     // Clear validation errors when typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -41,7 +41,7 @@ const LoginPage = () => {
   const validateForm = () => {
     let valid = true;
     const newErrors = { email: "", password: "", general: "" };
-    
+
     // Email validation
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -50,7 +50,7 @@ const LoginPage = () => {
       newErrors.email = "Please enter a valid email address";
       valid = false;
     }
-    
+
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -59,7 +59,7 @@ const LoginPage = () => {
       newErrors.password = "Password must be at least 6 characters";
       valid = false;
     }
-    
+
     setErrors(newErrors);
     return valid;
   };
@@ -71,29 +71,24 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       triggerWobble();
       return;
     }
-    
+
     const user = demoUsers.find(
       (u) => u.email === formData.email && u.password === formData.password
     );
-
     if (user) {
-      if (user) {
-        localStorage.setItem("userRole", user.role); // Save role
-        localStorage.setItem("isAuthenticated", "true"); // Save auth status
-        if (user.role === "admin") {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/user-dashboard");
-        }
-      }
-      
+      localStorage.setItem("userRole", user.role); // Save role
+      localStorage.setItem("isAuthenticated", "true"); // Save auth status
+      navigate("/dashboard");
     } else {
-      setErrors((prev) => ({ ...prev, general: "Invalid credentials. Please try again." }));
+      setErrors((prev) => ({
+        ...prev,
+        general: "Invalid credentials. Please try again.",
+      }));
       triggerWobble();
     }
   };
@@ -104,8 +99,16 @@ const LoginPage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <img src="assets/nsfdc.png" alt="Logo" className="w-24 object-fill" />
-            <img src="assets/ministry.png" alt="Logo" className="w-24 h-30 object-contain" />
+            <img
+              src="assets/nsfdc.png"
+              alt="Logo"
+              className="w-24 object-fill"
+            />
+            <img
+              src="assets/ministry.png"
+              alt="Logo"
+              className="w-24 h-30 object-contain"
+            />
             <img src="assets/src.jpg" alt="Logo" className="w-24 object-fill" />
           </div>
           <h2 className="text-3xl font-display font-semibold text-gray-900">
@@ -191,10 +194,10 @@ const LoginPage = () => {
                 name="rememberMe"
                 id="rememberMe"
                 checked={formData.rememberMe}
-                onChange={(e) => 
-                  setFormData((prev) => ({ 
-                    ...prev, 
-                    rememberMe: e.target.checked 
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    rememberMe: e.target.checked,
                   }))
                 }
                 className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"

@@ -4,14 +4,24 @@ import "jspdf-autotable";
 import {
   fetchDeviceProcurements,
   fetchSanitaryProcurements,
+  uploadProofImage,
 } from "../../../action/supabase_actions";
 import { SortAscIcon, SortDescIcon } from "lucide-react";
+import StatusTimeline from "./components/StatusTimeline";
+import ImageUploadModal from "./components/ImageUploadModal";
+import TableActions from "./components/TableActions";
+import { Eye, Upload } from "lucide-react";
 import HeaderButtons from "../components/table_components/header_buttons";
 import TableFilters from "../components/table_components/table_filters";
 import TablePageNavButton from "../components/table_components/table_pageNav_button";
 import EnhancedAddDataDialog from "./forms/Add_Data_Dialog/add_dataDialog";
 
-const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
+const AdminProjectSelectionForm = ({
+  selectedProject,
+  hierarchicalData,
+  projectdata,
+  psulist,
+}) => {
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [startDate, setStartDate] = useState("");
@@ -21,6 +31,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const [selectedSchool, setSelectedSchool] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showAddDataModal, setShowAddDataModal] = useState(false);
+  const [editingData, setEditingData] = useState({});
   const [selectedpsu, setSelectedpsu] = useState("");
   const [sortAsc, setsortAsc] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,6 +39,21 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const [exportType, setExportType] = useState("PDF");
   const [showEnhancedAddDataDialog, setShowEnhancedAddDataDialog] =
     useState(false);
+
+  // New state for editing and timeline
+  const [editingRow, setEditingRow] = useState(null);
+  const [editingStatus, setEditingStatus] = useState("");
+  const [timelineModal, setTimelineModal] = useState({
+    isOpen: false,
+    row: null,
+  });
+  const [imageModal, setImageModal] = useState({
+    isOpen: false,
+    row: null,
+    type: null,
+  });
+
+  const statusOptions = projectdata.status_list || [];
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const paginatedData = filteredData.slice(
@@ -88,6 +114,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
         (!selectedCategory || item.item_name === selectedCategory)
       );
     });
+
     filtered.sort((a, b) =>
       sortAsc
         ? new Date(a.delivery_date) - new Date(b.delivery_date)
@@ -95,6 +122,63 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
     );
 
     setFilteredData(filtered);
+  };
+
+  const handleEditStart = (row) => {
+    setEditingRow(row.id);
+    setEditingStatus(row.status);
+    setEditingData({
+      delivery_tracking_number: row.delivery_tracking_number || "",
+      vendor_name: row.vendor_name || "",
+      purchase_order_number: row.purchase_order_number || "",
+      invoice_number: row.invoice_number || "",
+      warranty_period: row.warranty_period || "",
+      installation_date: row.installation_date || "",
+      technician_name: row.technician_name || "",
+      remarks: row.remarks || "",
+      contact_person: row.contact_person || "",
+      contact_phone: row.contact_phone || "",
+    });
+  };
+
+  const handleEditSave = async (row) => {
+    try {
+      // Call your API to update the status
+      // await updateProcurementStatus(row.id, editingStatus);
+
+      // Update local state
+      const updatedData = tableData.map((item) =>
+        item.id === row.id ? { ...item, status: editingStatus } : item
+      );
+      setTableData(updatedData);
+      setFilteredData(updatedData);
+
+      setEditingRow(null);
+      setEditingStatus("");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingRow(null);
+    setEditingStatus("");
+  };
+
+  const handleImageUpload = async (file, rowId, imageType) => {
+    try {
+      // Call your API to upload image
+      const imageUrl = await uploadProofImage(file, rowId, imageType);
+
+      // Update local state
+      const updatedData = tableData.map((item) =>
+        item.id === rowId ? { ...item, [imageType]: imageUrl } : item
+      );
+      setTableData(updatedData);
+      setFilteredData(updatedData);
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+    }
   };
 
   const exportToPDF = () => {
@@ -114,6 +198,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
       "Status",
       "Cost",
     ];
+
     const tableRows = filteredData.map((row) => [
       row.id,
       new Date(row.delivery_date).toLocaleDateString(),
@@ -196,7 +281,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
     : [];
   const districtOptions =
     (selectedState &&
-      data
+      hierarchicalData
         .find((item) => item.state_name === selectedState)
         ?.districts.map((d) => d.district_name)
         .sort()) ||
@@ -204,43 +289,28 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
   const schoolOptions =
     (selectedState &&
       selectedDistrict &&
-      data
+      hierarchicalData
         .find((item) => item.state_name === selectedState)
         ?.districts.find((d) => d.district_name === selectedDistrict)
-        ?.schools.sort()) ||
+        ?.schools) ||
     [];
   const psuOptions = tableData
     ? Array.from(new Set(tableData.map((item) => item.psu)))
     : [];
-  return (
-    <div
-      className="
-        overflow-hidden
-        bg-white
-        rounded-2xl
-        shadow-lg
-        dark:bg-gray-900
-      "
-    >
-      <div
-        className="
-          p-6
-          border-b border-purple-200
-          dark:border-gray-700
-        "
-      >
-        {/* {Table Header Buttons} */}
 
+  return (
+    <div className="overflow-hidden bg-white rounded-2xl shadow-lg dark:bg-gray-900">
+      <div className="p-6 border-b border-purple-200 dark:border-gray-700">
         <HeaderButtons
           exportType={exportType}
           setExportType={setExportType}
           handleExport={handleExport}
-          setShowAddDataModal={() => setShowEnhancedAddDataDialog(true)} // Open Enhanced Dialog
+          isAdmin={true}
+          setShowAddDataModal={() => setShowEnhancedAddDataDialog(true)}
         />
 
-        {/* {Filters} */}
-
         <TableFilters
+          isAdmin={true}
           startDate={startDate}
           setStartDate={setStartDate}
           endDate={endDate}
@@ -256,7 +326,6 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
           stateOptions={stateOptions}
           districtOptions={districtOptions}
           schoolOptions={schoolOptions}
-          categories={categories}
           selectedProject={selectedProject}
           selectedPsu={selectedpsu}
           setSelectedPsu={setSelectedpsu}
@@ -264,125 +333,52 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
         />
       </div>
 
-      {/* {TABLE} */}
-
-      <div
-        className="
-          overflow-x-auto
-        "
-      >
-        <table
-          className="
-            w-full
-          "
-        >
-          <thead
-            className="
-              text-purple-800
-              bg-purple-50
-              dark:bg-gray-800 dark:text-purple-200
-            "
-          >
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="text-purple-800 bg-purple-50 dark:bg-gray-800 dark:text-purple-200">
             <tr>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 ID
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
-                <div
-                  className="
-                    flex
-                    justify-start items-center
-                  "
-                >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                <div className="flex justify-start items-center">
                   Delivery Date
-                  <button
-                    onClick={() => {
-                      setsortAsc(!sortAsc); // Toggle sort order
-                    }}
-                    className="
-                      ml-2
-                    "
-                  >
+                  <button onClick={() => setsortAsc(!sortAsc)} className="ml-2">
                     {sortAsc ? <SortAscIcon /> : <SortDescIcon />}
                   </button>
                 </div>
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 State
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 District
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 School
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 PSU
               </th>
-              {selectedProject?.name === "Digital Device Procurement" && (
-                <th
-                  className="
-                    px-6 py-4
-                    text-left text-xs font-semibold
-                    uppercase
-                  "
-                >
+              {projectdata.category_list.length > 0 && (
+                <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                   Category
                 </th>
               )}
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 Status
               </th>
-              <th
-                className="
-                  px-6 py-4
-                  text-left text-xs font-semibold
-                  uppercase
-                "
-              >
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                 Cost
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                Proof Photo
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                Completed Photo
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                Actions
               </th>
             </tr>
           </thead>
@@ -391,8 +387,7 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
               <tr
                 key={index}
                 className={`
-                  transition-colors
-                  hover:bg-purple-100/50 dark:hover:bg-gray-700/50
+                  transition-colors hover:bg-purple-100/50 dark:hover:bg-gray-700/50
                   ${
                     index % 2 === 0
                       ? "bg-white dark:bg-gray-900"
@@ -400,125 +395,166 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
                   }
                 `}
               >
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-900
-                    dark:text-gray-100
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                   {row.id}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {new Date(row.delivery_date).toLocaleDateString()}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {row.state_name}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {row.district_name}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {row.school_name}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   {"BPCL"}
                 </td>
                 {selectedProject?.name === "Digital Device Procurement" && (
-                  <td
-                    className="
-                      px-6 py-4
-                      text-sm text-gray-700
-                      dark:text-gray-300
-                    "
-                  >
+                  <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                     {row.item_name}
                   </td>
                 )}
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
-                  <span
-                    className={`
-                      inline-flex
-                      px-3 py-1
-                      text-xs leading-5 font-semibold
-                      rounded-full
-                      ${
-                        row.status.toLowerCase() === "shipped"
-                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                          : row.status.toLowerCase() === "pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : row.status.toLowerCase() === "just deployed"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : row.status.toLowerCase() === "arrived"
-                          ? "bg-indigo-100 text-green-800 dark:bg-green-500 dark:text-green-100"
-                          : ""
-                      }
-                    `}
-                  >
-                    {row.status}
-                  </span>
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                  {editingRow === row.id ? (
+                    <select
+                      value={editingStatus}
+                      onChange={(e) => setEditingStatus(e.target.value)}
+                      className="px-2 py-1 text-xs border rounded-md bg-white dark:bg-gray-700 dark:border-gray-600"
+                    >
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span
+                      className={`
+                        inline-flex px-3 py-1 text-xs leading-5 font-semibold rounded-full
+                        ${
+                          row.status.toLowerCase() === "shipped"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                            : row.status.toLowerCase() === "pending"
+                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                            : row.status.toLowerCase() === "just deployed"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                            : row.status.toLowerCase() === "arrived"
+                            ? "bg-indigo-100 text-green-800 dark:bg-green-500 dark:text-green-100"
+                            : ""
+                        }
+                      `}
+                    >
+                      {row.status}
+                    </span>
+                  )}
                 </td>
-                <td
-                  className="
-                    px-6 py-4
-                    text-sm text-gray-700
-                    dark:text-gray-300
-                  "
-                >
+                <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   ₹{row.cost}
+                </td>
+                {/* Proof Photo Column */}
+                <td className="px-6 py-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    {row.proof_photo ? (
+                      <button
+                        onClick={() =>
+                          setImageModal({
+                            isOpen: true,
+                            row,
+                            type: "proof_photo",
+                          })
+                        }
+                        className="p-1 text-blue-600 hover:text-blue-800"
+                        title="View proof photo"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          setImageModal({
+                            isOpen: true,
+                            row,
+                            type: "proof_photo",
+                          })
+                        }
+                        className="p-1 text-gray-600 hover:text-gray-800"
+                        title="Add proof photo"
+                      >
+                        <Upload size={16} />
+                      </button>
+                    )}
+                  </div>
+                </td>
+                {/* Completed Photo Column */}
+                <td className="px-6 py-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    {row.completed_photo ? (
+                      <button
+                        onClick={() =>
+                          setImageModal({
+                            isOpen: true,
+                            row,
+                            type: "completed_photo",
+                          })
+                        }
+                        className="p-1 text-green-600 hover:text-green-800"
+                        title="View completed photo"
+                      >
+                        <Eye size={16} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          setImageModal({
+                            isOpen: true,
+                            row,
+                            type: "completed_photo",
+                          })
+                        }
+                        className="p-1 text-gray-600 hover:text-gray-800"
+                        title="Add completed photo"
+                      >
+                        <Upload size={16} />
+                      </button>
+                    )}
+                  </div>
+                </td>
+                {/* Actions Column */}{" "}
+                <td className="px-6 py-4 text-sm">
+                  <TableActions
+                    row={row}
+                    editingRow={editingRow}
+                    handleEditStart={handleEditStart}
+                    handleEditSave={handleEditSave}
+                    handleEditCancel={handleEditCancel}
+                    setTimelineModal={setTimelineModal}
+                    setImageModal={setImageModal}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
       <TablePageNavButton
         totalPages={totalPages}
         currentPage={currentPage}
         setCurrentPage={setCurrentPage}
       />
+
       <EnhancedAddDataDialog
         isOpen={showEnhancedAddDataDialog}
         onClose={() => setShowEnhancedAddDataDialog(false)}
         selectedProject={selectedProject}
-        data={data}
-        categories={categories}
+        psuList={psulist}
+        hierarchicalData={hierarchicalData}
+        status={statusOptions}
+        categories={projectdata.category_list || []}
         onSubmitSingle={(entry) => {
           setTableData((prev) => [...prev, entry]);
           setFilteredData((prev) => [...prev, entry]);
@@ -527,6 +563,27 @@ const AdminProjectSelectionForm = ({ selectedProject, data, categories }) => {
           setTableData((prev) => [...prev, ...entries]);
           setFilteredData((prev) => [...prev, ...entries]);
         }}
+      />
+
+      {/* Timeline Modal */}
+      <StatusTimeline
+        status={timelineModal.row?.status}
+        deliveryDate={timelineModal.row?.delivery_date}
+        isOpen={timelineModal.isOpen}
+        onClose={() => setTimelineModal({ isOpen: false, row: null })}
+      />
+
+      {/* Image Upload/View Modal */}
+      <ImageUploadModal
+        isOpen={imageModal.isOpen}
+        onClose={() => setImageModal({ isOpen: false, row: null, type: null })}
+        title={
+          imageModal.type === "proof_photo" ? "Proof Photo" : "Completed Photo"
+        }
+        currentImage={imageModal.row?.[imageModal.type]}
+        onUpload={(file) =>
+          handleImageUpload(file, imageModal.row?.id, imageModal.type)
+        }
       />
     </div>
   );

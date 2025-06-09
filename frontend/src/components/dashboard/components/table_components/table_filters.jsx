@@ -19,6 +19,7 @@ const TableFilters = ({
   stateOptions = [],
   schoolOptions = [],
   districtOptions = [],
+  isAdmin = false,
 }) => {
   return (
     <div
@@ -81,26 +82,27 @@ const TableFilters = ({
         />
       </div>
 
-      {/* State Filter */}
-      <div>
-        <label
-          className="
+      {isAdmin && (
+        <>
+          <div>
+            <label
+              className="
               block
               mb-2
               text-sm font-medium text-[var(--color-primary)]
             "
-        >
-          State
-        </label>
-        <select
-          value={selectedState}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedState(value);
-            setSelectedDistrict("");
-            setSelectedSchool("");
-          }}
-          className="
+            >
+              State
+            </label>
+            <select
+              value={selectedState}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedState(value);
+                setSelectedDistrict("");
+                setSelectedSchool("");
+              }}
+              className="
               w-full
               px-3 py-2
               text-black
@@ -108,36 +110,35 @@ const TableFilters = ({
               border border-gray-300 rounded-lg
               dark:border-gray-500 dark:bg-gray-900 dark:text-white
             "
-        >
-          <option value="">All States</option>
-          {stateOptions.map((state) => (
-            <option key={state} value={state}>
-              {state}
-            </option>
-          ))}
-        </select>
-      </div>
+            >
+              <option value="">All States</option>
+              {stateOptions.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {/* District Filter */}
-      <div>
-        <label
-          className="
+          <div>
+            <label
+              className="
               block
               mb-2
               text-sm font-medium text-[var(--color-primary)]
             "
-        >
-          District
-        </label>
-        <select
-          value={selectedDistrict}
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedDistrict(value);
-            setSelectedSchool("");
-          }}
-          disabled={!selectedState}
-          className="
+            >
+              District
+            </label>
+            <select
+              value={selectedDistrict}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSelectedDistrict(value);
+                setSelectedSchool("");
+              }}
+              disabled={!selectedState}
+              className="
               w-full
               px-3 py-2
               text-black
@@ -145,32 +146,31 @@ const TableFilters = ({
               border border-gray-300 rounded-lg
               dark:border-gray-500 dark:disabled:bg-[var(--color-text-secondary)] disabled:bg-[var(--color-text-disabled)] dark:bg-gray-900 dark:text-white dark:disabled:text-gray-800
             "
-        >
-          <option value="">All Districts</option>
-          {districtOptions.map((district) => (
-            <option key={district} value={district}>
-              {district}
-            </option>
-          ))}
-        </select>
-      </div>
+            >
+              <option value="">All Districts</option>
+              {districtOptions.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {/* School Filter */}
-      <div>
-        <label
-          className="
+          <div>
+            <label
+              className="
               block
               mb-2
               text-sm font-medium text-[var(--color-primary)]
             "
-        >
-          School
-        </label>
-        <select
-          value={selectedSchool}
-          onChange={(e) => setSelectedSchool(e.target.value)}
-          disabled={!selectedDistrict}
-          className="
+            >
+              School
+            </label>
+            <select
+              value={selectedSchool}
+              onChange={(e) => setSelectedSchool(e.target.value)}
+              disabled={!selectedDistrict}
+              className="
               w-full
               px-3 py-2
               text-black
@@ -178,15 +178,17 @@ const TableFilters = ({
               border border-gray-300 rounded-lg
               dark:border-gray-500 dark:disabled:bg-[var(--color-text-secondary)] disabled:bg-[var(--color-text-disabled)] dark:bg-gray-900 dark:text-white dark:disabled:text-gray-800
             "
-        >
-          <option value="">All Schools</option>
-          {schoolOptions.map((school) => (
-            <option key={school} value={school}>
-              {school}
-            </option>
-          ))}
-        </select>
-      </div>
+            >
+              <option value="">All Schools</option>
+              {schoolOptions.map((school) => (
+                <option key={school} value={school}>
+                  {school}
+                </option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
 
       <div>
         <label
@@ -220,7 +222,7 @@ const TableFilters = ({
       </div>
 
       {/* Category Filter (Conditional) */}
-      {selectedProject?.name === "Digital Device Procurement" && (
+      {selectedProject?.name === "Digital Device Procurement" && isAdmin && (
         <div>
           <label
             className="

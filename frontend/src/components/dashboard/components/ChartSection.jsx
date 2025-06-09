@@ -23,7 +23,20 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
     Math.floor(Math.random() * 100000000)
   ); // New state for total budget
 
-  const { pieChartProps, elevatedCardClass, chartColors, chartTheme, pieDataBudget, pieDataCompletion, pieDataSchool } = createChartConfig({ isDarkMode, completionRate, budgetUtilization, implementationRate })
+  const {
+    pieChartProps,
+    elevatedCardClass,
+    chartColors,
+    chartTheme,
+    pieDataBudget,
+    pieDataCompletion,
+    pieDataSchool,
+  } = createChartConfig({
+    isDarkMode,
+    completionRate,
+    budgetUtilization,
+    implementationRate,
+  });
   const loadMetrics = async (state) => {
     setLoading(true);
     try {
@@ -84,20 +97,29 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
   // Generate fake state budget data for PSU view
   const generateStateData = () => {
     const states = [
-      "Andhra Pradesh", "Gujarat", "Karnataka", "Tamil Nadu",
-      "Maharashtra", "Delhi", "Uttar Pradesh", "West Bengal",
-      "Rajasthan", "Madhya Pradesh", "Kerala", "Punjab"
+      "Andhra Pradesh",
+      "Gujarat",
+      "Karnataka",
+      "Tamil Nadu",
+      "Maharashtra",
+      "Delhi",
+      "Uttar Pradesh",
+      "West Bengal",
+      "Rajasthan",
+      "Madhya Pradesh",
+      "Kerala",
+      "Punjab",
     ];
 
     return states.map((state) => ({
       id: state,
       label: state,
       value: Math.floor(Math.random() * 900000) + 100000,
-      color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+      color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`,
     }));
   };
 
-  // Generate fake district data for selected state and PSU
+  // Generate district data with realistic constraints
   const getDistrictData = () => {
     const districts = [
       "North District",
@@ -107,13 +129,70 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
       "Central District",
     ];
 
-    return districts.map((district) => ({
-      name: district,
-      budget: Math.floor(Math.random() * 50000000) + 10000000,
-      schoolsTotal: Math.floor(Math.random() * 15) + 5,
-      schoolsCompleted: Math.floor(Math.random() * 10) + 1,
-      projectStatus: Math.floor(Math.random() * 100),
-    }));
+    const projectTypes = [
+      "Digital Infrastructure",
+      "Smart Classrooms",
+      "Computer Labs",
+      "Teacher Training",
+      "Educational Software",
+    ];
+
+    return districts.map((district) => {
+      // Base budget between 1 to 5 crores
+      const districtBudget = Math.floor(Math.random() * 40000000) + 10000000;
+      const districtSchoolsTotal = Math.floor(Math.random() * 20) + 10; // 10-30 schools
+      // Ensure completed schools don't exceed total schools
+      const maxCompletedSchools = Math.min(
+        districtSchoolsTotal,
+        Math.floor(districtSchoolsTotal * 0.8)
+      );
+      const districtSchoolsCompleted = Math.floor(
+        Math.random() * maxCompletedSchools
+      );
+
+      // Generate projects with realistic constraints
+      const projects = projectTypes.map((projectName) => {
+        // Allocate 10-30% of district budget to each project
+        const projectBudget = Math.floor(
+          districtBudget * (0.1 + Math.random() * 0.2)
+        );
+        // Allocate schools proportionally
+        const projectSchoolsTotal = Math.floor(
+          districtSchoolsTotal * (0.3 + Math.random() * 0.4)
+        );
+        const maxProjectCompleted = Math.min(
+          projectSchoolsTotal,
+          districtSchoolsCompleted
+        );
+        const projectSchoolsCompleted = Math.floor(
+          Math.random() * maxProjectCompleted
+        );
+        // Calculate status based on schools completion
+        const status = Math.floor(
+          (projectSchoolsCompleted / projectSchoolsTotal) * 100
+        );
+
+        return {
+          name: projectName,
+          budget: projectBudget,
+          schoolsTotal: projectSchoolsTotal,
+          schoolsCompleted: projectSchoolsCompleted,
+          status: status,
+        };
+      });
+
+      return {
+        name: district,
+        budget: districtBudget,
+        schoolsTotal: districtSchoolsTotal,
+        schoolsCompleted: districtSchoolsCompleted,
+        activeProjects: Math.min(
+          projectTypes.length,
+          Math.floor(Math.random() * 4) + 2
+        ), // 2-5 active projects
+        projects: projects,
+      };
+    });
   };
 
   // ImplementationSummary Component
@@ -330,7 +409,7 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
     </div>
   );
 
-   const StateAffected = ({ selectedState, selectedPSU }) => {
+  const StateAffected = ({ selectedState, selectedPSU }) => {
     const districtData = getDistrictData();
 
     return (
@@ -344,11 +423,16 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
       >
         {!selectedState ? (
           // Show pie chart of state budgets when only PSU is selected
-          <StatesPieChart stateBudgetData={generateStateData()} formatBudget={formatBudget} />
-
+          <StatesPieChart
+            stateBudgetData={generateStateData()}
+            formatBudget={formatBudget}
+          />
         ) : (
           // Show district detail cards when both PSU and state are selected
-          <DistrictDropdownView districtData={districtData} formatBudget={formatBudget}/>
+          <DistrictDropdownView
+            districtData={districtData}
+            formatBudget={formatBudget}
+          />
         )}
       </div>
     );

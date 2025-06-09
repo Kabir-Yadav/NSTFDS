@@ -10,7 +10,6 @@ import {
   FileSpreadsheet,
   FilePlus,
   Loader,
-  LucidePencil,
   AlertCircle,
 } from "lucide-react";
 import DeviceForm from "../device-form";
@@ -19,12 +18,15 @@ import TableHeader from "./table_header";
 import TableBody from "./table_body";
 import DialogFooter from "./footer";
 import { validateRow } from "./actions";
+import AddSingleDataForm from "./add_single_data_form";
 
 const EnhancedAddDataDialog = ({
   isOpen,
   onClose,
   selectedProject,
-  data,
+  psuList,
+  hierarchicalData,
+  status,
   categories,
   onSubmitSingle,
   onSubmitMultiple,
@@ -237,30 +239,20 @@ const EnhancedAddDataDialog = ({
   };
 
   const openForm = (selectedProject) => {
-    if (selectedProject?.name === "Digital Device Procurement") {
-      return (
-        <DeviceForm
-          isOpen={true}
-          data={data}
-          categories={categories}
-          onClose={() => {
-            setMode(null); // Reset mode when form is closed
-            onClose(); // Close the dialog
-          }}
-        />
-      );
-    } else if (selectedProject?.name === "Sanitary Pad Devices Procurement") {
-      return (
-        <SanitaryPadForm
-          isOpen={true}
-          data={data}
-          onClose={() => {
-            setMode(null); // Reset mode when form is closed
-            onClose(); // Close the dialog
-          }}
-        />
-      );
-    }
+    return (
+      <AddSingleDataForm
+        projectName={selectedProject?.name}
+        isOpen={true}
+        psuList={psuList}
+        hierarchicalData={hierarchicalData}
+        categories={categories}
+        status={status}
+        onClose={() => {
+          setMode(null); // Reset mode when form is closed
+          onClose(); // Close the dialog
+        }}
+      />
+    );
   };
 
   return (
