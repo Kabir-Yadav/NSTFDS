@@ -10,6 +10,35 @@ import {
 } from "lucide-react";
 import { InputField } from "./FormFields";
 
+// Initial form state
+const initialFormState = {
+  // Required fields
+  committedDate: "",
+  state: "",
+  district: "",
+  schoolName: "",
+  itemType: "",
+  quantity: "",
+  unitCost: "",
+  totalCost: "",
+  status: "",
+  PSU: "",
+
+  // Optional fields
+  deliveryDate: "",
+  block: "",
+  stage1ProofUrl: null,
+  stage2ProofUrl: null,
+  TackNumber: "",
+  vendorName: "",
+  purchaseOrderNumber: "",
+  invoiceNumber: "",
+  installationDate: "",
+  contactNumber: "",
+  certificateUrl: "",
+  remarks: "",
+};
+
 const AddSingleDataForm = ({
   projectName,
   psuList,
@@ -19,21 +48,7 @@ const AddSingleDataForm = ({
   categories,
   status,
 }) => {
-  // Essential fields only
-  const [formData, setFormData] = useState({
-    committedDate: "",
-    state: "",
-    district: "",
-    block: "",
-    schoolName: "",
-    itemType: "",
-    quantity: "",
-    unitCost: "",
-    totalCost: "",
-    status: "",
-    stage1ProofUrl: null,
-  });
-
+  const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -164,19 +179,7 @@ const AddSingleDataForm = ({
   };
 
   const handleClose = () => {
-    setFormData({
-      committedDate: "",
-      state: "",
-      district: "",
-      block: "",
-      schoolName: "",
-      itemType: "",
-      quantity: "",
-      unitCost: "",
-      totalCost: "",
-      status: "",
-      stage1ProofUrl: null,
-    });
+    setFormData(initialFormState);
     setErrors({});
     setLoading(false);
     onClose();
@@ -372,6 +375,16 @@ const AddSingleDataForm = ({
                     onChange={handleInputChange}
                   />
                 </div>
+                <div className="md:col-span-1">
+                  <InputField
+                    label="Proof Document"
+                    name="stage2ProofUrl"
+                    type="file"
+                    icon={FileImage}
+                    value={formData.stage2ProofUrl}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
             </div>
 
@@ -430,6 +443,7 @@ const AddSingleDataForm = ({
                   label="Certificate Url"
                   name="certificateUrl"
                   type="text"
+                  value={formData.certificateUrl}
                   onChange={handleInputChange}
                 />
                 <InputField
