@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   Calendar,
   MapPin,
@@ -9,11 +9,16 @@ import {
   Landmark,
 } from "lucide-react";
 import { InputField } from "./FormFields";
+import {
+  insertProjectDelivery,
+  uploadProofImage,
+} from "../../../../../action/supabase_actions";
 
 // Initial form state
-const initialFormState = {
+const initialFormState = (psu_name) => ({
   // Required fields
   committedDate: "",
+  targetDate: "",
   state: "",
   district: "",
   schoolName: "",
@@ -22,10 +27,9 @@ const initialFormState = {
   unitCost: "",
   totalCost: "",
   status: "",
-  PSU: "",
+  PSU: psu_name || "",
 
   // Optional fields
-  deliveryDate: "",
   block: "",
   stage1ProofUrl: null,
   stage2ProofUrl: null,
@@ -37,18 +41,23 @@ const initialFormState = {
   contactNumber: "",
   certificateUrl: "",
   remarks: "",
-};
+});
 
 const AddSingleDataForm = ({
   projectName,
+  psu_name,
   psuList,
   isOpen,
   hierarchicalData,
   onClose,
   categories,
   status,
+  onSubmitSingle,
 }) => {
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState({
+    ...initialFormState,
+    PSU: psu_name || "",
+  });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -101,24 +110,31 @@ const AddSingleDataForm = ({
         ? hierarchicalData
             .find((item) => item.state_name === formData.state)
             ?.districts?.find((d) => d.district_name === formData.district)
-            ?.schools || []
+            ?.functional_schools || []
         : [],
     [hierarchicalData, formData.state, formData.district]
   );
 
   const validateForm = () => {
-    const newErrors = {};
-
-    // Required fields validation
+    const newErrors = {}; // Required fields validation
     const requiredFields = {
       committedDate: "Committed Date",
+      targetDate: "Target Date",
       state: "State",
       district: "District",
       schoolName: "School Name",
       totalCost: "Total Cost",
       status: "Status",
-      itemType: "Item Type",
+      ...(Array.isArray(categories) &&
+        categories.length > 0 && { itemType: "Item Type" }),
       PSU: "PSU",
+      ...(formData.status === status[status.length - 2] ||
+      formData.status === status[status.length - 1]
+        ? { stage1ProofUrl: "Stage 1 Proof Document" }
+        : {}),
+      ...(formData.status === status[status.length - 1]
+        ? { stage2ProofUrl: "Stage 2 Proof Document" }
+        : {}),
     };
 
     Object.entries(requiredFields).forEach(([field, label]) => {
@@ -157,29 +173,85 @@ const AddSingleDataForm = ({
     e.preventDefault();
 
     if (!validateForm()) {
+      console.log("Form validation failed. Invalid fields:", errors);
+      Object.entries(errors).forEach(([field, error]) => {
+        console.log(`${field}: ${error}`);
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      // Here you would implement the actual submission logic
-      // const result = await submitProjectDelivery(formData);
+      let urlStage1 = null;
+      let urlStage2 = null; // Upload Stage 1 proof if exists
+      // Only upload if value is a File (not string/URL)
+      if (formData.stage1ProofUrl && formData.stage1ProofUrl instanceof File) {
+        urlStage1 = await uploadProofImage({
+          file: formData.stage1ProofUrl,
+          projectName,
+        });
+      } else if (typeof formData.stage1ProofUrl === "string") {
+        urlStage1 = formData.stage1ProofUrl;
+      }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (formData.stage2ProofUrl && formData.stage2ProofUrl instanceof File) {
+        urlStage2 = await uploadProofImage({
+          file: formData.stage2ProofUrl,
+          projectName,
+        });
+      } else if (typeof formData.stage2ProofUrl === "string") {
+        urlStage2 = formData.stage2ProofUrl;
+      }
 
-      console.log("Submitting data:", formData);
-      handleClose();
+      // Continue with form submission
+      try {
+        const payload = {
+          psu_name: formData.PSU,
+          project_name: projectName,
+          state: formData.state,
+          district: formData.district,
+          block: formData.block || null,
+          school_name: formData.schoolName,
+          item_type: formData.itemType,
+          quantity: Number(formData.quantity) || 0,
+          unit_cost: Number(formData.unitCost) || 0,
+          total_cost: Number(formData.totalCost) || 0,
+          committed_date: formData.committedDate,
+          status: formData.status,
+          stage1_proof_url: urlStage1 || null,
+          stage2_proof_url: urlStage2 || null,
+          targetDate: formData.targetDate,
+          extra_json: {
+            tracking_number: formData.TackNumber || null,
+            vendor_name: formData.vendorName || null,
+            purchase_order_number: formData.purchaseOrderNumber || null,
+            invoice_number: formData.invoiceNumber || null,
+            installation_date: formData.installationDate || null,
+            contact_number: formData.contactNumber || null,
+            certificate_url: formData.certificateUrl || null,
+            remarks: formData.remarks || null,
+          },
+        };
+
+        const { error } = await insertProjectDelivery(payload);
+        if (error) throw error;
+        console.log(payload);
+        onSubmitSingle(payload);
+        handleClose();
+      } catch (error) {
+        console.error("Submission error:", error);
+        setErrors({ submit: `Failed to save data: ${error.message}` });
+      }
     } catch (error) {
-      setErrors({ submit: "Failed to save data. Please try again." });
+      console.error("Upload error:", error);
+      setErrors({ submit: `Failed to save data: ${error.message}` });
     } finally {
       setLoading(false);
     }
   };
-
   const handleClose = () => {
-    setFormData(initialFormState);
+    setFormData({ ...initialFormState, PSU: psu_name || "" });
     setErrors({});
     setLoading(false);
     onClose();
@@ -193,11 +265,10 @@ const AddSingleDataForm = ({
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">
-            Add New {projectName.replace("Procurement", "").trim()} Delivery
+            Add New {projectName.replace("Procurement", "").trim()}
           </h2>
           <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
-            Fill in the essential details to create a new project delivery
-            record
+            Fill in the essential details to create a new project record
           </p>
         </div>
 
@@ -224,13 +295,14 @@ const AddSingleDataForm = ({
                 error={errors.committedDate}
               />
               <InputField
-                label="Delivery Date"
-                name="deliveryDate"
+                label="Target Date"
+                name="targetDate"
                 type="date"
                 icon={Calendar}
-                value={formData.deliveryDate}
+                value={formData.targetDate}
                 onChange={handleInputChange}
-                error={errors.deliveryDate}
+                error={errors.targetDate}
+                required
               />
               <InputField
                 label="Status"
@@ -242,20 +314,15 @@ const AddSingleDataForm = ({
                 value={formData.status}
                 onChange={handleInputChange}
                 error={errors.status}
-              />
+              />{" "}
               <InputField
                 label="PSU"
                 name="PSU"
                 icon={Landmark}
-                options={psuList}
-                placeholder="Select PSU"
-                required
-                value={formData.PSU}
-                onChange={handleInputChange}
-                error={errors.PSU}
+                value={psu_name}
+                disabled={true}
               />
             </div>
-
             {/* Location Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">
@@ -307,7 +374,6 @@ const AddSingleDataForm = ({
                 />
               </div>
             </div>
-
             {/* Item Details */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">
@@ -336,8 +402,7 @@ const AddSingleDataForm = ({
                   error={errors.quantity}
                 />
               </div>
-            </div>
-
+            </div>{" "}
             {/* Cost Details */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">
@@ -365,29 +430,39 @@ const AddSingleDataForm = ({
                   onChange={handleInputChange}
                   error={errors.totalCost}
                 />
-                <div className="md:col-span-1">
-                  <InputField
-                    label="Proof Document"
-                    name="stage1ProofUrl"
-                    type="file"
-                    icon={FileImage}
-                    value={formData.stage1ProofUrl}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="md:col-span-1">
-                  <InputField
-                    label="Proof Document"
-                    name="stage2ProofUrl"
-                    type="file"
-                    icon={FileImage}
-                    value={formData.stage2ProofUrl}
-                    onChange={handleInputChange}
-                  />
-                </div>
+                {/* Show Stage 1 proof for second last and last status */}
+                {formData.status === status[status.length - 2] ||
+                formData.status === status[status.length - 1] ? (
+                  <div className="md:col-span-1">
+                    <InputField
+                      label="Stage 1 Proof"
+                      name="stage1ProofUrl"
+                      type="file"
+                      icon={FileImage}
+                      required
+                      value={formData.stage1ProofUrl}
+                      onChange={handleInputChange}
+                      error={errors.stage1ProofUrl}
+                    />
+                  </div>
+                ) : null}
+                {/* Show Stage 2 proof only for last status */}
+                {formData.status === status[status.length - 1] ? (
+                  <div className="md:col-span-1">
+                    <InputField
+                      label="Stage 2 Proof"
+                      name="stage2ProofUrl"
+                      type="file"
+                      icon={FileImage}
+                      required
+                      value={formData.stage2ProofUrl}
+                      onChange={handleInputChange}
+                      error={errors.stage2ProofUrl}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
-
             {/* Extra Details */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-2">

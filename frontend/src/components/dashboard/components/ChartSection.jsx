@@ -5,6 +5,7 @@ import {
   fetchDigitalDeviceProcurementRate,
   fetchBudgetUtilization,
   fetchSchoolImplementationRate,
+  fetchProjectCompletionRate,
 } from "../../../action/supabase_actions";
 import SchoolCard from "./charts/school_card";
 import BudgetCard from "./charts/budget_card";
@@ -19,9 +20,7 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
   const [completionRate, setCompletionRate] = useState(0);
   const [budgetUtilization, setBudgetUtilization] = useState(0);
   const [implementationRate, setImplementationRate] = useState(0);
-  const [totalBudget, setTotalBudget] = useState(
-    Math.floor(Math.random() * 100000000)
-  ); // New state for total budget
+  const [totalBudget, setTotalBudget] = useState(0); // New state for total budget
 
   const {
     pieChartProps,
@@ -43,32 +42,35 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
       // If no state is selected, pass null to fetch overall stats.
       const stateParam = state && state !== "" ? state : null;
 
-      // Fetch Digital Procurement Completion Rate
-      const digitalData = await fetchDigitalDeviceProcurementRate(stateParam);
+      const digitalData = await fetchProjectCompletionRate(stateParam);
       if (digitalData.length > 0) {
-        // Assume digital_completion_rate is returned as a string percentage.
-        setCompletionRate(Number(digitalData[0].digital_completion_rate));
+        if (stateParam) {
+          // If a state is selected, show that state's completion rate
+          setCompletionRate(Number(digitalData[0].completion_rate));
+        } else {
+          // If no state is selected, calculate cumulative completion rate
+          const totalRate = digitalData.reduce(
+            (sum, state) => sum + Number(state.completion_rate),
+            0
+          );
+          const averageRate = Number(
+            (totalRate / digitalData.length).toFixed(2)
+          );
+          setCompletionRate(averageRate);
+        }
       } else {
         setCompletionRate(0);
       }
 
       // Fetch Budget Utilization Data
       const budgetData = await fetchBudgetUtilization(stateParam);
-
-      if (budgetData.length > 0) {
-        setBudgetUtilization(Number(budgetData[0].budget_utilization_percent));
-      } else {
-        setBudgetUtilization(0);
-      }
+      console.log(budgetData);
+      setBudgetUtilization(Number(budgetData[0].budget_utilization_pct));
 
       // Fetch School Implementation Rate Data
       const implData = await fetchSchoolImplementationRate(stateParam);
 
-      if (implData.length > 0) {
-        setImplementationRate(Number(implData[0].implementation_rate));
-      } else {
-        setImplementationRate(0);
-      }
+      setImplementationRate(Number(implData[0].implementation_rate));
     } catch (err) {
       console.error("Error loading metrics:", err);
     }
@@ -92,7 +94,7 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
   };
 
   const StateBudget = Math.floor(Math.random() * totalBudget);
-  const budgetPercentage = ((StateBudget / totalBudget) * 100).toFixed(1);
+  const budgetPercentage = ((StateBudget / totalBudget) * 100).toFixed(2);
 
   // Generate fake state budget data for PSU view
   const generateStateData = () => {

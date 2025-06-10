@@ -2,7 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "../../../context/ThemeContext";
 import {
+  fetchDistrictCompletionRate,
   fetchDistrictProgressByState,
+  fetchProjectCompletionRate,
+  fetchPsuProjectBudgets,
+  fetchPsuProjectBudgetsByState,
+  fetchPsuStateBudgets,
   fetchStateProgress,
 } from "../../../action/supabase_actions";
 import { motion, AnimatePresence } from "framer-motion";
@@ -104,24 +109,50 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
       setLoading(true);
       try {
         if (!selectedState && !selectedPsu) {
-          const progress = await fetchStateProgress({
-            onLoadingStart: () => setLoading(true),
-            onLoadingEnd: () => setLoading(false),
-          });
-          setData(progress);
+          const progress = await fetchProjectCompletionRate();
+          const transformedData = progress.map(
+            ({ state_name, completion_rate }) => ({
+              state: state_name,
+              progress: completion_rate,
+            })
+          );
+          setData(transformedData);
           setKeys(["progress"]);
         } else if (!selectedState && selectedPsu) {
-          setData(getFakePsuBudgetData());
+          const budgetData = await fetchPsuStateBudgets(selectedPsu);
+          // Transform data to match chart format
+          const transformedData = budgetData.map(
+            ({ state_name, allocated_budget, used_budget }) => ({
+              state: state_name,
+              allocatedBudget: allocated_budget,
+              usedBudget: used_budget,
+            })
+          );
+          setData(transformedData);
           setKeys(["allocatedBudget", "usedBudget"]);
         } else if (selectedState && !selectedPsu) {
-          const progress = await fetchDistrictProgressByState(selectedState, {
-            onLoadingStart: () => setLoading(true),
-            onLoadingEnd: () => setLoading(false),
-          });
-          setData(progress);
+          const progress = await fetchDistrictCompletionRate(selectedState);
+          const transformedData = progress.map(
+            ({ district_name, completion_rate }) => ({
+              district: district_name,
+              progress: completion_rate,
+            })
+          );
+          setData(transformedData);
           setKeys(["progress"]);
         } else {
-          setData(getFakePsuProjectData());
+          const budgetData = await fetchPsuProjectBudgetsByState(
+            selectedPsu,
+            selectedState
+          );
+          const transformedData = budgetData.map(
+            ({ project_name, allocated_budget, used_budget }) => ({
+              project: project_name,
+              allocatedBudget: allocated_budget,
+              usedBudget: used_budget,
+            })
+          );
+          setData(transformedData);
           setKeys(["allocatedBudget", "usedBudget"]);
         }
       } catch (err) {
@@ -248,13 +279,13 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
           <div
             style={{
               width: `${chartWidth}px`,
-              height: data.length > 1 ? chartHeight : "200px",
+              height: data.length > 0 ? chartHeight : "200px",
               position: "relative",
               minHeight: "100px",
             }}
             className="inline-block"
           >
-            {data.length > 1 ? (
+            {data.length > 0 ? (
               <AnimatePresence mode="wait">
                 {!loading && (
                   <motion.div

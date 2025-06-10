@@ -19,25 +19,37 @@ const StatusTimeline = ({
   onUpdateData,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
+  const [editData, setEditData] = useState({
+    delivery_tracking_number: "",
+    vendor_name: "",
+    purchase_order_number: "",
+    invoice_number: "",
+    warranty_period: "",
+    installation_date: "",
+    technician_name: "",
+    contact_person: "",
+    contact_phone: "",
+    remarks: "",
+  });
 
   // Initialize edit data when modal opens
   useEffect(() => {
-    if (isOpen && additionalData) {
+    if (isOpen) {
       setEditData({
-        delivery_tracking_number: additionalData.delivery_tracking_number || "",
-        vendor_name: additionalData.vendor_name || "",
-        purchase_order_number: additionalData.purchase_order_number || "",
-        invoice_number: additionalData.invoice_number || "",
-        warranty_period: additionalData.warranty_period || "",
-        installation_date: additionalData.installation_date || "",
-        technician_name: additionalData.technician_name || "",
-        contact_person: additionalData.contact_person || "",
-        contact_phone: additionalData.contact_phone || "",
-        remarks: additionalData.remarks || "",
+        delivery_tracking_number:
+          additionalData?.delivery_tracking_number ?? "",
+        vendor_name: additionalData?.vendor_name ?? "",
+        purchase_order_number: additionalData?.purchase_order_number ?? "",
+        invoice_number: additionalData?.invoice_number ?? "",
+        warranty_period: additionalData?.warranty_period ?? "",
+        installation_date: additionalData?.installation_date ?? "",
+        technician_name: additionalData?.technician_name ?? "",
+        contact_person: additionalData?.contact_person ?? "",
+        contact_phone: additionalData?.contact_phone ?? "",
+        remarks: additionalData?.remarks ?? "",
       });
     }
-  }, [isOpen, additionalData]);
+  }, [isOpen]); // Only run when isOpen changes
 
   const getStatusStages = () => {
     const stages = [
@@ -65,20 +77,19 @@ const StatusTimeline = ({
     }
     setIsEditing(false);
   };
-
   const handleCancel = () => {
-    // Reset to original data
+    // Reset to original data using the same structure as in useEffect
     setEditData({
-      delivery_tracking_number: additionalData.delivery_tracking_number || "",
-      vendor_name: additionalData.vendor_name || "",
-      purchase_order_number: additionalData.purchase_order_number || "",
-      invoice_number: additionalData.invoice_number || "",
-      warranty_period: additionalData.warranty_period || "",
-      installation_date: additionalData.installation_date || "",
-      technician_name: additionalData.technician_name || "",
-      contact_person: additionalData.contact_person || "",
-      contact_phone: additionalData.contact_phone || "",
-      remarks: additionalData.remarks || "",
+      delivery_tracking_number: additionalData?.delivery_tracking_number ?? "",
+      vendor_name: additionalData?.vendor_name ?? "",
+      purchase_order_number: additionalData?.purchase_order_number ?? "",
+      invoice_number: additionalData?.invoice_number ?? "",
+      warranty_period: additionalData?.warranty_period ?? "",
+      installation_date: additionalData?.installation_date ?? "",
+      technician_name: additionalData?.technician_name ?? "",
+      contact_person: additionalData?.contact_person ?? "",
+      contact_phone: additionalData?.contact_phone ?? "",
+      remarks: additionalData?.remarks ?? "",
     });
     setIsEditing(false);
   };

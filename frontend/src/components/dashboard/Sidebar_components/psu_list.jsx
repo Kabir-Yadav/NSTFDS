@@ -6,6 +6,7 @@ const PSUList = ({
   onPsuProjectSelect,
   isOpen,
   setIsSidebarOpen,
+  setSelectedPsu,
 }) => {
   const [expandedPsu, setExpandedPsu] = useState(null);
   const [isMainExpanded, setIsMainExpanded] = useState(true);
@@ -17,6 +18,7 @@ const PSUList = ({
       );
       if (parentPsu) {
         setExpandedPsu(parentPsu.name);
+        setSelectedPsu(parentPsu.name);
         setIsMainExpanded(true);
       }
     }
@@ -123,9 +125,7 @@ const PSUList = ({
                   items-center duration-300 ease-in-out
                   ${
                     selectedPsuProject &&
-                    psu.projects?.some(
-                      (proj) => proj === selectedPsuProject
-                    )
+                    psu.projects?.some((proj) => proj === selectedPsuProject)
                       ? "bg-[var(--color-primary-light)] text-[var(--color-primary)] dark:text-[var(--color-primary)]"
                       : "text-[#433c3a] dark:text-[#c7bebc] dark:hover:text-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-light)]"
                   }
@@ -171,8 +171,7 @@ const PSUList = ({
                   `}
                 >
                   {psu.projects.map((project) => {
-                    const isProjectActive =
-                      selectedPsuProject === project;
+                    const isProjectActive = selectedPsuProject === project;
 
                     return (
                       <li
@@ -192,9 +191,7 @@ const PSUList = ({
                           ${isProjectActive ? "font-semibold" : ""}
                         `}
                       >
-                        <span className="text-sm font-outfit">
-                          {project}
-                        </span>
+                        <span className="text-sm font-outfit">{project}</span>
                       </li>
                     );
                   })}

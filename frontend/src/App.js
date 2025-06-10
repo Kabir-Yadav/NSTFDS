@@ -6,8 +6,6 @@ import LoginPage from './components/Auth/LoginPage';
 import RegisterPage from './components/Auth/RegisterPage';
 import Dashboard from './components/dashboard/dashboard';
 import ProtectedRoute from './protected_routes';
-import { supabase } from './supabaseClient'; // Import Supabase client
-
 
 function App() {
   return (
@@ -15,11 +13,8 @@ function App() {
       <Router>
         <Routes>
           {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
-
-
           <Route path="/login" element={<LoginPage />} />
-
-          <Route path="/login" element={<LoginPage />} />          <Route
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>

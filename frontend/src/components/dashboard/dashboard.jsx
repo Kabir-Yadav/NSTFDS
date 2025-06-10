@@ -45,6 +45,7 @@ const Dashboard = () => {
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedPsuProject, setSelectedPsuProject] = useState(null);
+  const [selectedNavPsu, setSelectedNavPsu] = useState("");
   const [psu, setPsu] = useState("");
   const [hierarchicalData, setHierarchicalData] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -57,7 +58,6 @@ const Dashboard = () => {
 
   const scrollRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
@@ -144,6 +144,7 @@ const Dashboard = () => {
     setSelectedPsuProject(null);
     setIsSidebarOpen(false);
   };
+
   return (
     <div
       className="flex h-screen w-screen dark:bg-[var(--color-background)] bg-[var(--color-background)] 
@@ -163,6 +164,7 @@ const Dashboard = () => {
         onLogout={handleLogout}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        setNavpsu={setSelectedNavPsu}
       />
       {/* Main content area */}
       <div
@@ -343,7 +345,13 @@ const Dashboard = () => {
                   (isAdmin ? (
                     <AdminPsuSelectionForm
                       selectedPsuProject={selectedPsuProject}
-                      data={hierarchicalData}
+                      hierarchicalData={hierarchicalData}
+                      projectList={projects}
+                      projectdata={projects.find(
+                        (p) => p.name === selectedPsuProject
+                      )}
+                      psulist={psuOptions}
+                      psuName={selectedNavPsu}
                     />
                   ) : (
                     <UserPsuSelectionForm

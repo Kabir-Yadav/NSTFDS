@@ -12,8 +12,6 @@ import {
   Loader,
   AlertCircle,
 } from "lucide-react";
-import DeviceForm from "../device-form";
-import SanitaryPadForm from "../sanitary-form";
 import TableHeader from "./table_header";
 import TableBody from "./table_body";
 import DialogFooter from "./footer";
@@ -21,6 +19,7 @@ import { validateRow } from "./actions";
 import AddSingleDataForm from "./add_single_data_form";
 
 const EnhancedAddDataDialog = ({
+  psuName,
   isOpen,
   onClose,
   selectedProject,
@@ -201,9 +200,7 @@ const EnhancedAddDataDialog = ({
       "District",
       "School",
       "PSU",
-      ...(selectedProject?.name === "Digital Device Procurement"
-        ? ["Category"]
-        : []),
+      ...(categories?.length > 0 ? ["Category"] : []),
       "Status",
       "Cost",
     ];
@@ -215,7 +212,7 @@ const EnhancedAddDataDialog = ({
       "Example District", // Example District
       "Example School", // Example School
       "BPCL", // Example PSU
-      ...(selectedProject?.name === "Digital Device Procurement"
+      ...(categories?.length > 0
         ? ["Example Category"] // Example Category
         : []),
       "Pending", // Example Status
@@ -231,7 +228,7 @@ const EnhancedAddDataDialog = ({
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `${selectedProject?.name || "Procurement"}SampleFormat.csv`
+      `${selectedProject || "Procurement"}SampleFormat.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -241,7 +238,7 @@ const EnhancedAddDataDialog = ({
   const openForm = (selectedProject) => {
     return (
       <AddSingleDataForm
-        projectName={selectedProject?.name}
+        projectName={selectedProject}
         isOpen={true}
         psuList={psuList}
         hierarchicalData={hierarchicalData}
@@ -251,6 +248,8 @@ const EnhancedAddDataDialog = ({
           setMode(null); // Reset mode when form is closed
           onClose(); // Close the dialog
         }}
+        onSubmitSingle={onSubmitSingle}
+        psu_name={psuName}
       />
     );
   };

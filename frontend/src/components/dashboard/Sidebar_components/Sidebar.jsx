@@ -19,6 +19,7 @@ const Sidebar = ({
   onLogout,
   isSidebarOpen,
   setIsSidebarOpen,
+  setNavpsu,
 }) => {
   const handleOverlayClick = () => {
     setIsSidebarOpen(false);
@@ -68,6 +69,7 @@ const Sidebar = ({
               }}
               selectedPsuProject={selectedpsuProject}
               setIsSidebarOpen={setIsSidebarOpen}
+              setSelectedPsu={setNavpsu}
             />
           </div>
 
