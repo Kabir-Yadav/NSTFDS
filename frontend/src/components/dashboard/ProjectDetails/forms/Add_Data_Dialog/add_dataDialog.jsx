@@ -144,7 +144,6 @@ const EnhancedAddDataDialog = ({
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
-        console.log(results);
         validateAndPreviewData(results.data);
       },
       error: (error) => {

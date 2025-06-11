@@ -1,4 +1,4 @@
-import {  Save, X, InfoIcon, SquarePen } from "lucide-react";
+import { Save, X, InfoIcon, SquarePen } from "lucide-react";
 
 const TableActions = ({
   row,
@@ -41,7 +41,7 @@ const TableActions = ({
 
       {/* Timeline Button */}
       <button
-        onClick={() => setTimelineModal({ isOpen: true, row })}
+        onClick={() => setTimelineModal({ isOpen: true, row: row })}
         className="p-1 text-purple-600 hover:text-purple-800"
         title="View timeline"
       >

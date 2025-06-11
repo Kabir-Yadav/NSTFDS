@@ -236,7 +236,6 @@ const AddSingleDataForm = ({
 
         const { data, error } = await insertProjectDelivery(payload);
         if (error) throw error;
-        console.log(payload);
         onSubmitSingle(data);
         handleClose();
       } catch (error) {

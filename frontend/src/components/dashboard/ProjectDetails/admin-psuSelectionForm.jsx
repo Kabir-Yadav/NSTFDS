@@ -72,9 +72,7 @@ const AdminPsuSelectionForm = ({
     //   result = await fetchDeviceProcurements({});
     // } else if (selectedProject?.name === "Sanitary Pad Devices Procurement") {
     //   result = await fetchSanitaryProcurements({});
-    // }
-
-    // Sort data by delivery_date (ascending)
+    // }    // Sort data by target date (ascending)
     result.sort(
       (a, b) => new Date(a.committed_date) - new Date(b.committed_date)
     );
@@ -260,7 +258,6 @@ const AdminPsuSelectionForm = ({
     });
   };
 
-  console.log(filterData);
   // Function to export data to PDF or CSV -------------------------------------------
 
   const exportToPDF = () => {
@@ -788,13 +785,14 @@ const AdminPsuSelectionForm = ({
         }}
         psuName={psuName}
       />
-
-      {/* Timeline Modal */}
+      {/* Timeline Modal */}{" "}
       <StatusTimeline
         status={timelineModal.row?.status}
-        deliveryDate={timelineModal.row?.delivery_date}
+        deliveryDate={timelineModal.row?.target_date}
         isOpen={timelineModal.isOpen}
         onClose={() => setTimelineModal({ isOpen: false, row: null })}
+        projectStatuses={statusOptions}
+        additionalData={timelineModal.row?.extra_json}
       />
       <ImageUploadModal
         isOpen={imageModal.isOpen}

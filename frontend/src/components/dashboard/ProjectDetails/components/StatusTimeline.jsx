@@ -8,6 +8,8 @@ import {
   Edit3,
   Save,
   XCircle,
+  AlertCircle,
+  FileCheck,
 } from "lucide-react";
 
 const StatusTimeline = ({
@@ -17,6 +19,7 @@ const StatusTimeline = ({
   onClose,
   additionalData = {},
   onUpdateData,
+  projectStatuses = [], // Array of possible statuses for this project
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -50,18 +53,34 @@ const StatusTimeline = ({
       });
     }
   }, [isOpen]); // Only run when isOpen changes
-
   const getStatusStages = () => {
-    const stages = [
-      { key: "pending", label: "Order Placed", icon: Clock },
-      { key: "approved", label: "Approved", icon: CheckCircle },
-      { key: "shipped", label: "Shipped", icon: Truck },
-      { key: "arrived", label: "Arrived at Location", icon: Package },
-      { key: "just deployed", label: "Deployed", icon: CheckCircle },
-    ];
+    // Map status icons based on position in the flow
+    const getIconForStatus = (status, index, total) => {
+      if (index === 0) return Clock; // First status
+      if (index === total - 1) return FileCheck; // Last status
+      if (index === total - 2) return CheckCircle; // Second to last status
+
+      // For intermediate statuses, use contextual icons
+      const lowerStatus = status.toLowerCase();
+      if (lowerStatus.includes("ship")) return Truck;
+      if (lowerStatus.includes("arrive") || lowerStatus.includes("deliver"))
+        return Package;
+      if (lowerStatus.includes("deploy")) return CheckCircle;
+      if (lowerStatus.includes("approve")) return FileCheck;
+      if (lowerStatus.includes("review")) return AlertCircle;
+
+      return CheckCircle; // Default icon
+    };
+
+    // Map the actual project statuses to stage objects
+    const stages = projectStatuses.map((statusOption, index) => ({
+      key: statusOption.toLowerCase(),
+      label: statusOption,
+      icon: getIconForStatus(statusOption, index, projectStatuses.length),
+    }));
 
     const currentStageIndex = stages.findIndex(
-      (stage) => stage.key.toLowerCase() === status?.toLowerCase()
+      (stage) => stage.key === status?.toLowerCase()
     );
 
     return stages.map((stage, index) => ({

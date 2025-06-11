@@ -64,7 +64,6 @@ const ChartSection = ({ selectedState, selectedPSU }) => {
 
       // Fetch Budget Utilization Data
       const budgetData = await fetchBudgetUtilization(stateParam);
-      console.log(budgetData);
       setBudgetUtilization(Number(budgetData[0].budget_utilization_pct));
 
       // Fetch School Implementation Rate Data

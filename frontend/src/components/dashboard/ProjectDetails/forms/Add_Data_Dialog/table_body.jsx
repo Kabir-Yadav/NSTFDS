@@ -65,7 +65,6 @@ const TableBody = ({
       />
     );
   };
-  console.log(parsedData);
   return (
     <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
       {parsedData.map((row, index) => (
