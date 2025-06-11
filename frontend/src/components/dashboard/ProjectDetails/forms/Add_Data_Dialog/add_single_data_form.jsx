@@ -222,6 +222,7 @@ const AddSingleDataForm = ({
           stage1_proof_url: urlStage1 || null,
           stage2_proof_url: urlStage2 || null,
           targetDate: formData.targetDate,
+          completion_certificate_url: formData.certificateUrl || null,
           extra_json: {
             tracking_number: formData.TackNumber || null,
             vendor_name: formData.vendorName || null,
@@ -229,15 +230,14 @@ const AddSingleDataForm = ({
             invoice_number: formData.invoiceNumber || null,
             installation_date: formData.installationDate || null,
             contact_number: formData.contactNumber || null,
-            certificate_url: formData.certificateUrl || null,
             remarks: formData.remarks || null,
           },
         };
 
-        const { error } = await insertProjectDelivery(payload);
+        const { data, error } = await insertProjectDelivery(payload);
         if (error) throw error;
         console.log(payload);
-        onSubmitSingle(payload);
+        onSubmitSingle(data);
         handleClose();
       } catch (error) {
         console.error("Submission error:", error);

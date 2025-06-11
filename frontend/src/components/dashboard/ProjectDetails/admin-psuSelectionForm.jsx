@@ -3,7 +3,11 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import TablePageNavButton from "../components/table_components/table_pageNav_button";
 import HeaderButtons from "../components/table_components/header_buttons";
-import { fetchTableData } from "../../../action/supabase_actions";
+import {
+  fetchTableData,
+  uploadProofImage,
+  supabase,
+} from "../../../action/supabase_actions";
 import { SortAscIcon, SortDescIcon, Eye, Upload } from "lucide-react";
 import EnhancedAddDataDialog from "./forms/Add_Data_Dialog/add_dataDialog";
 import StatusTimeline from "./components/StatusTimeline";
@@ -144,16 +148,44 @@ const AdminPsuSelectionForm = ({
   };
 
   // Function to handle row click for editing status or viewing timeline ----------------------------
-
   const handleEditSave = async (row) => {
     try {
-      // Call your API to update the status
-      // await updateProcurementStatus(row.id, editingStatus);
+      // Update the database
+      const { data, error } = await supabase
+        .from("project_deliveries")
+        .update({
+          status: editingStatus,
+          // Reset proof URLs if status is changed to earlier stages
+          ...(statusOptions.indexOf(editingStatus) < statusOptions.length - 2
+            ? { stage1_proof_url: null, stage2_proof_url: null }
+            : statusOptions.indexOf(editingStatus) === statusOptions.length - 2
+            ? { stage2_proof_url: null }
+            : {}),
+        })
+        .eq("id", row.id)
+        .select()
+        .single();
+
+      if (error) throw error;
 
       // Update local state
       const updatedData = tableData.map((item) =>
-        item.id === row.id ? { ...item, status: editingStatus } : item
+        item.id === row.id
+          ? {
+              ...item,
+              status: editingStatus,
+              // Also update proof URLs in UI if needed
+              ...(statusOptions.indexOf(editingStatus) <
+              statusOptions.length - 2
+                ? { proof_photo: null, completed_photo: null }
+                : statusOptions.indexOf(editingStatus) ===
+                  statusOptions.length - 2
+                ? { completed_photo: null }
+                : {}),
+            }
+          : item
       );
+
       setTableData(updatedData);
       setFilteredData(updatedData);
 
@@ -161,6 +193,7 @@ const AdminPsuSelectionForm = ({
       setEditingStatus("");
     } catch (error) {
       console.error("Failed to update status:", error);
+      alert("Failed to update status. Please try again.");
     }
   };
 
@@ -168,19 +201,45 @@ const AdminPsuSelectionForm = ({
     setEditingRow(null);
     setEditingStatus("");
   };
-
   const handleImageUpload = async (file, rowId, imageType) => {
     try {
-      // Call your API to upload image
-      // // const imageUrl = await uploadProofImage(file, rowId, imageType);
-      // // Update local state
-      // const updatedData = tableData.map((item) =>
-      //   item.id === rowId ? { ...item, [imageType]: imageUrl } : item
-      // // );
-      // setTableData(updatedData);
-      // setFilteredData(updatedData);
+      // Upload the image to storage bucket
+      const imageUrl = await uploadProofImage({
+        file,
+        projectName: selectedPsuProject,
+      });
+
+      if (!imageUrl) {
+        throw new Error("Failed to upload image");
+      }
+
+      // Convert imageType to database column name
+      const columnName =
+        imageType === "proof_photo" ? "stage1_proof_url" : "stage2_proof_url";
+
+      // Update the database
+      const { data, error } = await supabase
+        .from("project_deliveries")
+        .update({ [columnName]: imageUrl })
+        .eq("id", rowId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update local state after successful database update
+      const updatedData = tableData.map((item) =>
+        item.id === rowId ? { ...item, [imageType]: imageUrl } : item
+      );
+
+      setTableData(updatedData);
+      setFilteredData(updatedData);
+
+      // Close the modal
+      setImageModal({ isOpen: false, row: null, type: null });
     } catch (error) {
       console.error("Failed to upload image:", error);
+      alert("Failed to upload image. Please try again.");
     }
   };
 
@@ -201,35 +260,93 @@ const AdminPsuSelectionForm = ({
     });
   };
 
+  console.log(filterData);
   // Function to export data to PDF or CSV -------------------------------------------
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF("landscape");
     doc.text(`${selectedPsuProject?.name || "Funding"} Report`, 14, 10);
 
     const tableColumn = [
-      "Date",
-      "District",
+      "ID",
+      "Committed_Date",
+      "Target_Date",
       "State",
+      "District",
+      "Block",
       "School",
-      "Project",
       "Status",
-      "Fund",
+      "Quantity",
+      "Unit_Cost",
+      "Total_Cost",
+      ...(projectdata.category_list.length > 0 ? ["Item_Type"] : []),
+      "Stage1_proof",
+      "Stage2_proof",
+      "Completion_Certificate",
+      "Extras",
     ];
+
+    const columnWidths = {
+      0: 15, // ID
+      1: 25, // Committed_Date
+      2: 25, // Target_Date
+      3: 25, // State
+      4: 25, // District
+      5: 25, // Block
+      6: 35, // School
+      7: 25, // Status
+      8: 20, // Quantity
+      9: 25, // Unit_Cost
+      10: 25, // Total_Cost
+      11: 25, // Item_Type (if applicable)
+      12: 10, // Stage1_proof - reduced URL width
+      13: 10, // Stage2_proof - reduced URL width
+      14: 10, // Completion_Certificate - reduced URL width
+      15: 25, // Extras
+    };
+
     const tableRows = filteredData.map((row) => [
-      row.date,
-      row.district_name,
-      row.state_name,
+      row.id,
+      row.committed_date,
+      row.target_date,
+      row.state,
+      row.district,
+      row.block,
       row.school_name,
-      row.project_name,
       row.status,
-      row.fund,
+      row.quantity,
+      row.unit_cost,
+      row.total_cost,
+      ...(projectdata.category_list.length > 0 ? [row.item_type] : []),
+      row.stage1_proof_url ? "View" : "--",
+      row.stage2_proof_url ? "View" : "--",
+      row.completion_certificate_url ? "View" : "--",
+      row.extra_json
+        ? (() => {
+            try {
+              return JSON.stringify(
+                JSON.parse(row.extra_json),
+                null,
+                1
+              ).replace(/[{}"]/g, "");
+            } catch (e) {
+              console.error("Invalid JSON:", e);
+              return "--";
+            }
+          })()
+        : "--",
     ]);
 
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 20,
+      columnStyles: columnWidths,
+
+      styles: { fontSize: 8 },
+      margin: { top: 20 },
+      pageBreak: "auto",
+      headStyles: { fillColor: [102, 51, 153] },
     });
 
     doc.save(`${selectedPsuProject || "Funding"}Report.pdf`);
@@ -238,23 +355,54 @@ const AdminPsuSelectionForm = ({
   const exportToCSV = () => {
     const headers = [
       "ID",
-      "Date",
+      "Committed_Date",
+      "Target_Date",
       "State",
       "District",
+      "Block",
       "School",
       "Status",
-      "Cost",
+      "Quantity",
+      "Unit_Cost",
+      "Total_Cost",
+      ...(projectdata.category_list.length > 0 ? ["Item_Type"] : []),
+      "Stage1_proof",
+      "Stage2_proof",
+      "Completion_Certificate",
+      "Extras",
     ];
 
     const rows = filteredData.map((row) => [
       row.id,
-      new Date(row.date).toLocaleDateString(),
-      row.state_name,
-      row.district_name,
+      row.committed_date,
+      row.target_date,
+      row.state,
+      row.district,
+      row.block,
       row.school_name,
-      row.project_name,
       row.status,
-      row.cost,
+      row.quantity,
+      row.unit_cost,
+      row.total_cost,
+      ...(projectdata.category_list.length > 0 ? [row.item_type] : []),
+      row.stage1_proof_url,
+      row.stage2_proof_url,
+      row.completion_certificate_url,
+      // Parse and format the JSON data
+      row.extra_json
+        ? (() => {
+            try {
+              return JSON.stringify(
+                JSON.parse(row.extra_json),
+                null,
+                1
+              ).replace(/[{}"]/g, "");
+            } catch (e) {
+              console.error("Invalid JSON:", e);
+              return "";
+            }
+          })()
+        : "",
     ]);
 
     const csvContent =
@@ -482,73 +630,122 @@ const AdminPsuSelectionForm = ({
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                   ₹{row.total_cost}
-                </td>
+                </td>{" "}
                 {/* Proof Photo Column */}
                 <td className="px-6 py-4 text-sm">
                   <div className="flex items-center space-x-2">
-                    {row.proof_photo ? (
-                      <button
-                        onClick={() =>
-                          setImageModal({
-                            isOpen: true,
-                            row,
-                            type: "proof_photo",
-                          })
-                        }
-                        className="p-1 text-blue-600 hover:text-blue-800"
-                        title="View proof photo"
-                      >
-                        <Eye size={16} />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          setImageModal({
-                            isOpen: true,
-                            row,
-                            type: "proof_photo",
-                          })
-                        }
-                        className="p-1 text-gray-600 hover:text-gray-800"
-                        title="Add proof photo"
-                      >
-                        <Upload size={16} />
-                      </button>
-                    )}
+                    {(() => {
+                      const statusIndex = statusOptions.indexOf(row.status);
+                      const totalStatuses = statusOptions.length;
+                      const showProofUpload = statusIndex >= totalStatuses - 2;
+
+                      if (!showProofUpload) {
+                        return (
+                          <span className="text-gray-400 text-xs">
+                            Not required
+                          </span>
+                        );
+                      }
+
+                      if (row.proof_photo) {
+                        return (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                setImageModal({
+                                  isOpen: true,
+                                  row,
+                                  type: "proof_photo",
+                                })
+                              }
+                              className="p-1 text-blue-600 hover:text-blue-800"
+                              title="View proof photo"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <span className="text-xs text-gray-600 truncate max-w-[120px]">
+                              {row.proof_photo.split("/").pop()}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <button
+                          onClick={() =>
+                            setImageModal({
+                              isOpen: true,
+                              row,
+                              type: "proof_photo",
+                            })
+                          }
+                          className="p-1 text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                          title="Add proof photo"
+                        >
+                          <Upload size={16} />
+                          <span className="text-xs">Upload proof</span>
+                        </button>
+                      );
+                    })()}
                   </div>
                 </td>
                 {/* Completed Photo Column */}
                 <td className="px-6 py-4 text-sm">
                   <div className="flex items-center space-x-2">
-                    {row.completed_photo ? (
-                      <button
-                        onClick={() =>
-                          setImageModal({
-                            isOpen: true,
-                            row,
-                            type: "completed_photo",
-                          })
-                        }
-                        className="p-1 text-green-600 hover:text-green-800"
-                        title="View completed photo"
-                      >
-                        <Eye size={16} />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          setImageModal({
-                            isOpen: true,
-                            row,
-                            type: "completed_photo",
-                          })
-                        }
-                        className="p-1 text-gray-600 hover:text-gray-800"
-                        title="Add completed photo"
-                      >
-                        <Upload size={16} />
-                      </button>
-                    )}
+                    {(() => {
+                      const statusIndex = statusOptions.indexOf(row.status);
+                      const totalStatuses = statusOptions.length;
+                      const showCompletedUpload =
+                        statusIndex === totalStatuses - 1;
+
+                      if (!showCompletedUpload) {
+                        return (
+                          <span className="text-gray-400 text-xs">
+                            Not required
+                          </span>
+                        );
+                      }
+
+                      if (row.completed_photo) {
+                        return (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                setImageModal({
+                                  isOpen: true,
+                                  row,
+                                  type: "completed_photo",
+                                })
+                              }
+                              className="p-1 text-green-600 hover:text-green-800"
+                              title="View completed photo"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <span className="text-xs text-gray-600 truncate max-w-[120px]">
+                              {row.completed_photo.split("/").pop()}
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <button
+                          onClick={() =>
+                            setImageModal({
+                              isOpen: true,
+                              row,
+                              type: "completed_photo",
+                            })
+                          }
+                          className="p-1 text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                          title="Add completed photo"
+                        >
+                          <Upload size={16} />
+                          <span className="text-xs">Upload photo</span>
+                        </button>
+                      );
+                    })()}
                   </div>
                 </td>
                 {/* Actions Column */}{" "}

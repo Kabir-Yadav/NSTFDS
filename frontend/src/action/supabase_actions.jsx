@@ -339,22 +339,22 @@ export async function isSanitaryProcurementActive(schoolName) {
  * =============================
  */
 
-/**
- * Insert a single delivery record.
- * @param {object} record — must match your project_deliveries columns.
- * @returns {{ data: object, error: object }}
- */
 export async function insertProjectDelivery(record) {
-  return supabase.from("project_deliveries").insert([record]).single();
+  // Note: .select() returns the full row (including id, timestamps)
+  const { data, error } = await supabase
+    .from("project_deliveries")
+    .insert([record])
+    .select()
+    .single(); // .single() so data is one row, not array
+  return { data, error };
 }
 
-/**
- * Insert multiple delivery records at once.
- * @param {object[]} records
- * @returns {{ data: object[], error: object }}
- */
 export async function insertProjectDeliveries(records) {
-  return supabase.from("project_deliveries").insert(records);
+  const { data, error } = await supabase
+    .from("project_deliveries")
+    .insert(records)
+    .select(); // returns array of full rows
+  return { data, error };
 }
 
 // ----------------------------------------------------------------------

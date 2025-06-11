@@ -1,62 +1,102 @@
-export const validateRow = (row, selectedProject, categories) => {
+export const validateRow = (
+  row,
+  selectedProject,
+  categories,
+  statusOptions
+) => {
   const rowErrors = [];
+  // List required fields as per table_header.jsx
   const requiredFields = [
-    "ID",
-    "Delivery_Date",
-    "State",
-    "District",
-    "School",
-    "PSU",
-    "Status",
-    "Cost",
+    "Committed_Date", // string, required, valid date
+    "Target_Date", // string, required, valid date
+    "State", // string, required, not empty
+    "District", // string, required, not empty
+    "School", // string, required, not empty
+    "Status", // string, required, in statusOptions
+    "Quantity", // number, required, > 0
+    "Unit_Cost", // number, required, > 0
+    "Total_Cost", // number, required, > 0
   ];
-
+  // "Item_Type" required only for Digital Device Procurement
   if (selectedProject?.name === "Digital Device Procurement") {
-    requiredFields.push("Category");
+    requiredFields.push("Item_Type");
   }
 
-  // Check for required fields
+  // Check missing fields
   requiredFields.forEach((field) => {
-    const value = row[field];
-    if (value === undefined || value === null || value === "") {
+    if (!row[field] || row[field].toString().trim() === "") {
       rowErrors.push(`Missing ${field.replace("_", " ")}`);
     }
   });
 
-  // Validate date format
-  if (row.Delivery_Date) {
-    const dateValue = new Date(row.Delivery_Date);
-    if (isNaN(dateValue.getTime())) {
-      rowErrors.push("Invalid delivery date format");
-    }
+  // Type/Range checks
+  if (
+    row["Quantity"] &&
+    (isNaN(row["Quantity"]) || Number(row["Quantity"]) <= 0)
+  ) {
+    rowErrors.push("Quantity must be a positive number");
   }
-
-  // Validate cost is a number
-  if (row.Cost) {
-    const costValue = parseFloat(row.Cost.toString().replace(/[^0-9.-]+/g, ""));
-    if (isNaN(costValue)) {
-      rowErrors.push("Cost must be a number");
-    }
+  if (
+    row["Unit_Cost"] &&
+    (isNaN(row["Unit_Cost"]) || Number(row["Unit_Cost"]) <= 0)
+  ) {
+    rowErrors.push("Unit Cost must be a positive number");
   }
-
-  // Add valid status values check
-  const validStatuses = ["Shipped", "Pending", "Just Deployed", "Arrived"];
-  if (row.Status && !validStatuses.includes(row.Status)) {
+  if (
+    row["Total_Cost"] &&
+    (isNaN(row["Total_Cost"]) || Number(row["Total_Cost"]) <= 0)
+  ) {
+    rowErrors.push("Total Cost must be a positive number");
+  }
+  // Status check
+  if (row["Status"] && !statusOptions.includes(row["Status"])) {
     rowErrors.push(
-      `Invalid status. Must be one of: ${validStatuses.join(", ")}`
+      `Invalid status: ${row["Status"]}. Allowed: ${statusOptions.join(", ")}`
     );
   }
 
-  // If digital device procurement, validate item category
-  if (selectedProject?.name === "Digital Device Procurement" && row.Category) {
-    if (!categories.includes(row.Category)) {
+  // Proof validation based on status
+  if (row["Status"]) {
+    const statusIndex = statusOptions.indexOf(row["Status"]);
+    const totalStatuses = statusOptions.length;
+
+    // For second last status
+    if (statusIndex === totalStatuses - 2) {
+      if (!row["Stage1_proof"]) {
+        rowErrors.push("Stage 1 proof is required for this status");
+      }
+    }
+    // For last status
+    else if (statusIndex === totalStatuses - 1) {
+      if (!row["Stage1_proof"]) {
+        rowErrors.push("Stage 1 proof is required for this status");
+      }
+      if (!row["Stage2_proof"]) {
+        rowErrors.push("Stage 2 proof is required for this status");
+      }
+    }
+  }
+
+  // Category check
+  if (
+    selectedProject?.name === "Digital Device Procurement" &&
+    row["Item_Type"]
+  ) {
+    if (!categories.includes(row["Item_Type"])) {
       rowErrors.push(
-        `Invalid item category: ${
-          row.Category
-        }. Must be one of: ${categories.join(", ")}`
+        `Invalid item type: ${row["Item_Type"]}. Allowed: ${categories.join(
+          ", "
+        )}`
       );
     }
   }
+
+  // Date checks
+  ["Committed_Date", "Target_Date"].forEach((field) => {
+    if (row[field] && isNaN(new Date(row[field]).getTime())) {
+      rowErrors.push(`${field.replace("_", " ")} is not a valid date`);
+    }
+  });
 
   return rowErrors;
 };

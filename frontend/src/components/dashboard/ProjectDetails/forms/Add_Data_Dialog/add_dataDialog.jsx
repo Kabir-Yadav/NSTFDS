@@ -2,6 +2,10 @@ import React, { useState, useCallback, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
+import {
+  uploadProofImage,
+  insertProjectDeliveries,
+} from "../../../../../action/supabase_actions";
 import TablePageNavButton from "../../../components/table_components/table_pageNav_button";
 
 import {
@@ -41,6 +45,10 @@ const EnhancedAddDataDialog = ({
   const recordsPerPage = 10;
 
   const totalPages = Math.max(1, Math.ceil(parsedData.length / recordsPerPage));
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const paginatedData = parsedData.slice(indexOfFirstRecord, indexOfLastRecord);
+
   // Reset form state when dialog opens/closes
   React.useEffect(() => {
     if (isOpen) {
@@ -56,13 +64,36 @@ const EnhancedAddDataDialog = ({
   // New function to handle cell value change
   const handleCellChange = (rowIndex, field, newValue) => {
     const updatedData = [...parsedData];
-    const updatedRow = {
+    let updatedRow = {
       ...updatedData[rowIndex],
       [field]: newValue,
     };
 
+    // Only add this logic when changing Status
+    if (field === "Status") {
+      const totalStatuses = status.length;
+      const newStatusIndex = status.indexOf(newValue);
+
+      // If not second last or last status, clear both proofs
+      if (newStatusIndex < totalStatuses - 2) {
+        updatedRow.Stage1_proof = null;
+        updatedRow.Stage2_proof = null;
+      }
+      // If second last status, keep Stage1_proof, clear Stage2_proof
+      else if (newStatusIndex === totalStatuses - 2) {
+        // Keep Stage1_proof as is
+        updatedRow.Stage2_proof = null;
+      }
+      // If last status, keep both proofs as is (do nothing)
+    }
+
     // Validate the updated row
-    updatedRow.errors = validateRow(updatedRow, selectedProject, categories);
+    updatedRow.errors = validateRow(
+      updatedRow,
+      selectedProject,
+      categories,
+      status
+    );
 
     // Update the parsed data
     updatedData[rowIndex] = updatedRow;
@@ -85,14 +116,10 @@ const EnhancedAddDataDialog = ({
 
     const file = acceptedFiles[0];
     setIsProcessing(true);
-    console.log("File added");
     // Check file type
     if (file.name.endsWith(".csv")) {
-      console.log("Processing CSV");
-
       processCSV(file);
     } else if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-      console.log("Processing Xls");
       processExcel(file);
     } else {
       setErrorMessages(["Only CSV and Excel files are supported"]);
@@ -160,7 +187,8 @@ const EnhancedAddDataDialog = ({
       normalizedRow.errors = validateRow(
         normalizedRow,
         selectedProject,
-        categories
+        categories,
+        status
       );
 
       allData.push(normalizedRow);
@@ -184,39 +212,155 @@ const EnhancedAddDataDialog = ({
       setErrorMessages([]);
     }
   };
+  const handleSubmitMultiple = async () => {
+    // Check for any rows that have validation errors
+    const hasValidationErrors = parsedData.some(
+      (row) => row.errors && row.errors.length > 0
+    );
 
-  const handleSubmitMultiple = () => {
+    // Check for any rows that need proofs based on status
+    const hasProofErrors = parsedData.some((row) => {
+      const statusIndex = status.indexOf(row.Status);
+      const totalStatuses = status.length;
+
+      if (statusIndex === totalStatuses - 2) {
+        return !row.Stage1_proof;
+      }
+      if (statusIndex === totalStatuses - 1) {
+        return !row.Stage1_proof || !row.Stage2_proof;
+      }
+      return false;
+    });
+
+    if (hasValidationErrors || hasProofErrors) {
+      setHasErrors(true);
+      setErrorMessages([
+        ...errorMessages,
+        "Please ensure all required proofs are uploaded based on status",
+      ]);
+      return;
+    }
+
     if (parsedData.length > 0) {
-      onSubmitMultiple(parsedData);
-      onClose();
+      setIsProcessing(true);
+      try {
+        // Process each row and upload proofs if they exist
+        const processedData = await Promise.all(
+          parsedData.map(async (row) => {
+            const processedRow = { ...row };
+
+            // Upload Stage1 proof if it's a File
+            if (row.Stage1_proof instanceof File) {
+              const stage1Url = await uploadProofImage({
+                file: row.Stage1_proof,
+                projectName: selectedProject,
+              });
+              processedRow.Stage1_proof = stage1Url;
+            }
+
+            // Upload Stage2 proof if it's a File
+            if (row.Stage2_proof instanceof File) {
+              const stage2Url = await uploadProofImage({
+                file: row.Stage2_proof,
+                projectName: selectedProject,
+              });
+              processedRow.Stage2_proof = stage2Url;
+            }
+
+            // Format the data for database
+            return {
+              psu_name: psuName,
+              project_name: selectedProject,
+              state: processedRow.State,
+              district: processedRow.District,
+              block: processedRow.Block || null,
+              school_name: processedRow.School,
+              item_type: processedRow.Item_Type,
+              quantity: Number(processedRow.Quantity) || 0,
+              unit_cost: Number(processedRow.Unit_Cost) || 0,
+              total_cost: Number(processedRow.Total_Cost) || 0,
+              committed_date: processedRow.Committed_Date,
+              target_date: processedRow.Target_Date,
+              status: processedRow.Status,
+              stage1_proof_url: processedRow.Stage1_proof || null,
+              stage2_proof_url: processedRow.Stage2_proof || null,
+              completion_certificate_url:
+                processedRow.Completion_Certificate || null,
+              extra_json: processedRow.Extras
+                ? JSON.parse(processedRow.Extras)
+                : {},
+            };
+          })
+        );
+
+        // Insert all records into the database
+        const { data, error } = await insertProjectDeliveries(processedData);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        onSubmitMultiple(data); // data = array of DB-inserted rows (with IDs)
+        onClose();
+      } catch (error) {
+        console.error("Error processing data:", error);
+        setHasErrors(true);
+        setErrorMessages([
+          ...errorMessages,
+          `Error submitting data: ${error.message}`,
+        ]);
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
-
   const sampleCSV = () => {
     const headers = [
       "ID",
-      "Delivery_Date",
+      // Required fields
+      "Commited_Date",
+      "Target_Date",
       "State",
       "District",
+      "Block",
       "School",
-      "PSU",
-      ...(categories?.length > 0 ? ["Category"] : []),
       "Status",
-      "Cost",
+      "Quantity",
+      "Unit_Cost",
+      "Total_Cost",
+      ...(categories?.length > 0 ? ["Item_Type"] : []),
+      // Optional proofs
+      "Stage1_proof",
+      "Stage2_proof",
+      "Completion_Certificate",
+      // Optional notes
+      "Extras",
     ];
 
+    const today = new Date();
+    const targetDate = new Date();
+    targetDate.setMonth(targetDate.getMonth() + 1);
+
     const exampleRow = [
-      "112", // Example ID
-      new Date().toLocaleDateString(), // Example Date
-      "Example State", // Example State
-      "Example District", // Example District
-      "Example School", // Example School
-      "BPCL", // Example PSU
-      ...(categories?.length > 0
-        ? ["Example Category"] // Example Category
-        : []),
-      "Pending", // Example Status
-      "1000", // Example Cost
+      "122",
+      // Required fields
+      today.toISOString().split("T")[0], // Committed Date
+      targetDate.toISOString().split("T")[0], // Target Date
+      "Maharashtra", // State
+      "Mumbai", // District
+      "Delhi Public School", // School
+      "Block A", // Block
+      status?.[0] || "Pending", // Status
+      "100", // Quantity
+      "1000", // Unit Cost
+      "100000", // Total Cost
+      ...(categories?.length > 0 ? [categories[0]] : []), // Item Type if applicable
+      // Optional proofs
+      "https://example.com/stage1.pdf", // Stage 1 proof
+      "https://example.com/stage2.pdf", // Stage 2 proof
+      "https://example.com/cert.pdf", // Certificate URL
+      // Optional notes
+      '{"tracking_id": "DEL123456", "courier_name": "Express Delivery", "expected_date": "2025-07-01","invoice_number":"122312312", "installation_date": "2025-07-15", "warranty_period": "2 years", "notes": "Special handling required, fragile items included"}', // Extras (JSON format with sample fields)
     ];
 
     const csvContent =
@@ -406,10 +550,11 @@ const EnhancedAddDataDialog = ({
                         <TableHeader selectedProject={selectedProject} />
                         <TableBody
                           selectedProject={selectedProject}
-                          parsedData={parsedData}
+                          parsedData={paginatedData}
                           setEditingRowIndex={setEditingRowIndex}
                           editingRowIndex={editingRowIndex}
                           handleCellChange={handleCellChange}
+                          statusOptions={status}
                         />
                       </table>
                     </div>
@@ -433,6 +578,7 @@ const EnhancedAddDataDialog = ({
                 isPreviewReady={isPreviewReady}
                 parsedData={parsedData}
                 hasError={hasErrors}
+                isSubmitting={isProcessing}
               />
             </>
           )}
