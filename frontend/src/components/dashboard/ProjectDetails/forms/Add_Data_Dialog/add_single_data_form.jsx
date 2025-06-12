@@ -221,7 +221,7 @@ const AddSingleDataForm = ({
           status: formData.status,
           stage1_proof_url: urlStage1 || null,
           stage2_proof_url: urlStage2 || null,
-          targetDate: formData.targetDate,
+          target_date: formData.targetDate,
           completion_certificate_url: formData.certificateUrl || null,
           extra_json: {
             tracking_number: formData.TackNumber || null,

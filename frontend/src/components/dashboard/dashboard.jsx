@@ -22,6 +22,8 @@ import AdminProjectSelectionForm from "./ProjectDetails/admin_ProjectSelectionFo
 import AdminPsuSelectionForm from "./ProjectDetails/admin-psuSelectionForm";
 import UserProjectSelectionForm from "./ProjectDetails/user_ProjectSelectionForm";
 import UserPsuSelectionForm from "./ProjectDetails/user_psuSelectionform";
+import ProjectSelectionForm from "./ProjectDetails/projectSelectionForm";
+import PsuSelectionForm from "./ProjectDetails/psu_Selection_form";
 
 const Dashboard = () => {
   // Check user role and authentication
@@ -320,45 +322,30 @@ const Dashboard = () => {
               </>
             ) : (
               <div className="mt-4 md:mt-0">
-                {selectedProject &&
-                  (isAdmin ? (
-                    <AdminProjectSelectionForm
-                      key={selectedProject.id}
-                      selectedProject={selectedProject}
-                      hierarchicalData={hierarchicalData}
-                      psulist={psuOptions}
-                      projectdata={projects.find(
-                        (p) => p.name === selectedProject?.name
-                      )}
-                    />
-                  ) : (
-                    <UserProjectSelectionForm
-                      key={selectedProject.id}
-                      selectedProject={selectedProject}
-                      hierarchicalData={hierarchicalData}
-                      projectdata={projects.find(
-                        (p) => p.name === selectedProject?.name
-                      )}
-                    />
-                  ))}
-                {selectedPsuProject &&
-                  (isAdmin ? (
-                    <AdminPsuSelectionForm
-                      selectedPsuProject={selectedPsuProject}
-                      hierarchicalData={hierarchicalData}
-                      projectList={projects}
-                      projectdata={projects.find(
-                        (p) => p.name === selectedPsuProject
-                      )}
-                      psulist={psuOptions}
-                      psuName={selectedNavPsu}
-                    />
-                  ) : (
-                    <UserPsuSelectionForm
-                      selectedPsuProject={selectedPsuProject}
-                      data={hierarchicalData}
-                    />
-                  ))}
+                {selectedProject && (
+                  <ProjectSelectionForm
+                    key={selectedProject?.id}
+                    isAdmin={isAdmin}
+                    selectedProject={selectedProject}
+                    projectdata={projects.find(
+                      (p) => p.name === selectedProject?.name
+                    )}
+                  />
+                )}
+                {selectedPsuProject && (
+                  <PsuSelectionForm
+                    key={selectedPsuProject?.id}
+                    selectedPsuProject={selectedPsuProject}
+                    hierarchicalData={hierarchicalData}
+                    projectList={projects}
+                    projectdata={projects.find(
+                      (p) => p.name === selectedPsuProject
+                    )}
+                    psulist={psuOptions}
+                    psuName={selectedNavPsu}
+                    isAdmin={isAdmin}
+                  />
+                )}
               </div>
             )}
           </div>

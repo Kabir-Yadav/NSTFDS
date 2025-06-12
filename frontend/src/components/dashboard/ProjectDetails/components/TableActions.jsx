@@ -8,36 +8,38 @@ const TableActions = ({
   handleEditCancel,
   setTimelineModal,
   setImageModal,
+  isAdmin = false,
 }) => {
   return (
     <div className="flex items-center space-x-2">
       {/* Edit/Save Actions */}
-      {editingRow === row.id ? (
-        <>
+      {isAdmin &&
+        (editingRow === row.id ? (
+          <>
+            <button
+              onClick={() => handleEditSave(row)}
+              className="p-1 text-green-600 hover:text-green-800"
+              title="Save changes"
+            >
+              <Save size={16} />
+            </button>
+            <button
+              onClick={handleEditCancel}
+              className="p-1 text-red-600 hover:text-red-800"
+              title="Cancel edit"
+            >
+              <X size={16} />
+            </button>
+          </>
+        ) : (
           <button
-            onClick={() => handleEditSave(row)}
-            className="p-1 text-green-600 hover:text-green-800"
-            title="Save changes"
+            onClick={() => handleEditStart(row)}
+            className="p-1 text-blue-600 hover:text-blue-800"
+            title="Edit status"
           >
-            <Save size={16} />
+            <SquarePen size={16} />
           </button>
-          <button
-            onClick={handleEditCancel}
-            className="p-1 text-red-600 hover:text-red-800"
-            title="Cancel edit"
-          >
-            <X size={16} />
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={() => handleEditStart(row)}
-          className="p-1 text-blue-600 hover:text-blue-800"
-          title="Edit status"
-        >
-          <SquarePen size={16} />
-        </button>
-      )}
+        ))}
 
       {/* Timeline Button */}
       <button

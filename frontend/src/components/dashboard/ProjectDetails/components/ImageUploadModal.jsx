@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, Download } from "lucide-react";
 
 const ImageUploadModal = ({
   isOpen,
@@ -58,14 +58,28 @@ const ImageUploadModal = ({
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               Current Image:
             </p>
-            <img
-              src={currentImage}
-              alt="Current"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            <p className="text-xs text-red-500 mt-1">
-              * You can only add an image if none exists
-            </p>
+            <div className="w-full h-48 max-h-[200px] overflow-hidden rounded-lg">
+              <img
+                src={currentImage}
+                alt="Current"
+                className="w-full h-full object-contain"
+              />{" "}
+            </div>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-xs text-red-500">
+                * You can only add an image if none exists
+              </p>{" "}
+              <a
+                href={currentImage}
+                download
+                className="px-3 py-1 text-sm text-purple-600 hover:text-purple-800 flex items-center gap-2 bg-purple-50 hover:bg-purple-100 rounded-md transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Download size={16} />
+                Download
+              </a>
+            </div>
           </div>
         )}
 
@@ -88,11 +102,13 @@ const ImageUploadModal = ({
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Preview:
                 </p>
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="w-full h-32 object-cover rounded-lg"
-                />
+                <div className="w-full h-48 max-h-[300px] overflow-hidden rounded-lg">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               </div>
             )}
 

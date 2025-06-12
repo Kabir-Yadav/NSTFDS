@@ -20,6 +20,7 @@ const StatusTimeline = ({
   additionalData = {},
   onUpdateData,
   projectStatuses = [], // Array of possible statuses for this project
+  isAdmin = false,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -151,32 +152,33 @@ const StatusTimeline = ({
               Project Timeline
             </h3>
             <div className="flex items-center space-x-2">
-              {!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
-                  title="Edit additional information"
-                >
-                  <Edit3 size={18} />
-                </button>
-              ) : (
-                <div className="flex space-x-2">
+              {isAdmin &&
+                (!isEditing ? (
                   <button
-                    onClick={handleSave}
-                    className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-md transition-colors"
-                    title="Save changes"
+                    onClick={() => setIsEditing(true)}
+                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition-colors"
+                    title="Edit additional information"
                   >
-                    <Save size={18} />
+                    <Edit3 size={18} />
                   </button>
-                  <button
-                    onClick={handleCancel}
-                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
-                    title="Cancel editing"
-                  >
-                    <XCircle size={18} />
-                  </button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleSave}
+                      className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-md transition-colors"
+                      title="Save changes"
+                    >
+                      <Save size={18} />
+                    </button>
+                    <button
+                      onClick={handleCancel}
+                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+                      title="Cancel editing"
+                    >
+                      <XCircle size={18} />
+                    </button>
+                  </div>
+                ))}
               <button
                 onClick={onClose}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"

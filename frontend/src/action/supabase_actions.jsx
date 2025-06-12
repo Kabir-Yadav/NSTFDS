@@ -386,6 +386,25 @@ export async function uploadProofImage({ file, projectName }) {
   return data.publicUrl;
 }
 
+export async function updateProjectExtraData(rowId, extraData) {
+  try {
+    const { data, error } = await supabase
+      .from("project_deliveries")
+      .update({
+        extra_json: extraData,
+      })
+      .eq("id", rowId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error("Error updating extra data:", error);
+    return { data: null, error };
+  }
+}
+
 export async function insertDigitalProcurement(formData) {
   // const { state_name, district_name, school_name } = formData;
   // const { error } = await supabase.from("digital_device_procurement").insert({

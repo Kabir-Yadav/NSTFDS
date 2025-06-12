@@ -7,6 +7,7 @@ const TableFilters = ({
   selectedProject,
   selectedDistrict,
   selectedCategory,
+  selectedStatus,
   setEndDate,
   setStartDate,
   setSelectedPsu,
@@ -14,11 +15,13 @@ const TableFilters = ({
   setSelectedSchool,
   setSelectedDistrict,
   setSelectedCategory,
+  setSelectedStatus,
   psuOptions = [],
   categories = [],
   stateOptions = [],
   schoolOptions = [],
   districtOptions = [],
+  statusOptions = [],
   fundFilter = "",
   setFundFilter,
   fundComparison = "greater",
@@ -216,6 +219,39 @@ const TableFilters = ({
             {psuOptions.map((psu) => (
               <option key={psu} value={psu}>
                 {psu}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {setSelectedStatus && (
+        <div>
+          <label
+            className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+          >
+            Status
+          </label>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:disabled:bg-[var(--color-text-secondary)] disabled:bg-[var(--color-text-disabled)] dark:bg-gray-900 dark:text-white dark:disabled:text-gray-800
+            "
+          >
+            <option value="">All Status</option>
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
               </option>
             ))}
           </select>
