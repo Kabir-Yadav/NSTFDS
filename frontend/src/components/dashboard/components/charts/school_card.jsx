@@ -1,7 +1,13 @@
 import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveContainer } from "recharts";
 
-const SchoolCard = ({pieDataSchool,chartTheme,implementationRate,pieChartProps,chartColors}) => {
+const SchoolCard = ({
+  pieDataSchool,
+  chartTheme,
+  implementationRate,
+  pieChartProps,
+  chartColors,
+}) => {
   return (
     <div
       className="
@@ -11,7 +17,11 @@ const SchoolCard = ({pieDataSchool,chartTheme,implementationRate,pieChartProps,c
             rounded-br-xl rounded-bl-xl
           "
     >
-      <ResponsiveContainer width="100%" height="100%" className="animate-fade-up">
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        className="animate-fade-up"
+      >
         <ResponsivePie
           data={pieDataSchool}
           margin={{ top: 25, right: 25, bottom: 25, left: 25 }}
@@ -74,4 +84,120 @@ const SchoolCard = ({pieDataSchool,chartTheme,implementationRate,pieChartProps,c
   );
 };
 
-export default SchoolCard;
+const ImplementationSummary = ({ implementationRate }) => {
+  const completedSchools = Math.round((implementationRate * 38) / 100);
+  const remainingSchools = Math.round(((100 - implementationRate) * 38) / 100);
+  return (
+    <div
+      className="
+          flex flex-col
+          h-64
+          mt-3
+          bg-[var(--color-surface-secondary)]
+          rounded-br-xl rounded-bl-xl
+          justify-center items-center
+        "
+    >
+      <div
+        className="
+            mb-6
+            text-center
+            animate-fade-down
+          "
+      >
+        <div
+          className="
+              text-5xl font-bold text-[var(--color-warning)]
+            "
+        >
+          {implementationRate}%
+        </div>
+        <div
+          className="
+              mt-2
+              text-xl font-medium text-[var(--color-text)]
+            "
+        >
+          Implementation Complete
+        </div>
+      </div>
+
+      <div
+        className="
+            w-full max-w-xs
+            animate-fade-down
+          "
+      >
+        <div
+          className="
+              grid grid-cols-2
+              text-center
+              gap-4
+            "
+        >
+          <div
+            className="
+                p-3
+                bg-[var(--color-warning)] bg-opacity-20
+                rounded-lg
+              "
+          >
+            <div
+              className="
+                  font-semibold
+                "
+            >
+              Schools Completed
+            </div>
+            <div
+              className="
+                  text-2xl font-bold
+                "
+            >
+              {completedSchools}
+            </div>
+            <div
+              className="
+                  text-sm text-[var(--color-text)]
+                "
+            >
+              of 38 schools
+            </div>
+          </div>
+          <div
+            className="
+                p-3
+                text-[var(--color-text)]
+                bg-[var(--color-surface-hover)]
+                rounded-lg
+              "
+          >
+            <div
+              className="
+                  font-semibold
+                "
+            >
+              Remaining
+            </div>
+            <div
+              className="
+                  text-2xl font-bold
+                "
+            >
+              {remainingSchools}
+            </div>
+            <div
+              className="
+                  text-sm text-[var(--color-text-secondary)]
+                "
+            >
+              schools pending
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export { SchoolCard, ImplementationSummary };

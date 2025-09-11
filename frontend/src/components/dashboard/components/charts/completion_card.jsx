@@ -55,7 +55,7 @@ const CompletionCard = ({
                     dur="1s"
                     repeatCount="1"
                   />
-                  <tspan>{completionRate}%</tspan>
+                  <tspan>{Number(completionRate).toFixed(2)}%</tspan>
                 </text>
                 <text
                   x={centerX}

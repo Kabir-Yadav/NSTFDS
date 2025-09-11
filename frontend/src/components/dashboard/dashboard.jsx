@@ -312,6 +312,8 @@ const Dashboard = () => {
                   <ChartSection
                     selectedState={selectedState}
                     selectedPSU={psu}
+                    hierarchicalData={hierarchicalData}
+                    projectsData={projects}
                   />
                   <BarChartSection
                     stateList={statesList}

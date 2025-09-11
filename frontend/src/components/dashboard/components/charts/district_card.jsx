@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
+import StatesPieChart from "./states_piechart";
 
-const DistrictDropdownView = ({ districtData, formatBudget }) => {
+const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
+  console.log(districtData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -9,6 +11,14 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const getSchoolsTotal = (district) => {
+    return (
+      district?.projects?.reduce((sum, project) => {
+        return sum + (project.schoolsTotal || 0);
+      }, 0) || 0
+    );
+  };
+
   // Use projects from district data
   const getDistrictProjects = (district) => {
     return district?.projects || [];
@@ -221,7 +231,7 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
                               className="px-2 py-1 rounded-full text-xs"
                               style={{ color: getStatusColor(project.status) }}
                             >
-                              {project.status}%
+                              {project.status}
                             </span>
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               ₹{formatBudget(project.budget)}
@@ -259,7 +269,7 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
 
               <div className="bg-[var(--color-surface-hover)] justify-center flex flex-col p-3 rounded-lg">
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {selectedProject ? "Project Status" : "District Status"}
+                  {selectedProject ? "Project Status" : "Active Projects"}
                 </div>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -281,7 +291,7 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
                     >
                       {selectedProject
                         ? `${selectedProject.status}`
-                        : `${calculateCumulativeStatus(selectedDistrict)}%`}
+                        : `${selectedDistrict.activeProjects}`}
                     </div>
                   </div>
                 </div>
@@ -326,16 +336,17 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
                     style={{
                       width: `${
                         (selectedDistrict.schoolsCompleted /
-                          selectedDistrict.schoolsTotal) *
+                          getSchoolsTotal(selectedDistrict)) *
                         100
                       }%`,
                     }}
                   ></div>
                 </div>
                 <div className="text-xs text-right mt-1 text-gray-500 dark:text-gray-400">
+                  {" "}
                   {Math.round(
                     (selectedDistrict.schoolsCompleted /
-                      selectedDistrict.schoolsTotal) *
+                      getSchoolsTotal(selectedDistrict)) *
                       100
                   )}
                   % Complete
@@ -349,4 +360,39 @@ const DistrictDropdownView = ({ districtData, formatBudget }) => {
   );
 };
 
-export default DistrictDropdownView;
+const StateAffected = ({
+  selectedState,
+  formatBudget,
+  districtData,
+  stateData,
+  projectData,
+}) => {
+  console.log(districtData);
+  return (
+    <div
+      className="
+          h-64
+          mt-3
+          bg-[var(--color-surface-secondary)]
+          rounded-br-xl rounded-bl-xl
+        "
+    >
+      {!selectedState ? (
+        // Show pie chart of state budgets when only PSU is selected
+        <StatesPieChart
+          stateBudgetData={stateData}
+          formatBudget={formatBudget}
+        />
+      ) : (
+        // Show district detail cards when both PSU and state are selected
+        <DistrictDropdownView
+          districtData={districtData}
+          formatBudget={formatBudget}
+          projectData={projectData}
+        />
+      )}
+    </div>
+  );
+};
+
+export { DistrictDropdownView, StateAffected };

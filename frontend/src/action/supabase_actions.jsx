@@ -273,15 +273,23 @@ export async function fetchSchoolImplementationRate(stateName = null) {
 
 //-----------------------------------------------------------------------------------------------------
 
-export async function fetchStateProgress(options = {}) {
-  return [];
+export async function fetchPsuStateDistrictStats(psu, state) {
+  const { data, error } = await supabase.rpc("get_psu_state_district_stats", {
+    p_psu: psu,
+    p_state: state,
+  });
+  if (error) {
+    console.error("Error fetching district stats:", error);
+    return [];
+  }
+  return data;
 }
 
 //-----------------------------------------------------------------------------------------------------
 
-export async function fetchDistrictProgressByState(stateName, options = {}) {
-  return [];
-}
+// export async function fetchDistrictProgressByState(stateName, options = {}) {
+//   return [];
+// }
 
 //-----------------------------------------------------------------------------------------------------
 
@@ -300,39 +308,39 @@ export async function fetchTableData({ selectedProject }) {
 
 //-----------------------------------------------------------------------------------------------------
 
-export async function isDigitalProcurementActive(schoolName) {
-  // console.log(schoolName);
-  // const { data, error } = await supabase
-  //   .from("schools")
-  //   .select("digital_device_procurement_active")
-  //   .match({
-  //     school_name: schoolName,
-  //   })
-  //   .single();
-  // if (error) {
-  //   console.error("Failed to fetch procurement status:", error);
-  //   return false;
-  // }
-  // return data?.digital_device_procurement_active === true;
-}
+// export async function isDigitalProcurementActive(schoolName) {
+// console.log(schoolName);
+// const { data, error } = await supabase
+//   .from("schools")
+//   .select("digital_device_procurement_active")
+//   .match({
+//     school_name: schoolName,
+//   })
+//   .single();
+// if (error) {
+//   console.error("Failed to fetch procurement status:", error);
+//   return false;
+// }
+// return data?.digital_device_procurement_active === true;
+// }
 
 //-----------------------------------------------------------------------------------------------------
 
-export async function isSanitaryProcurementActive(schoolName) {
-  // console.log(schoolName);
-  // const { data, error } = await supabase
-  //   .from("schools")
-  //   .select("sanitary_pad_procurement_active")
-  //   .match({
-  //     school_name: schoolName,
-  //   })
-  //   .single();
-  // if (error) {
-  //   console.error("Failed to fetch procurement status:", error);
-  //   return false;
-  // }
-  // return data?.sanitary_pad_procurement_active === true;
-}
+// export async function isSanitaryProcurementActive(schoolName) {
+// console.log(schoolName);
+// const { data, error } = await supabase
+//   .from("schools")
+//   .select("sanitary_pad_procurement_active")
+//   .match({
+//     school_name: schoolName,
+//   })
+//   .single();
+// if (error) {
+//   console.error("Failed to fetch procurement status:", error);
+//   return false;
+// }
+// return data?.sanitary_pad_procurement_active === true;
+// }
 /*
  * =============================
  *      INSERT FUNCTIONS
@@ -405,23 +413,23 @@ export async function updateProjectExtraData(rowId, extraData) {
   }
 }
 
-export async function insertDigitalProcurement(formData) {
-  // const { state_name, district_name, school_name } = formData;
-  // const { error } = await supabase.from("digital_device_procurement").insert({
-  //   state_name,
-  //   district_name,
-  //   school_name,
-  //   item_name: formData.item_name,
-  //   cost: formData.cost,
-  //   status: formData.status,
-  //   delivery_date: formData.delivery_date,
-  //   proof_image_url: formData.proof_image_url,
-  // });
-  // if (error) {
-  //   console.error("Error inserting digital procurement record:", error);
-  //   return { success: false, error };
-  // }
-  // return { success: true };
-}
+// export async function insertDigitalProcurement(formData) {
+// const { state_name, district_name, school_name } = formData;
+// const { error } = await supabase.from("digital_device_procurement").insert({
+//   state_name,
+//   district_name,
+//   school_name,
+//   item_name: formData.item_name,
+//   cost: formData.cost,
+//   status: formData.status,
+//   delivery_date: formData.delivery_date,
+//   proof_image_url: formData.proof_image_url,
+// });
+// if (error) {
+//   console.error("Error inserting digital procurement record:", error);
+//   return { success: false, error };
+// }
+// return { success: true };
+// }
 
 export { supabase };

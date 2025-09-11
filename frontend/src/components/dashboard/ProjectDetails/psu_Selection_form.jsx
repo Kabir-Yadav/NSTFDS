@@ -295,9 +295,9 @@ const PsuSelectionForm = ({
       9: 25, // Unit_Cost
       10: 25, // Total_Cost
       11: 25, // Item_Type (if applicable)
-      12: 10, // Stage1_proof - reduced URL width
-      13: 10, // Stage2_proof - reduced URL width
-      14: 10, // Completion_Certificate - reduced URL width
+      12: 15, // Stage1_proof - slightly increased for better readability
+      13: 15, // Stage2_proof - slightly increased for better readability
+      14: 15, // Completion_Certificate - slightly increased for better readability
       15: 25, // Extras
     };
 
@@ -314,9 +314,9 @@ const PsuSelectionForm = ({
       row.unit_cost,
       row.total_cost,
       ...(projectdata.category_list.length > 0 ? [row.item_type] : []),
-      ...(isAdmin ? [row.stage1_proof_url ?? "View"] : []),
-      ...(isAdmin ? [row.stage2_proof_url ?? "View"] : []),
-      ...(isAdmin ? [row.completion_certificate_url ?? "View"] : []),
+      ...(isAdmin ? [row.stage1_proof_url ? "Link" : "No Link"] : []),
+      ...(isAdmin ? [row.stage2_proof_url ? "Link" : "No Link"] : []),
+      ...(isAdmin ? [row.completion_certificate_url ? "Link" : "No Link"] : []),
       row.extra_json
         ? (() => {
             try {
@@ -338,11 +338,23 @@ const PsuSelectionForm = ({
       body: tableRows,
       startY: 20,
       columnStyles: columnWidths,
-
-      styles: { fontSize: 8 },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: "linebreak",
+        halign: "left",
+      },
       margin: { top: 20 },
       pageBreak: "auto",
-      headStyles: { fillColor: [102, 51, 153] },
+      headStyles: {
+        fillColor: [102, 51, 153],
+        textColor: [255, 255, 255],
+        fontSize: 8,
+      },
+      bodyStyles: {
+        fontSize: 7,
+        cellPadding: 1,
+      },
     });
 
     doc.save(`${selectedPsuProject || "Funding"}Report.pdf`);
