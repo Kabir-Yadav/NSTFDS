@@ -102,7 +102,7 @@ const LoginPage = () => {
             <img
               src="assets/nsfdc.png"
               alt="Logo"
-              className="w-24 object-fill"
+              className="w-32 object-fill"
             />
             <img
               src="assets/ministry.png"
