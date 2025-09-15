@@ -288,7 +288,7 @@ const Dashboard = () => {
                 ? selectedProject.name
                 : selectedPsuProject
                 ? selectedPsuProject
-                : "Welcome to NSTFDS Dashboard"}
+                : "Welcome to NSTFDC Dashboard"}
             </h2>
             <p className="font-redhat text-[var(--color-text-secondary)] mt-1 mb-1">
               {selectedProject || selectedPsuProject
