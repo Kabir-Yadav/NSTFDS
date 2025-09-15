@@ -100,9 +100,9 @@ const LoginPage = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <img
-              src="assets/nsfdc.png"
+              src="assets/nsfdc_new.png"
               alt="Logo"
-              className="w-32 object-fill"
+              className="w-32 object-contain"
             />
             <img
               src="assets/ministry.png"
