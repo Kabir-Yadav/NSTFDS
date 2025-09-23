@@ -18,10 +18,6 @@ import ThemeToggle from "./components/ThemeToggle";
 import UserProfile from "./Sidebar_components/UserProfile";
 
 // Import both admin and user form components
-import AdminProjectSelectionForm from "./ProjectDetails/admin_ProjectSelectionForm";
-import AdminPsuSelectionForm from "./ProjectDetails/admin-psuSelectionForm";
-import UserProjectSelectionForm from "./ProjectDetails/user_ProjectSelectionForm";
-import UserPsuSelectionForm from "./ProjectDetails/user_psuSelectionform";
 import ProjectSelectionForm from "./ProjectDetails/projectSelectionForm";
 import PsuSelectionForm from "./ProjectDetails/psu_Selection_form";
 
@@ -29,6 +25,7 @@ const Dashboard = () => {
   // Check user role and authentication
   const userRole = localStorage.getItem("userRole");
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+  const userPsu = localStorage.getItem("userPsu");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +41,25 @@ const Dashboard = () => {
   }, [isAuthenticated, userRole, navigate]);
 
   const isAdmin = userRole === "admin";
+  const isPsuUser = userRole === "psu_user";
+
+  // Filter projects based on user's PSU
+  const getFilteredProjects = () => {
+    if (!isPsuUser || !userPsu) {
+      return projects;
+    }
+
+    // Find the PSU data for the current user
+    const userPsuData = psuNavList.find((psu) => psu.name === userPsu);
+    if (!userPsuData) {
+      return projects;
+    }
+
+    // Filter projects to only include those belonging to the user's PSU
+    return projects.filter((project) =>
+      userPsuData.projects.includes(project.name)
+    );
+  };
 
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedPsuProject, setSelectedPsuProject] = useState(null);
@@ -104,6 +120,11 @@ const Dashboard = () => {
         setPsuNavList(transformedPsuList);
         setProjects(navData.projects);
         setPsuOptions(transformedPsuList.map((p) => p.name));
+
+        // Set PSU for PSU users
+        if (isPsuUser && userPsu) {
+          setPsu(userPsu);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -114,14 +135,8 @@ const Dashboard = () => {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array means this only runs once on mount
+  }, [isPsuUser, userPsu]); // Add dependencies for PSU user initialization
 
-  // Mock user data - should be replaced with real user data from auth system
-  const user = {
-    name: "Arun Kumar",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmnWamWQaGg46q1S3u0uMMgK3SZDBh1nBk-Q&s",
-  };
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setSelectedState(null);
@@ -131,6 +146,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("userRole");
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userPsu");
     navigate("/login");
   };
 
@@ -155,9 +171,13 @@ const Dashboard = () => {
       <DashboardBackground1 />
       <DashboardBackground2 />
       <Sidebar
-        user={user}
-        projects={projects}
-        psu={psuNavList}
+        isAdmin={isAdmin}
+        projects={getFilteredProjects()}
+        psu={
+          isPsuUser
+            ? psuNavList.filter((psu) => psu.name === userPsu)
+            : psuNavList
+        }
         selectedpsuProject={selectedPsuProject}
         onPsuProjectSelect={handlePsuProjectSelect}
         selectedProject={selectedProject}
@@ -167,6 +187,7 @@ const Dashboard = () => {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         setNavpsu={setSelectedNavPsu}
+        isPsuUser={isPsuUser}
       />
       {/* Main content area */}
       <div
@@ -243,21 +264,29 @@ const Dashboard = () => {
               </select>
               <select
                 onChange={(e) => {
-                  const selectedPsuName = e.target.value;
-                  const selectedPsu = psuNavList.find(
-                    (psu) => psu.name === selectedPsuName
-                  );
-                  if (selectedPsu) {
-                    setPsu(selectedPsu.name);
-                  } else {
-                    setPsu("");
+                  if (!isPsuUser) {
+                    const selectedPsuName = e.target.value;
+                    const selectedPsu = psuNavList.find(
+                      (psu) => psu.name === selectedPsuName
+                    );
+                    if (selectedPsu) {
+                      setPsu(selectedPsu.name);
+                    } else {
+                      setPsu("");
+                    }
                   }
                 }}
-                value={psu || ""}
-                className="px-3 py-2 w-full md:w-auto border border-gray-300 dark:border-gray-600 rounded-lg z-0 
-              bg-white dark:bg-gray-800
-              text-gray-900 dark:text-gray-100
-              focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={isPsuUser ? userPsu : psu || ""}
+                disabled={isPsuUser}
+                className={`px-3 py-2 w-full md:w-auto border border-gray-300 dark:border-gray-600 rounded-lg z-0 
+                bg-white dark:bg-gray-800
+                text-gray-900 dark:text-gray-100
+                focus:outline-none focus:ring-2 focus:ring-purple-500
+                ${
+                  isPsuUser
+                    ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 <option value="" className="bg-white dark:bg-gray-800">
                   All PSUs
@@ -279,7 +308,7 @@ const Dashboard = () => {
           <div className="flex-1" /> {/* Spacer */}
           <ThemeToggle />
           <span className="pr-2" />
-          <UserProfile user={user} isOpen={isSidebarOpen} />
+          <UserProfile isOpen={isSidebarOpen} />
         </div>
         <div className="px-4 md:px-6 lg:px-8">
           <div>
@@ -327,9 +356,9 @@ const Dashboard = () => {
                 {selectedProject && (
                   <ProjectSelectionForm
                     key={selectedProject?.id}
-                    isAdmin={isAdmin}
+                    isAdmin={isAdmin && !isPsuUser}
                     selectedProject={selectedProject}
-                    projectdata={projects.find(
+                    projectdata={getFilteredProjects().find(
                       (p) => p.name === selectedProject?.name
                     )}
                   />
@@ -340,12 +369,12 @@ const Dashboard = () => {
                     selectedPsuProject={selectedPsuProject}
                     hierarchicalData={hierarchicalData}
                     projectList={projects}
-                    projectdata={projects.find(
+                    projectdata={getFilteredProjects().find(
                       (p) => p.name === selectedPsuProject
                     )}
                     psulist={psuOptions}
                     psuName={selectedNavPsu}
-                    isAdmin={isAdmin}
+                    isAdmin={isAdmin && !isPsuUser}
                   />
                 )}
               </div>

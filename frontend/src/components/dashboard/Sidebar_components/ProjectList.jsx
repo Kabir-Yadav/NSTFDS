@@ -8,7 +8,7 @@ const ProjectList = ({
   setIsSidebarOpen, // Add this prop to control the sidebar state
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-
+  console.log(projects);
   const handleHeaderClick = () => {
     setIsExpanded(!isExpanded); // Toggle the dropdown
     setIsSidebarOpen(true); // Ensure the sidebar is open

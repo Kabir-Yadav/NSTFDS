@@ -26,6 +26,18 @@ const LoginPage = () => {
   const demoUsers = [
     { email: "admin@example.com", password: "admin123", role: "admin" },
     { email: "user@example.com", password: "user123", role: "user" },
+    {
+      email: "user@bpcl.example.com",
+      password: "bpcl123",
+      role: "psu_user",
+      psu: "BPCL",
+    },
+    {
+      email: "user@iocl.example.com",
+      password: "iocl123",
+      role: "psu_user",
+      psu: "IOCL",
+    },
   ];
 
   const handleInputChange = (e) => {
@@ -83,6 +95,9 @@ const LoginPage = () => {
     if (user) {
       localStorage.setItem("userRole", user.role); // Save role
       localStorage.setItem("isAuthenticated", "true"); // Save auth status
+      if (user.psu) {
+        localStorage.setItem("userPsu", user.psu); // Save PSU for PSU-specific users
+      }
       navigate("/dashboard");
     } else {
       setErrors((prev) => ({
@@ -227,17 +242,6 @@ const LoginPage = () => {
             Sign in
           </button>
         </form>
-
-        {/* Sign Up Link */}
-        <p className="mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <button
-            onClick={() => navigate("/register")}
-            className="text-purple-600 hover:text-purple-500 font-medium"
-          >
-            Create account
-          </button>
-        </p>
       </div>
     </div>
   );

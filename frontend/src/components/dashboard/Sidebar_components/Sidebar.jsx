@@ -6,7 +6,6 @@ import DottedDivider from "../components/dotted_divider";
 import PSUList from "./psu_list";
 
 const Sidebar = ({
-  user,
   projects,
   psu,
   selectedPsu,
@@ -20,6 +19,8 @@ const Sidebar = ({
   isSidebarOpen,
   setIsSidebarOpen,
   setNavpsu,
+  isAdmin = false,
+  isPsuUser = false,
 }) => {
   const handleOverlayClick = () => {
     setIsSidebarOpen(false);
@@ -60,18 +61,21 @@ const Sidebar = ({
           <div className="mt-3">
             <DottedDivider isSidebarOpen={isSidebarOpen} text={"Services"} />
           </div>
-          <div className="">
-            <PSUList
-              psu={psu}
-              isOpen={isSidebarOpen}
-              onPsuProjectSelect={(project) => {
-                onPsuProjectSelect(project);
-              }}
-              selectedPsuProject={selectedpsuProject}
-              setIsSidebarOpen={setIsSidebarOpen}
-              setSelectedPsu={setNavpsu}
-            />
-          </div>
+          {!isPsuUser && isAdmin && (
+            <div className="">
+              <PSUList
+                psu={psu}
+                isOpen={isSidebarOpen}
+                onPsuProjectSelect={(project) => {
+                  onPsuProjectSelect(project);
+                }}
+                selectedPsuProject={selectedpsuProject}
+                setIsSidebarOpen={setIsSidebarOpen}
+                setSelectedPsu={setNavpsu}
+                isPsuUser={isPsuUser}
+              />
+            </div>
+          )}
 
           <div className="mt-2">
             <ProjectList

@@ -7,10 +7,11 @@ const PSUList = ({
   isOpen,
   setIsSidebarOpen,
   setSelectedPsu,
+  isPsuUser = false,
 }) => {
   const [expandedPsu, setExpandedPsu] = useState(null);
   const [isMainExpanded, setIsMainExpanded] = useState(true);
-
+  console.log(psu);
   useEffect(() => {
     if (selectedPsuProject) {
       const parentPsu = psu.find((p) =>
@@ -23,6 +24,18 @@ const PSUList = ({
       }
     }
   }, [selectedPsuProject, psu]);
+
+  // Auto-expand PSU for PSU users
+  useEffect(() => {
+    if (isPsuUser && psu.length > 0) {
+      const userPsu = psu[0]; // Since we filtered to only show user's PSU
+      if (userPsu) {
+        setExpandedPsu(userPsu.name);
+        setSelectedPsu(userPsu.name);
+        setIsMainExpanded(true);
+      }
+    }
+  }, [isPsuUser, psu]);
 
   const handleHeaderClick = () => {
     setIsMainExpanded(!isMainExpanded);

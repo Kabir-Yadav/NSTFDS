@@ -306,7 +306,7 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
                         bottom: isSmallMobile ? 50 : isMobile ? 30 : 70,
                         left: isSmallMobile ? 60 : isMobile ? 80 : 75,
                       }}
-                      padding={isMobile ? 0.15 : 0.3}
+                      padding={data.length <= 3 ? 0.6 : isMobile ? 0.15 : 0.3}
                       layout={isMobile ? "horizontal" : "vertical"}
                       groupMode={groupMode}
                       colors={({ id }) =>
@@ -409,7 +409,7 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
                         modifiers: [["darker", 2.5]],
                       }}
                       borderRadius={3}
-                      innerPadding={isMobile ? 1 : 4}
+                      innerPadding={data.length <= 3 ? 8 : isMobile ? 1 : 4}
                       // More responsive tooltip
                       tooltip={({ id, value, color, indexValue }) => (
                         <div
