@@ -7,6 +7,8 @@ const UserProfile = ({ isOpen, isPsuUser, userPsu }) => (
         isPsuUser
           ? userPsu == "BPCL"
             ? "assets/bpcl.png"
+            : userPsu == "IOCL"
+            ? "assets/iocl.png"
             : "assets/icon.png"
           : "assets/icon.png"
       }
