@@ -5,8 +5,8 @@ import * as XLSX from "xlsx";
 import {
   uploadProofImage,
   insertProjectDeliveries,
-} from "../../../../../action/supabase_actions";
-import TablePageNavButton from "../../../components/table_components/table_pageNav_button";
+} from "../../../action/supabase_actions";
+import TablePageNavButton from "../../table_components/table_pageNav_button";
 
 import {
   X,
@@ -314,6 +314,21 @@ const EnhancedAddDataDialog = ({
     }
   };
   const sampleCSV = () => {
+    // Helper function to properly escape CSV fields
+    const escapeCSVField = (field) => {
+      if (field === null || field === undefined) return "";
+      const fieldStr = String(field);
+      // If field contains comma, quote, or newline, wrap in quotes and escape quotes
+      if (
+        fieldStr.includes(",") ||
+        fieldStr.includes('"') ||
+        fieldStr.includes("\n")
+      ) {
+        return `"${fieldStr.replace(/"/g, '""')}"`;
+      }
+      return fieldStr;
+    };
+
     const headers = [
       "ID",
       // Required fields
@@ -364,7 +379,7 @@ const EnhancedAddDataDialog = ({
 
     const csvContent =
       "data:text/csv;charset=utf-8," +
-      [headers.join(","), exampleRow.join(",")].join("\n");
+      [headers.join(","), exampleRow.map(escapeCSVField).join(",")].join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");

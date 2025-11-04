@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { fetchTableData } from "../../../action/supabase_actions";
+import { fetchTableData } from "../../action/supabase_actions";
 import { SortAscIcon, SortDescIcon, BarChart3, ListFilter } from "lucide-react";
-import ImageUploadModal from "./components/ImageUploadModal";
+import ImageUploadModal from "../../components/project_components/ImageUploadModal";
 import { Eye } from "lucide-react";
-import HeaderButtons from "../components/table_components/header_buttons";
-import TableFilters from "../components/table_components/table_filters";
-import TablePageNavButton from "../components/table_components/table_pageNav_button";
-import ProjectOverview from "./components/ProjectOverview";
+import HeaderButtons from "../../components/table_components/header_buttons";
+import TableFilters from "../../components/table_components/table_filters";
+import TablePageNavButton from "../../components/table_components/table_pageNav_button";
+import ProjectOverview from "../../components/project_components/ProjectOverview";
 
 const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
   const [tableData, setTableData] = useState([]);

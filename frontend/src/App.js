@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import './style/theme.css';
-import LoginPage from './components/Auth/LoginPage';
-import RegisterPage from './components/Auth/RegisterPage';
-import Dashboard from './components/dashboard/dashboard';
+import LoginPage from './view/Auth/LoginPage';
+import RegisterPage from './view/Auth/RegisterPage';
+import DashboardView from './view/dashboard/dashboard_view';
 import ProtectedRoute from './protected_routes';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardView />
               </ProtectedRoute>
             }
           />

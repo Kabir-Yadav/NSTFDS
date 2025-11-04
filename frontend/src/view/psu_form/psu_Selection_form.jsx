@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import TablePageNavButton from "../components/table_components/table_pageNav_button";
-import HeaderButtons from "../components/table_components/header_buttons";
+import TablePageNavButton from "../../components/table_components/table_pageNav_button";
+import HeaderButtons from "../../components/table_components/header_buttons";
 import {
   fetchTableData,
   uploadProofImage,
   supabase,
-} from "../../../action/supabase_actions";
+} from "../../action/supabase_actions";
 import { SortAscIcon, SortDescIcon, Eye, Upload } from "lucide-react";
-import EnhancedAddDataDialog from "./forms/Add_Data_Dialog/add_dataDialog";
-import StatusTimeline from "./components/StatusTimeline";
-import TableActions from "./components/TableActions";
-import ImageUploadModal from "./components/ImageUploadModal";
-import TableFilters from "../components/table_components/table_filters";
+import EnhancedAddDataDialog from "../../components/forms/addDataDialog/add_dataDialog";
+import StatusTimeline from "../../components/project_components/StatusTimeline";
+import TableActions from "../../components/project_components/TableActions";
+import ImageUploadModal from "../../components/project_components/ImageUploadModal";
+import TableFilters from "../../components/table_components/table_filters";
 
 const PsuSelectionForm = ({
   selectedPsuProject,

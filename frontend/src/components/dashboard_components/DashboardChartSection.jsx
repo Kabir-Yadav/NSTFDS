@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo } from "react";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 import {
   fetchBudgetUtilization,
   fetchSchoolImplementationRate,
@@ -8,15 +8,14 @@ import {
   fetchPsuStateBudgets,
   fetchPsuProjectBudgetsByState,
   fetchPsuStateDistrictStats,
-} from "../../../action/supabase_actions";
-import { SchoolCard, ImplementationSummary } from "./charts/school_card";
-import { BudgetCard, BudgetPSUCard } from "./charts/budget_card";
-import CompletionCard from "./charts/completion_card";
-import StatesPieChart from "./charts/states_piechart";
-import createChartConfig from "./charts/style";
-import { StateAffected } from "./charts/district_card";
+} from "../../action/supabase_actions";
+import { SchoolCard, ImplementationSummary } from "../charts/school_card";
+import { BudgetCard, BudgetPSUCard } from "../charts/budget_card";
+import CompletionCard from "../charts/completion_card";
+import createChartConfig from "../charts/style";
+import { StateAffected } from "../charts/district_card";
 
-const ChartSection = ({
+const DashboardChartSection = ({
   selectedState,
   selectedPSU,
   hierarchicalData,
@@ -51,6 +50,9 @@ const ChartSection = ({
     budgetUtilization,
     implementationRate,
   });
+
+  //------------------------------------API CALLS------------------------------------------------------------
+
   const loadMetrics = async (state, psu) => {
     setLoading(true);
     try {
@@ -109,6 +111,7 @@ const ChartSection = ({
       // If no state is selected, pass null to fetch overall stats.
       const stateParam = state && state !== "" ? state : null;
       const digitalData = await fetchProjectCompletionRate(stateParam);
+      console.log(digitalData, "digitalData");
       if (digitalData.length > 0) {
         if (stateParam) {
           // If a state is selected, show that state's completion rate
@@ -130,6 +133,7 @@ const ChartSection = ({
       // Fetch Budget Utilization Data
       if (!psu) {
         const budgetData = await fetchBudgetUtilization(stateParam);
+        console.log(budgetData, "budgetData");
         setBudgetUtilization(Number(budgetData[0].budget_utilization_pct));
       }
 
@@ -146,6 +150,8 @@ const ChartSection = ({
     loadMetrics(selectedState, selectedPSU);
   }, [selectedState, selectedPSU]);
 
+  //------------------------------------DATA TRANSFORMATION------------------------------------------------------------
+
   const formatBudget = (value) => {
     if (value >= 10000000) {
       return `${(value / 10000000).toFixed(2)} Cr`; // Crore
@@ -157,44 +163,18 @@ const ChartSection = ({
     return value.toString(); // Default
   };
 
+  //------------------------------------RENDERING------------------------------------------------------------
+
   return (
     <>
       {/* Circular Charts Row */}
-      <div
-        className="
-          grid grid-cols-1
-          mb-8
-          gap-6
-          sm:grid-cols-2
-          lg:grid-cols-3
-        "
-      >
+      <div className="grid grid-cols-1 mb-8 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {loading ? (
-          <div
-            className="
-              h-64
-              bg-[var(--color-surface-hover)]
-              rounded-xl
-              animate-pulse
-            "
-          ></div>
+          <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse"></div>
         ) : (
-          <div
-            className={`
-              ${elevatedCardClass}
-            `}
-          >
-            <div
-              className="
-                p-1 pl-6 mt-4
-                border-l-4 border-[var(--color-primary)]
-              "
-            >
-              <h3
-                className="
-                  text-lg font-outfit font-medium text-[var(--color-text)]
-                "
-              >
+          <div className={`${elevatedCardClass}`}>
+            <div className="p-1 pl-6 mt-4 border-l-4 border-[var(--color-primary)]">
+              <h3 className="text-lg font-outfit font-medium text-[var(--color-text)]">
                 {selectedPSU ? "Total Budget" : "Project Completion Rate"}
               </h3>
             </div>
@@ -218,26 +198,10 @@ const ChartSection = ({
         )}
 
         {loading ? (
-          <div
-            className="
-              h-64
-              bg-[var(--color-surface-hover)]
-              rounded-xl
-              animate-pulse
-            "
-          ></div>
+          <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse"></div>
         ) : (
-          <div
-            className={`
-              ${elevatedCardClass}
-            `}
-          >
-            <div
-              className="
-                p-1 pl-6 mt-4
-                border-l-4 border-[var(--color-primary)]
-              "
-            >
+          <div className={` ${elevatedCardClass} `}>
+            <div className="p-1 pl-6 mt-4 border-l-4 border-[var(--color-primary)] ">
               <h3
                 className="
                   text-lg font-outfit font-medium text-[var(--color-text)]
@@ -265,37 +229,13 @@ const ChartSection = ({
         )}
 
         {loading ? (
-          <div
-            className="
-              h-64
-              bg-[var(--color-surface-hover)]
-              rounded-xl
-              animate-pulse
-              col-span-1
-              sm:col-span-2
-              lg:col-span-1
-            "
-          ></div>
+          <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse col-span-1 sm:col-span-2 lg:col-span-1"></div>
         ) : (
           <div
-            className={`
-              col-span-1
-              sm:col-span-2
-              lg:col-span-1
-              ${elevatedCardClass}
-            `}
+            className={`col-span-1 sm:col-span-2 lg:col-span-1 ${elevatedCardClass}`}
           >
-            <div
-              className="
-                p-1 pl-6 mt-4
-                border-l-4 border-[var(--color-primary)]
-              "
-            >
-              <h3
-                className="
-                  text-lg font-outfit font-medium text-[var(--color-text)]
-                "
-              >
+            <div className="p-1 pl-6 mt-4 border-l-4 border-[var(--color-primary)]">
+              <h3 className="text-lg font-outfit font-medium text-[var(--color-text)]">
                 School Implementation
               </h3>
             </div>
@@ -317,4 +257,4 @@ const ChartSection = ({
   );
 };
 
-export default ChartSection;
+export default DashboardChartSection;

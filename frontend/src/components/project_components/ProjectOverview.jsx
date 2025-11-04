@@ -6,7 +6,7 @@ import {
   TrendingUp,
   CheckCircle,
 } from "lucide-react";
-import { formatIndianCurrency } from "../../../../utils/currencyFormatter";
+import { formatIndianCurrency } from "../../utils/currencyFormatter";
 
 const ProjectOverview = ({ data, projectName, statusList }) => {
   // Calculate comprehensive statistics
@@ -120,7 +120,7 @@ const ProjectOverview = ({ data, projectName, statusList }) => {
                 </div>
               </div>
             </div>
-            
+
             {/* Subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 dark:to-white/5 pointer-events-none" />
           </div>

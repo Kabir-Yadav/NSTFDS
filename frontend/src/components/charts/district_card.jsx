@@ -3,7 +3,6 @@ import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
 import StatesPieChart from "./states_piechart";
 
 const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
-  console.log(districtData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -21,7 +20,7 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
 
   // Use projects from district data
   const getDistrictProjects = (district) => {
-    return district?.projects || [];
+    return district?.projects || []; 
   };
 
   // Set the first district as default selected when component mounts
@@ -87,7 +86,7 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
   };
 
   return (
-    <div className="h-full overflow-y-auto mt-3 bg-[var(--color-surface-secondary)] rounded-br-xl rounded-bl-xl">
+    <div className="relative h-full overflow-y-auto mt-3 bg-[var(--color-surface-secondary)] rounded-br-xl rounded-bl-xl">
       {/* Sticky Dropdown and Search */}
       <div className="sticky top-0 z-10 bg-[var(--color-surface-secondary)] p-3 border-b border-gray-200 dark:border-gray-700 max-w-full">
         <div className="flex items-center gap-2">
@@ -155,7 +154,7 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
 
             {/* District Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-56 rounded-md overflow-auto focus:outline-none">
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-44 rounded-md overflow-auto focus:outline-none">
                 {/* Search input */}
                 <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="relative">
@@ -193,7 +192,7 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
 
             {/* Project Dropdown Menu */}
             {isProjectDropdownOpen && selectedDistrict && (
-              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-56 rounded-md overflow-auto focus:outline-none">
+              <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-44 rounded-md overflow-auto focus:outline-none">
                 {/* Search input for projects */}
                 <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-2 border-b border-gray-200 dark:border-gray-700">
                   <div className="relative">

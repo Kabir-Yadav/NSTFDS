@@ -1,8 +1,6 @@
 import React from "react";
-import UserProfile from "./UserProfile";
 import ProjectList from "./ProjectList";
-import ThemeToggle from "../components/ThemeToggle";
-import DottedDivider from "../components/dotted_divider";
+import DottedDivider from "../ui/dotted_divider";
 import PSUList from "./psu_list";
 
 const Sidebar = ({

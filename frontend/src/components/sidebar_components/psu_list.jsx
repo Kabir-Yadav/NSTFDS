@@ -11,7 +11,6 @@ const PSUList = ({
 }) => {
   const [expandedPsu, setExpandedPsu] = useState(null);
   const [isMainExpanded, setIsMainExpanded] = useState(true);
-  console.log(psu);
   useEffect(() => {
     if (selectedPsuProject) {
       const parentPsu = psu.find((p) =>

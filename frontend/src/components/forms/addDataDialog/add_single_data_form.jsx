@@ -12,7 +12,7 @@ import { InputField } from "./FormFields";
 import {
   insertProjectDelivery,
   uploadProofImage,
-} from "../../../../../action/supabase_actions";
+} from "../../../action/supabase_actions";
 
 // Initial form state
 const initialFormState = (psu_name) => ({

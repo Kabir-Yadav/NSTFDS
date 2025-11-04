@@ -1,27 +1,36 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar_components/Sidebar";
-import SummaryCards from "./components/Summary";
-import ChartSection from "./components/ChartSection";
+import Sidebar from "../../components/sidebar_components/Sidebar";
+import SummaryCards from "../../components/dashboard_components/SummaryCards";
+import DashboardChartSection from "../../components/dashboard_components/DashboardChartSection";
 import {
   fetchHierarchicalData,
   fetchProjectsAndPsu,
   useStatsWithStateFilter,
 } from "../../action/supabase_actions";
-import { BarChartSection } from "./components/BarChart";
+import { BarChartSection } from "../../components/dashboard_components/BarChart";
 import {
   DashboardBackground1,
   DashboardBackground2,
-} from "./components/background";
+} from "../../components/ui/background";
 
-import ThemeToggle from "./components/ThemeToggle";
-import UserProfile from "./Sidebar_components/UserProfile";
+import ThemeToggle from "../../components/ui/ThemeToggle";
+import UserProfile from "../../components/sidebar_components/UserProfile";
+import ProjectSelectionForm from "../project_form/projectSelectionForm";
+import PsuSelectionForm from "../psu_form/psu_Selection_form";
 
-// Import both admin and user form components
-import ProjectSelectionForm from "./ProjectDetails/projectSelectionForm";
-import PsuSelectionForm from "./ProjectDetails/psu_Selection_form";
+const DashboardView = () => {
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedPsuProject, setSelectedPsuProject] = useState(null);
+  const [selectedNavPsu, setSelectedNavPsu] = useState("");
+  const [psu, setPsu] = useState("");
+  const [hierarchicalData, setHierarchicalData] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [psuNavList, setPsuNavList] = useState([]);
+  const [psuOptions, setPsuOptions] = useState([]);
 
-const Dashboard = () => {
+  //------------------------------------USER AUTHENTICATION------------------------------------------------------------
   // Check user role and authentication
   const userRole = localStorage.getItem("userRole");
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
@@ -43,6 +52,8 @@ const Dashboard = () => {
   const isAdmin = userRole === "admin";
   const isPsuUser = userRole === "psu_user";
 
+  //------------------------------------PROJECT FILTERING------------------------------------------------------------
+
   // Filter projects based on user's PSU
   const getFilteredProjects = () => {
     if (!isPsuUser || !userPsu) {
@@ -61,18 +72,7 @@ const Dashboard = () => {
     );
   };
 
-  const [selectedProject, setSelectedProject] = useState(null);
-  const [selectedPsuProject, setSelectedPsuProject] = useState(null);
-  const [selectedNavPsu, setSelectedNavPsu] = useState("");
-  const [psu, setPsu] = useState("");
-  const [hierarchicalData, setHierarchicalData] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [psuNavList, setPsuNavList] = useState([]);
-  const [psuOptions, setPsuOptions] = useState([]);
-
-  const { stats, loading, statesList, selectedState, setSelectedState } =
-    useStatsWithStateFilter();
+  //------------------------------------SCROLLING------------------------------------------------------------
 
   const scrollRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
@@ -94,6 +94,11 @@ const Dashboard = () => {
       }
     };
   }, []);
+
+  //------------------------------------DATA FETCHING------------------------------------------------------------
+
+  const { stats, loading, statesList, selectedState, setSelectedState } =
+    useStatsWithStateFilter();
 
   useEffect(() => {
     let isMounted = true;
@@ -137,6 +142,8 @@ const Dashboard = () => {
     };
   }, [isPsuUser, userPsu]); // Add dependencies for PSU user initialization
 
+  //------------------------------------HANDLERS------------------------------------------------------------
+
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setSelectedState(null);
@@ -162,6 +169,8 @@ const Dashboard = () => {
     setSelectedPsuProject(null);
     setIsSidebarOpen(false);
   };
+
+  //------------------------------------RENDERING------------------------------------------------------------
 
   return (
     <div
@@ -308,7 +317,11 @@ const Dashboard = () => {
           <div className="flex-1" /> {/* Spacer */}
           <ThemeToggle />
           <span className="pr-2" />
-          <UserProfile isOpen={isSidebarOpen} isPsuUser={isPsuUser} userPsu={userPsu}/>
+          <UserProfile
+            isOpen={isSidebarOpen}
+            isPsuUser={isPsuUser}
+            userPsu={userPsu}
+          />
         </div>
         <div className="px-4 md:px-6 lg:px-8">
           <div>
@@ -338,7 +351,7 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="mb-4 md:mb-6 ">
-                  <ChartSection
+                  <DashboardChartSection
                     selectedState={selectedState}
                     selectedPSU={psu}
                     hierarchicalData={hierarchicalData}
@@ -386,4 +399,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardView;

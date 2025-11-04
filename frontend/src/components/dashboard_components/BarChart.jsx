@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ResponsiveBar } from "@nivo/bar";
-import { useTheme } from "../../../context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 import {
   fetchDistrictCompletionRate,
   fetchDistrictProgressByState,
@@ -9,7 +9,7 @@ import {
   fetchPsuProjectBudgetsByState,
   fetchPsuStateBudgets,
   fetchStateProgress,
-} from "../../../action/supabase_actions";
+} from "../../action/supabase_actions";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
@@ -18,8 +18,10 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
   const [data, setData] = useState([]);
   const [keys, setKeys] = useState(["progress"]);
   const chartContainerRef = useRef(null);
-  const outerContainerRef = useRef(null); // New ref for the outer container
+  const outerContainerRef = useRef(null);
   const [chartWidth, setChartWidth] = useState(600);
+
+  //------------------------------------RESPONSIVE CHECKS------------------------------------------------------------
 
   // Responsive check with more detailed breakpoints
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -75,33 +77,7 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
     updateChartWidth();
   }, [data]);
 
-  // Generate fake budget data for PSU overview
-  const getFakePsuBudgetData = () =>
-    stateList.map((state) => ({
-      state,
-      allocatedBudget: Math.floor(Math.random() * 500_000) + 500_000,
-      usedBudget: Math.floor(Math.random() * 400_000) + 100_000,
-    }));
-
-  // Generate fake project data for PSU within a state
-  const getFakePsuProjectData = () => {
-    const projects = [
-      "Highway Development",
-      "Bridge Construction",
-      "Rural Road Network",
-      "Urban Infrastructure",
-      "Railways Connection",
-      "Port Development",
-      "Airport Expansion",
-      "Public Transport",
-      "Smart City Initiative",
-    ];
-    return projects.map((project) => ({
-      project,
-      allocatedBudget: Math.floor(Math.random() * 800_000) + 200_000,
-      usedBudget: Math.floor(Math.random() * 500_000) + 100_000,
-    }));
-  };
+  //------------------------------------API CALLS------------------------------------------------------------
 
   // Load appropriate dataset based on selection
   useEffect(() => {
@@ -164,6 +140,8 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
     loadData();
   }, [selectedState, selectedPsu, stateList]);
 
+  //------------------------------------DATA TRANSFORMATION------------------------------------------------------------
+
   // Determine index field
   const getIndexBy = () => {
     if (selectedState && selectedPsu) return "project";
@@ -198,12 +176,17 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
     if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
     return `${value}`;
   };
+
+  //------------------------------------VARIABLES------------------------------------------------------------
+
   // Add these variables below your breakpoints (isMobile, isSmallMobile):
   const mobileBarHeight = isSmallMobile ? 40 : 50;
   const mobileMaxHeight = 600; // Maximum height before scroll
   const chartHeight = isMobile
     ? Math.min(data.length * mobileBarHeight, mobileMaxHeight)
     : 450; // Fixed height on desktop
+
+  //------------------------------------RENDERING------------------------------------------------------------
 
   return (
     <div className="bg-[var(--color-surface)] rounded-xl transition-all duration-300">
