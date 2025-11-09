@@ -111,6 +111,40 @@ const EnhancedAddDataDialog = ({
     setHasErrors(allErrors.length > 0);
   };
 
+  // Function to handle row deletion
+  const handleDeleteRow = (rowIndex) => {
+    const updatedData = parsedData.filter((_, index) => index !== rowIndex);
+    setParsedData(updatedData);
+
+    // Reset editing if the deleted row was being edited
+    if (editingRowIndex === rowIndex) {
+      setEditingRowIndex(null);
+    } else if (editingRowIndex > rowIndex) {
+      // Adjust editing index if a row before the edited row was deleted
+      setEditingRowIndex(editingRowIndex - 1);
+    }
+
+    // Revalidate remaining rows and update error messages
+    const allErrors = [];
+    updatedData.forEach((row, index) => {
+      if (row.errors && row.errors.length > 0) {
+        allErrors.push(`Row ${index + 1}: ${row.errors.join(", ")}`);
+      }
+    });
+
+    setErrorMessages(allErrors);
+    setHasErrors(allErrors.length > 0);
+
+    // Adjust current page if needed (if last item on last page is deleted)
+    const newTotalPages = Math.max(
+      1,
+      Math.ceil(updatedData.length / recordsPerPage)
+    );
+    if (currentPage > newTotalPages) {
+      setCurrentPage(newTotalPages);
+    }
+  };
+
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length === 0) return;
 
@@ -300,6 +334,7 @@ const EnhancedAddDataDialog = ({
         }
 
         onSubmitMultiple(data); // data = array of DB-inserted rows (with IDs)
+        console.log(processedData);
         onClose();
       } catch (error) {
         console.error("Error processing data:", error);
@@ -412,10 +447,28 @@ const EnhancedAddDataDialog = ({
     );
   };
 
+  // Determine dialog width based on mode and file state
+  const getDialogWidthClass = () => {
+    if (mode === null) {
+      // Initial state with 2 buttons - smaller width
+      return "w-full max-w-2xl";
+    } else if (mode === "multiple" && isPreviewReady) {
+      // File dropped and preview ready - larger width for content viewing
+      return "w-full max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw]";
+    } else if (mode === "multiple" && !isPreviewReady) {
+      // Multiple mode but no file yet - medium width
+      return "w-full max-w-3xl";
+    }
+    // Default fallback
+    return "w-full max-w-2xl";
+  };
+
   return (
     isOpen && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 max-h-4xl">
-        <div className="w-full max-w-2xl md:max-w-3xl max-h-[80%] flex flex-col rounded-xl shadow-xl bg-[var(--color-surface-secondary)]">
+        <div
+          className={`${getDialogWidthClass()} max-h-[90%] flex flex-col rounded-xl shadow-xl bg-[var(--color-surface-secondary)]`}
+        >
           {/* Render Form or Dialog Content */}
           {mode === "single" ? (
             openForm(selectedProject)
@@ -569,6 +622,9 @@ const EnhancedAddDataDialog = ({
                           editingRowIndex={editingRowIndex}
                           handleCellChange={handleCellChange}
                           statusOptions={status}
+                          handleDeleteRow={handleDeleteRow}
+                          indexOfFirstRecord={indexOfFirstRecord}
+                          totalDataLength={parsedData.length}
                         />
                       </table>
                     </div>

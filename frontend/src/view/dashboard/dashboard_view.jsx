@@ -18,6 +18,7 @@ import ThemeToggle from "../../components/ui/ThemeToggle";
 import UserProfile from "../../components/sidebar_components/UserProfile";
 import ProjectSelectionForm from "../project_form/projectSelectionForm";
 import PsuSelectionForm from "../psu_form/psu_Selection_form";
+import { useAuth } from "../../context/AuthContext";
 
 const DashboardView = () => {
   const [selectedProject, setSelectedProject] = useState(null);
@@ -31,26 +32,24 @@ const DashboardView = () => {
   const [psuOptions, setPsuOptions] = useState([]);
 
   //------------------------------------USER AUTHENTICATION------------------------------------------------------------
-  // Check user role and authentication
-  const userRole = localStorage.getItem("userRole");
-  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
-  const userPsu = localStorage.getItem("userPsu");
+  const {
+    isAuthenticated,
+    loading: authLoading,
+    role,
+    psu: userPsu,
+    logout,
+  } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!isAuthenticated) {
       navigate("/login");
-      return;
     }
-    if (!userRole) {
-      console.error("User role not found");
-      navigate("/login");
-      return;
-    }
-  }, [isAuthenticated, userRole, navigate]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  const isAdmin = userRole === "admin";
-  const isPsuUser = userRole === "psu_user";
+  const isAdmin = role === "admin";
+  const isPsuUser = role === "psu_viewer";
 
   //------------------------------------PROJECT FILTERING------------------------------------------------------------
 
@@ -150,10 +149,8 @@ const DashboardView = () => {
     setSelectedPsuProject(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userPsu");
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 

@@ -13,7 +13,7 @@ import { SchoolCard, ImplementationSummary } from "../charts/school_card";
 import { BudgetCard, BudgetPSUCard } from "../charts/budget_card";
 import CompletionCard from "../charts/completion_card";
 import createChartConfig from "../charts/style";
-import { StateAffected } from "../charts/district_card";
+import { StateAffected } from "../charts/state_affected";
 
 const DashboardChartSection = ({
   selectedState,

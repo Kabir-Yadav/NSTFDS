@@ -1,10 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  EyeSlashIcon,
-  EyeIcon,
-  GlobeAltIcon,
-} from "@heroicons/react/24/outline";
+import { EyeSlashIcon, EyeIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "../../context/AuthContext";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -21,24 +18,35 @@ const LoginPage = () => {
   const [wobble, setWobble] = useState(false);
   const buttonRef = useRef(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Hardcoded demo users
-  const demoUsers = [
-    { email: "admin@example.com", password: "admin123", role: "admin" },
-    { email: "user@example.com", password: "user123", role: "user" },
-    {
-      email: "user@bpcl.example.com",
-      password: "bpcl123",
-      role: "psu_user",
-      psu: "BPCL",
-    },
-    {
-      email: "user@iocl.example.com",
-      password: "iocl123",
-      role: "psu_user",
-      psu: "IOCL",
-    },
-  ];
+  const renderDemoCards = (accounts) =>
+    accounts.map((account) => (
+      <div
+        key={account.email}
+        className="border border-dashed border-purple-200 rounded-lg p-3 bg-purple-50/60"
+      >
+        <p className="text-sm text-gray-700">
+          <span className="font-medium">Account:</span>{" "}
+          {account.label || account.role}
+        </p>
+        {account.psu && (
+          <p className="text-xs text-gray-600">
+            <span className="font-medium">PSU:</span> {account.psu}
+          </p>
+        )}
+        <p className="text-xs text-gray-600">
+          <span className="font-medium">Role:</span> {account.role}
+        </p>
+        <p className="text-xs text-gray-600">
+          <span className="font-medium">Email:</span> {account.email}
+        </p>
+        <p className="text-xs text-gray-600">
+          <span className="font-medium">Password:</span> {account.password}
+        </p>
+      </div>
+    ));
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,7 +89,7 @@ const LoginPage = () => {
     setTimeout(() => setWobble(false), 1000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -89,22 +97,19 @@ const LoginPage = () => {
       return;
     }
 
-    const user = demoUsers.find(
-      (u) => u.email === formData.email && u.password === formData.password
-    );
-    if (user) {
-      localStorage.setItem("userRole", user.role); // Save role
-      localStorage.setItem("isAuthenticated", "true"); // Save auth status
-      if (user.psu) {
-        localStorage.setItem("userPsu", user.psu); // Save PSU for PSU-specific users
-      }
+    setIsSubmitting(true);
+
+    try {
+      await login(formData.email, formData.password);
       navigate("/dashboard");
-    } else {
+    } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        general: "Invalid credentials. Please try again.",
+        general: error.message || "Invalid credentials. Please try again.",
       }));
       triggerWobble();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -235,11 +240,12 @@ const LoginPage = () => {
           <button
             ref={buttonRef}
             type="submit"
+            disabled={isSubmitting}
             className={`w-full bg-purple-600 text-white py-3 px-4 rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ${
               wobble ? "animate-wobble" : ""
             }`}
           >
-            Sign in
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </button>
         </form>
       </div>

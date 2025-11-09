@@ -67,10 +67,10 @@
   --color-accent-light: #2e3e3a;
   --color-accent-dark: #dbf9f1;
 
-  --color-background: #141921;
-  --color-surface: #242b3d;
+  --color-background: #0f141b;
+  --color-surface: #1a212e;
   --color-surface-hover: #2e3649;
-  --color-surface-secondary: rgba(29, 36, 50, 1);
+  --color-surface-secondary: #202634;
   --color-surface-dark: #242b3d;
 
   --color-text: #e3e8f0;
