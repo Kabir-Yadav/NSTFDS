@@ -1,6 +1,5 @@
 import {
-  Building2,
-  Users,
+  MapPin,
   IndianRupee,
   School,
   TrendingUp,
@@ -10,28 +9,29 @@ import { formatIndianCurrency } from "../../utils/currencyFormatter";
 
 const ProjectOverview = ({ data, projectName, statusList }) => {
   // Calculate comprehensive statistics
-  const totalPSUs = new Set(
-    data.filter((item) => item.psu_name).map((item) => item.psu_name)
+  const totalRecords = data.length;
+
+  // Count unique states
+  const totalStates = new Set(
+    data.filter((item) => item.state).map((item) => item.state)
   ).size;
+
+  // Count unique schools
   const totalSchools = new Set(
     data.filter((item) => item.school_name).map((item) => item.school_name)
   ).size;
-  const totalSpent = data.reduce(
-    (sum, item) => sum + (parseFloat(item.total_cost) || 0),
-    0
-  );
-  const totalRecords = data.length;
 
-  // More accurate completion detection
-  const completedDeliveries = data.filter((item) => {
-    const status = item.status?.toLowerCase() || "";
-    return status === statusList[statusList.length - 1]?.toLowerCase();
+  // Calculate total investment from unit_cost * quantity for each school project
+  const totalInvestment = data.reduce((sum, item) => {
+    const unitCost = parseFloat(item.unit_cost) || 0;
+    const quantity = parseFloat(item.quantity) || 0;
+    return sum + unitCost * quantity;
+  }, 0);
+
+  // Count complete handovers
+  const completeHandovers = data.filter((item) => {
+    return item.handover_status === "complete";
   }).length;
-
-  const completionRate =
-    totalRecords > 0
-      ? ((completedDeliveries / totalRecords) * 100).toFixed(1)
-      : 0;
 
   const stats = [
     {
@@ -44,15 +44,15 @@ const ProjectOverview = ({ data, projectName, statusList }) => {
       iconBg: "bg-slate-100 dark:bg-slate-800/30",
     },
     {
-      title: "Participating PSUs",
-      value: totalPSUs.toLocaleString(),
-      icon: Building2,
+      title: "States",
+      value: totalStates.toLocaleString(),
+      icon: MapPin,
       color: "bg-cyan-50 text-cyan-700 border-cyan-200",
       darkColor: "dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800",
       iconBg: "bg-cyan-100 dark:bg-cyan-800/30",
     },
     {
-      title: "Schools Covered",
+      title: "Total Schools",
       value: totalSchools.toLocaleString(),
       icon: School,
       color: "bg-teal-50 text-teal-700 border-teal-200",
@@ -61,8 +61,8 @@ const ProjectOverview = ({ data, projectName, statusList }) => {
     },
     {
       title: "Total Investment",
-      value: formatIndianCurrency(totalSpent),
-      fullValue: `₹${totalSpent.toLocaleString()}`,
+      value: formatIndianCurrency(totalInvestment),
+      fullValue: `₹${totalInvestment.toLocaleString()}`,
       icon: IndianRupee,
       color: "bg-amber-50 text-amber-700 border-amber-200",
       darkColor:
@@ -71,14 +71,13 @@ const ProjectOverview = ({ data, projectName, statusList }) => {
       hasTooltip: true,
     },
     {
-      title: "Completed Deliveries",
-      value: completedDeliveries.toLocaleString(),
+      title: "Complete Handovers",
+      value: completeHandovers.toLocaleString(),
       icon: CheckCircle,
       color: "bg-emerald-50 text-emerald-700 border-emerald-200",
       darkColor:
         "dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800",
       iconBg: "bg-emerald-100 dark:bg-emerald-800/30",
-      subtitle: `${completionRate}% completion rate`,
     },
   ];
 
@@ -135,11 +134,10 @@ const ProjectOverview = ({ data, projectName, statusList }) => {
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             {projectName} encompasses <strong>{totalRecords}</strong> total
-            records across <strong>{totalPSUs}</strong> participating PSUs and{" "}
+            records across <strong>{totalStates}</strong> states and{" "}
             <strong>{totalSchools}</strong> schools, with a total investment of{" "}
-            <strong>₹{totalSpent.toLocaleString()}</strong>. Current completion
-            rate stands at <strong>{completionRate}%</strong> with{" "}
-            <strong>{completedDeliveries}</strong> deliveries completed.
+            <strong>₹{totalInvestment.toLocaleString()}</strong>. Currently{" "}
+            <strong>{completeHandovers}</strong> handovers have been completed.
           </p>
         </div>
       )}

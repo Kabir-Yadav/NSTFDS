@@ -20,7 +20,7 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
 
   // Use projects from district data
   const getDistrictProjects = (district) => {
-    return district?.projects || []; 
+    return district?.projects || [];
   };
 
   // Set the first district as default selected when component mounts
@@ -89,21 +89,18 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
     <div className="relative h-full overflow-y-auto mt-3 bg-[var(--color-surface-secondary)] rounded-br-xl rounded-bl-xl">
       {/* Sticky Dropdown and Search */}
       <div className="sticky top-0 z-10 bg-[var(--color-surface-secondary)] p-3 border-b border-gray-200 dark:border-gray-700 max-w-full">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3 w-full">
           {/* District Selector Dropdown */}
-          <div
-            className="relative flex-1"
-            style={{ "max-width": "-moz-available" }}
-          >
-            <div className="flex gap-2 flex-nowrap">
+          <div className="relative flex-1 min-w-0">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <button
-                className="flex-1 flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 min-w-0 flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => {
                   setIsDropdownOpen(!isDropdownOpen);
                   setIsProjectDropdownOpen(false);
                 }}
               >
-                <span className="truncate text-gray-700 dark:text-gray-200 font-medium max-w-[calc(100%-24px)]">
+                <span className="truncate text-gray-700 dark:text-gray-200 font-medium max-w-full">
                   {selectedDistrict ? selectedDistrict.name : "Select District"}
                 </span>
                 {isDropdownOpen ? (
@@ -116,13 +113,13 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
               {/* Project Selector */}
 
               <button
-                className="flex-1 flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 min-w-0 flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => {
                   setIsProjectDropdownOpen(!isProjectDropdownOpen);
                   setIsDropdownOpen(false);
                 }}
               >
-                <span className="truncate text-gray-700 dark:text-gray-200 font-medium max-w-[calc(100%-48px)]">
+                <span className="truncate text-gray-700 dark:text-gray-200 font-medium max-w-full">
                   {selectedProject
                     ? selectedProject.name
                     : `Projects (${

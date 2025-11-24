@@ -4,7 +4,6 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import './style/theme.css';
 import LoginPage from './view/Auth/LoginPage';
-import RegisterPage from './view/Auth/RegisterPage';
 import DashboardView from './view/dashboard/dashboard_view';
 import ProtectedRoute from './protected_routes';
 
@@ -24,8 +23,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/register" element={<RegisterPage />} />
-
             <Route path="/" element={<Navigate to="/login" replace />} />
 
           </Routes>

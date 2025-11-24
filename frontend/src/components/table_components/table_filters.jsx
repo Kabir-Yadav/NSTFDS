@@ -8,6 +8,9 @@ const TableFilters = ({
   selectedDistrict,
   selectedCategory,
   selectedStatus,
+  selectedReady,
+  selectedTraining,
+  selectedHandover,
   setEndDate,
   setStartDate,
   setSelectedPsu,
@@ -16,6 +19,9 @@ const TableFilters = ({
   setSelectedDistrict,
   setSelectedCategory,
   setSelectedStatus,
+  setSelectedReady,
+  setSelectedTraining,
+  setSelectedHandover,
   psuOptions = [],
   categories = [],
   stateOptions = [],
@@ -37,21 +43,22 @@ const TableFilters = ({
         "
     >
       {/* Start Date Filter */}
-      <div>
-        <label
-          className="
+      {startDate && setStartDate && (
+        <div>
+          <label
+            className="
               block
               mb-2
               text-sm font-medium text-[var(--color-primary)]
             "
-        >
-          Start Date
-        </label>
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="
+          >
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="
               w-full
               px-3 py-2
               text-black
@@ -59,25 +66,27 @@ const TableFilters = ({
               border border-gray-300 rounded-lg
               dark:border-gray-500 dark:bg-gray-900 dark:text-white
             "
-        />
-      </div>
+          />
+        </div>
+      )}
 
       {/* End Date Filter */}
-      <div>
-        <label
-          className="
+      {endDate && setEndDate && (
+        <div>
+          <label
+            className="
               block
               mb-2
               text-sm font-medium text-[var(--color-primary)]
             "
-        >
-          End Date
-        </label>
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="
+          >
+            End Date
+          </label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="
               w-full
               px-3 py-2
               text-black
@@ -85,8 +94,9 @@ const TableFilters = ({
               border border-gray-300 rounded-lg
               dark:border-gray-500 dark:bg-gray-900 dark:text-white
             "
-        />
-      </div>
+          />
+        </div>
+      )}
 
       <div>
         <label
@@ -332,6 +342,98 @@ const TableFilters = ({
                 dark:border-gray-500 dark:bg-gray-900 dark:text-white
               "
           />
+        </div>
+      )}
+
+      {setSelectedReady && (
+        <div>
+          <label
+            className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+          >
+            Ready Status
+          </label>
+          <select
+            value={selectedReady}
+            onChange={(e) => setSelectedReady(e.target.value)}
+            className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:bg-gray-900 dark:text-white
+            "
+          >
+            <option value="">All</option>
+            <option value="ready">Ready</option>
+            <option value="not_ready">Not Ready</option>
+          </select>
+        </div>
+      )}
+
+      {setSelectedTraining && (
+        <div>
+          <label
+            className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+          >
+            Training Status
+          </label>
+          <select
+            value={selectedTraining}
+            onChange={(e) => setSelectedTraining(e.target.value)}
+            className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:bg-gray-900 dark:text-white
+            "
+          >
+            <option value="">All</option>
+            <option value="not_started">Not Started</option>
+            <option value="in_progress">In Progress</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+      )}
+
+      {setSelectedHandover && (
+        <div>
+          <label
+            className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+          >
+            Handover Status
+          </label>
+          <select
+            value={selectedHandover}
+            onChange={(e) => setSelectedHandover(e.target.value)}
+            className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:bg-gray-900 dark:text-white
+            "
+          >
+            <option value="">All</option>
+            <option value="not_started">Not Started</option>
+            <option value="in_progress">In Progress</option>
+            <option value="complete">Complete</option>
+          </select>
         </div>
       )}
     </div>

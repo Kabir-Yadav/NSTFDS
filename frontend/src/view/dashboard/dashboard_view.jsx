@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Sidebar from "../../components/sidebar_components/Sidebar";
 import SummaryCards from "../../components/dashboard_components/SummaryCards";
 import DashboardChartSection from "../../components/dashboard_components/DashboardChartSection";
@@ -40,6 +40,7 @@ const DashboardView = () => {
     logout,
   } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     if (authLoading) return;
@@ -141,12 +142,44 @@ const DashboardView = () => {
     };
   }, [isPsuUser, userPsu]); // Add dependencies for PSU user initialization
 
+  //------------------------------------URL ⇄ STATE SYNC------------------------------------------------------------
+
+  // Sync selected project / PSU project with URL search params (?project= / ?psuProject=)
+  useEffect(() => {
+    const projectName = searchParams.get("project");
+    const psuProjectName = searchParams.get("psuProject");
+
+    if (projectName) {
+      // Prefer filtered projects (respect PSU restrictions), fall back to all
+      const allProjects = getFilteredProjects();
+      const projectFromFiltered =
+        allProjects.find((p) => p.name === projectName) ||
+        projects.find((p) => p.name === projectName);
+
+      setSelectedProject(projectFromFiltered || null);
+      setSelectedPsuProject(null);
+      return;
+    }
+
+    if (psuProjectName) {
+      setSelectedPsuProject(psuProjectName);
+      setSelectedProject(null);
+      return;
+    }
+
+    // No params – show main dashboard
+    setSelectedProject(null);
+    setSelectedPsuProject(null);
+  }, [searchParams, projects]);
+
   //------------------------------------HANDLERS------------------------------------------------------------
 
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setSelectedState(null);
     setSelectedPsuProject(null);
+    // Update URL: /dashboard?project=Project%20Name
+    setSearchParams({ project: project.name });
   };
 
   const handleLogout = async () => {
@@ -158,6 +191,8 @@ const DashboardView = () => {
     setSelectedPsuProject(psuProject);
     setSelectedProject(null);
     setIsSidebarOpen(false);
+    // Update URL: /dashboard?psuProject=Project%20Name
+    setSearchParams({ psuProject });
   };
 
   const handleReturnHome = () => {
@@ -165,6 +200,8 @@ const DashboardView = () => {
     setSelectedState("");
     setSelectedPsuProject(null);
     setIsSidebarOpen(false);
+    // Clear any project-related URL params
+    setSearchParams({});
   };
 
   //------------------------------------RENDERING------------------------------------------------------------
@@ -199,7 +236,7 @@ const DashboardView = () => {
       <div
         ref={scrollRef}
         key={"main"}
-        className="relative flex-1 overflow-y-auto 
+        className="relative flex-1 overflow-y-auto overflow-x-hidden
         transition-all duration-500 ease-in-out"
         style={{
           scrollbarWidth: "thin",

@@ -3,12 +3,9 @@ import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "../../context/ThemeContext";
 import {
   fetchDistrictCompletionRate,
-  fetchDistrictProgressByState,
   fetchProjectCompletionRate,
-  fetchPsuProjectBudgets,
   fetchPsuProjectBudgetsByState,
   fetchPsuStateBudgets,
-  fetchStateProgress,
 } from "../../action/supabase_actions";
 import { motion, AnimatePresence } from "framer-motion";
 

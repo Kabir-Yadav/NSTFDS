@@ -2,58 +2,58 @@ import { supabase } from "../action/supabase_actions";
 
 const AUTH_STORAGE_KEY = "nstfds-auth-state";
 
-export const DUMMY_ACCOUNTS = [
-    {
-        email: "admin@example.com",
-        password: "admin123",
-        role: "admin",
-        label: "Admin",
-        isViewOnly: false,
-    },
-    {
-        email: "user@example.com",
-        password: "user123",
-        role: "user",
-        label: "Standard User",
-        isViewOnly: true,
-    },
-    {
-        email: "viewer.bpcl@nstfdc.com",
-        password: "bpcl123",
-        psu: "BPCL",
-        role: "psu_viewer",
-        label: "BPCL PSU Viewer",
-        isViewOnly: true,
-    },
-    {
-        email: "viewer.iocl@nstfdc.com",
-        password: "iocl123",
-        psu: "IOCL",
-        role: "psu_viewer",
-        label: "IOCL PSU Viewer",
-        isViewOnly: true,
-    },
-    {
-        email: "viewer.hpcl@nstfdc.com",
-        password: "hpcl123",
-        psu: "HPCL",
-        role: "psu_viewer",
-        label: "HPCL PSU Viewer",
-        isViewOnly: true,
-    },
-];
+// export const DUMMY_ACCOUNTS = [
+//     {
+//         email: "admin@example.com",
+//         password: "admin123",
+//         role: "admin",
+//         label: "Admin",
+//         isViewOnly: false,
+//     },
+//     {
+//         email: "user@example.com",
+//         password: "user123",
+//         role: "user",
+//         label: "Standard User",
+//         isViewOnly: true,
+//     },
+//     {
+//         email: "viewer.bpcl@nstfdc.com",
+//         password: "bpcl123",
+//         psu: "BPCL",
+//         role: "psu_viewer",
+//         label: "BPCL PSU Viewer",
+//         isViewOnly: true,
+//     },
+//     {
+//         email: "viewer.iocl@nstfdc.com",
+//         password: "iocl123",
+//         psu: "IOCL",
+//         role: "psu_viewer",
+//         label: "IOCL PSU Viewer",
+//         isViewOnly: true,
+//     },
+//     {
+//         email: "viewer.hpcl@nstfdc.com",
+//         password: "hpcl123",
+//         psu: "HPCL",
+//         role: "psu_viewer",
+//         label: "HPCL PSU Viewer",
+//         isViewOnly: true,
+//     },
+// ];
 
-export const DUMMY_PSU_USERS = DUMMY_ACCOUNTS.filter(
-    (account) => account.role === "psu_viewer"
-);
+// export const DUMMY_PSU_USERS = DUMMY_ACCOUNTS.filter(
+//     (account) => account.role === "psu_viewer"
+// );
 
-export const DUMMY_ADMIN_USERS = DUMMY_ACCOUNTS.filter(
-    (account) => account.role === "admin"
-);
+// export const DUMMY_ADMIN_USERS = DUMMY_ACCOUNTS.filter(
+//     (account) => account.role === "admin"
+// );
 
-export const DUMMY_STANDARD_USERS = DUMMY_ACCOUNTS.filter(
-    (account) => account.role === "user"
-);
+// export const DUMMY_STANDARD_USERS = DUMMY_ACCOUNTS.filter(
+//     (account) => account.role === "user"
+// );
 
 const persistAuthState = (payload) => {
     if (!payload) {
@@ -100,15 +100,15 @@ const mapSupabaseUserToAuthState = (user, session) => {
     const role =
         appMetadata.role || userMetadata.role || userMetadata.access_role || "user";
     const psu = appMetadata.psu || userMetadata.psu || userMetadata.psu_name || null;
-    const accessLevel =
-        appMetadata.access_level || userMetadata.access_level || null;
+    // const accessLevel =
+    //     appMetadata.access_level || userMetadata.access_level || null;
     const viewOnlyFlag = appMetadata.is_view_only ?? userMetadata.is_view_only;
 
     const normalizedRole = role === "psu_user" ? "psu_viewer" : role;
     const isViewOnly =
         typeof viewOnlyFlag === "boolean"
             ? viewOnlyFlag
-            : normalizedRole !== "admin" || (accessLevel && accessLevel !== "admin");
+            : normalizedRole !== "admin" ;
 
     return {
         provider: "supabase",
@@ -123,23 +123,23 @@ const mapSupabaseUserToAuthState = (user, session) => {
 };
 
 export const signIn = async ({ email, password }) => {
-    const dummyAccount = DUMMY_ACCOUNTS.find(
-        (account) => account.email === email && account.password === password
-    );
+    // const dummyAccount = DUMMY_ACCOUNTS.find(
+    //     (account) => account.email === email && account.password === password
+    // );
 
-    if (dummyAccount) {
-        const authState = {
-            provider: "dummy",
-            email: dummyAccount.email,
-            role: dummyAccount.role,
-            psu: dummyAccount.psu,
-            isViewOnly:
-                dummyAccount.isViewOnly ?? (dummyAccount.role && dummyAccount.role !== "admin"),
-        };
+    // if (dummyAccount) {
+    //     const authState = {
+    //         provider: "dummy",
+    //         email: dummyAccount.email,
+    //         role: dummyAccount.role,
+    //         psu: dummyAccount.psu,
+    //         isViewOnly:
+    //             dummyAccount.isViewOnly ?? (dummyAccount.role && dummyAccount.role !== "admin"),
+    //     };
 
-        persistAuthState(authState);
-        return authState;
-    }
+    //     persistAuthState(authState);
+    //     return authState;
+    // }
 
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
