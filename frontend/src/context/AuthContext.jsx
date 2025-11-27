@@ -77,6 +77,7 @@ export const AuthProvider = ({ children }) => {
       user: authState,
       role: authState?.role || null,
       psu: authState?.psu || null,
+      org: authState?.org || null,
       isAuthenticated: Boolean(authState),
       isViewOnly: authState?.isViewOnly ?? true,
       loading,

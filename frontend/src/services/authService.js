@@ -103,17 +103,19 @@ const mapSupabaseUserToAuthState = (user, session) => {
     // const accessLevel =
     //     appMetadata.access_level || userMetadata.access_level || null;
     const viewOnlyFlag = appMetadata.is_view_only ?? userMetadata.is_view_only;
+    const org = appMetadata.org ?? userMetadata.org ?? null;
 
     const normalizedRole = role === "psu_user" ? "psu_viewer" : role;
     const isViewOnly =
         typeof viewOnlyFlag === "boolean"
             ? viewOnlyFlag
-            : normalizedRole !== "admin" ;
+            : normalizedRole !== "admin";
 
     return {
         provider: "supabase",
         email: user.email,
         userId: user.id,
+        org: org || null,
         role: normalizedRole,
         psu: psu || null,
         isViewOnly,
@@ -151,6 +153,7 @@ export const signIn = async ({ email, password }) => {
     }
 
     const { user, session } = data;
+    console.log("user", user);
     const authState = mapSupabaseUserToAuthState(user, session);
 
     persistAuthState(authState);

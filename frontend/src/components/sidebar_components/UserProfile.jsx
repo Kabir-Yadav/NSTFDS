@@ -1,6 +1,6 @@
 import React from "react";
 
-const UserProfile = ({ isOpen, isPsuUser, userPsu }) => (
+const UserProfile = ({ isOpen, isPsuUser, userPsu, userOrg }) => (
   <div className="flex items-center theme-transition">
     <img
       src={
@@ -10,6 +10,8 @@ const UserProfile = ({ isOpen, isPsuUser, userPsu }) => (
             : userPsu == "IOCL"
             ? "assets/iocl.png"
             : "assets/icon.png"
+          : userOrg == "NSTFDC"
+          ? "assets/nsfdc_logo.png"
           : "assets/icon.png"
       }
       alt="User Profile"

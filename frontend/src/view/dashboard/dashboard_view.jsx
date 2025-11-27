@@ -37,6 +37,7 @@ const DashboardView = () => {
     loading: authLoading,
     role,
     psu: userPsu,
+    org: userOrg,
     logout,
   } = useAuth();
   const navigate = useNavigate();
@@ -355,6 +356,7 @@ const DashboardView = () => {
             isOpen={isSidebarOpen}
             isPsuUser={isPsuUser}
             userPsu={userPsu}
+            userOrg={userOrg}
           />
         </div>
         <div className="px-4 md:px-6 lg:px-8">
