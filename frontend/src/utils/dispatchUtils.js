@@ -494,10 +494,7 @@ export function validateSchoolForDispatch(school) {
         return { isReady: false, error: "School must be marked as ready first" };
     }
 
-    if (!school.certificate_url) {
-        return { isReady: false, error: "School must have certificate uploaded" };
-    }
-
+    // Readiness certificate is no longer mandatory for dispatch
     return { isReady: true, error: null };
 }
 
