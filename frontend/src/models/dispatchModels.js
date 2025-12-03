@@ -287,22 +287,22 @@ export class Dispatch {
 /**
  * Status options for delivery
  */
-export const DELIVERY_STATUS_OPTIONS = [
-    "Pending",
-    "Dispatched",
-    "In Transit",
-    "Out for Delivery",
-    "Delivered",
-];
+// export const DELIVERY_STATUS_OPTIONS = [
+//     "Pending",
+//     "Dispatched",
+//     "In Transit",
+//     "Out for Delivery",
+//     "Delivered",
+// ];
 
 /**
  * Status options for installation
  */
-export const INSTALLATION_STATUS_OPTIONS = [
-    "Not Started",
-    "Scheduled",
-    "In Progress",
-    "Completed",
-    "Installed",
-];
+// export const INSTALLATION_STATUS_OPTIONS = [
+//     "Not Started",
+//     "Scheduled",
+//     "In Progress",
+//     "Completed",
+//     "Installed",
+// ];
 

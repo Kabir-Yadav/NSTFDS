@@ -372,7 +372,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
               <thead className="text-purple-800 bg-purple-50 dark:bg-gray-800 dark:text-purple-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
-                    ID
+                    S.No
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                     State
@@ -404,41 +404,45 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((row, index) => (
-                  <tr
-                    key={index}
-                    className={`
+                {paginatedData.map((row, index) => {
+                  // Calculate enumerated ID based on page and position
+                  const enumeratedId =
+                    (currentPage - 1) * recordsPerPage + index + 1;
+                  return (
+                    <tr
+                      key={row.id || index}
+                      className={`
                   transition-colors hover:bg-purple-100/50 dark:hover:bg-gray-700/50
                   ${
                     index % 2 === 0
                       ? "bg-white dark:bg-gray-900"
                       : "bg-purple-50/50 dark:bg-gray-800/50"
                   }
-                `}
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                      {row.id}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                      {row.state}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                      {row.district}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                      {row.school_name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={row.is_ready || false}
-                          onChange={() => {}}
-                          disabled
-                          className="sr-only peer"
-                        />
-                        <div
-                          className={`relative w-9 h-5 rounded-full peer
+                    `}
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                        {enumeratedId}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        {row.state}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        {row.district}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        {row.school_name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                        <label className="inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={row.is_ready || false}
+                            onChange={() => {}}
+                            disabled
+                            className="sr-only peer"
+                          />
+                          <div
+                            className={`relative w-9 h-5 rounded-full peer
                         dark:bg-gray-700 peer-checked:bg-green-600 dark:peer-checked:bg-green-600
                           peer-focus:ring-2 peer-focus:ring-green-300 dark:peer-focus:ring-green-800
                           peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
@@ -451,100 +455,102 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                               : "bg-gray-300 dark:bg-gray-700"
                           }
                         `}
-                        ></div>
-                      </label>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {row.certificate_url ? (
-                        <a
-                          href={row.certificate_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
-                        >
-                          <FileCheck className="h-4 w-4" />
-                          View
-                        </a>
-                      ) : (
-                        <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                          Not uploaded
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-center">
-                      {row.dispatches && row.dispatches.length > 0 ? (
-                        <span
-                          className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getCumulativeDispatchStatusColor(
-                            row.dispatches
-                          )}`}
-                        >
-                          {getCumulativeDispatchStatus(row.dispatches)}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                          No dispatches
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="space-y-1">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSimpleStatusColor(
-                            row.training_status || "not_started"
-                          )}`}
-                        >
-                          {getSimpleStatusDisplay(
-                            row.training_status || "not_started"
-                          )}
-                        </span>
-                        {row.expected_training_completion_date &&
-                          row.training_status !== "complete" && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Expected: {row.expected_training_completion_date}
-                            </p>
-                          )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="space-y-1">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSimpleStatusColor(
-                            row.handover_status || "not_started"
-                          )}`}
-                        >
-                          {getSimpleStatusDisplay(
-                            row.handover_status || "not_started"
-                          )}
-                        </span>
-                        {row.expected_handover_date &&
-                          row.handover_status !== "complete" && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Expected: {row.expected_handover_date}
-                            </p>
-                          )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {row.handover_certificate_url ? (
-                        <a
-                          href={row.handover_certificate_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
-                        >
-                          <FileCheck className="h-4 w-4" />
-                          View
-                        </a>
-                      ) : (
-                        <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                          {row.handover_status === "complete"
-                            ? "Certificate required"
-                            : "--"}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                          ></div>
+                        </label>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        {row.certificate_url ? (
+                          <a
+                            href={row.certificate_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
+                          >
+                            <FileCheck className="h-4 w-4" />
+                            View
+                          </a>
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500 text-xs italic">
+                            Not uploaded
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-center">
+                        {row.dispatches && row.dispatches.length > 0 ? (
+                          <span
+                            className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getCumulativeDispatchStatusColor(
+                              row.dispatches
+                            )}`}
+                          >
+                            {getCumulativeDispatchStatus(row.dispatches)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500 text-xs italic">
+                            No dispatches
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSimpleStatusColor(
+                              row.training_status || "not_started"
+                            )}`}
+                          >
+                            {getSimpleStatusDisplay(
+                              row.training_status || "not_started"
+                            )}
+                          </span>
+                          {row.expected_training_completion_date &&
+                            row.training_status !== "complete" && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Expected:{" "}
+                                {row.expected_training_completion_date}
+                              </p>
+                            )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="space-y-1">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getSimpleStatusColor(
+                              row.handover_status || "not_started"
+                            )}`}
+                          >
+                            {getSimpleStatusDisplay(
+                              row.handover_status || "not_started"
+                            )}
+                          </span>
+                          {row.expected_handover_date &&
+                            row.handover_status !== "complete" && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                Expected: {row.expected_handover_date}
+                              </p>
+                            )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        {row.handover_certificate_url ? (
+                          <a
+                            href={row.handover_certificate_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
+                          >
+                            <FileCheck className="h-4 w-4" />
+                            View
+                          </a>
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500 text-xs italic">
+                            {row.handover_status === "complete"
+                              ? "Certificate required"
+                              : "--"}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

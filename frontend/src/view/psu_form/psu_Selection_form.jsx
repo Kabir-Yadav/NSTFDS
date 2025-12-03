@@ -65,7 +65,6 @@ const PsuSelectionForm = ({
   const [certificateDialog, setCertificateDialog] = useState({
     isOpen: false,
     school: null,
-    pendingToggle: false, // Track if this is from a toggle action
   });
   const [dispatchDialog, setDispatchDialog] = useState({
     isOpen: false,
@@ -276,24 +275,17 @@ const PsuSelectionForm = ({
   const handleToggleReady = async (schoolId, currentStatus) => {
     const school = tableData.find((s) => s.id === schoolId);
 
-    // If school has certificate, don't allow toggling off
-    if (school?.certificate_url && currentStatus) {
-      return; // Prevent toggling off if certificate exists
+    // Once a dispatch exists, readiness status cannot be changed
+    if (school?.dispatches && school.dispatches.length > 0) {
+      alert(
+        "Readiness cannot be changed after a dispatch has been created for this school."
+      );
+      return;
     }
 
-    // If toggling ON, open certificate dialog
-    if (!currentStatus) {
-      setCertificateDialog({
-        isOpen: true,
-        school: school,
-        pendingToggle: true, // Flag to indicate this is from toggle
-      });
-      return; // Don't toggle yet, wait for certificate upload
-    }
-
-    // If toggling OFF (and no certificate), proceed
+    // Simply toggle ready on/off (no certificate requirement)
     try {
-      const { data, error } = await toggleSchoolReady(schoolId, false);
+      const { data, error } = await toggleSchoolReady(schoolId, !currentStatus);
       if (error) throw new Error(error);
 
       // Update local state
@@ -308,7 +300,6 @@ const PsuSelectionForm = ({
 
   // Handle certificate upload
   const handleUploadCertificate = async (schoolId, file) => {
-    const wasPendingToggle = certificateDialog.pendingToggle;
     const school = certificateDialog.school;
 
     try {
@@ -324,36 +315,10 @@ const PsuSelectionForm = ({
         ...school,
       });
       if (error) throw new Error(error);
-
-      // If this was from a pending toggle, also toggle ready status
-      if (wasPendingToggle) {
-        try {
-          const { data: readyData, error: readyError } =
-            await toggleSchoolReady(schoolId, true);
-          if (readyError) throw new Error(readyError);
-
-          // Update local state with both certificate and ready status
-          setTableData((prev) =>
-            prev.map((school) =>
-              school.id === schoolId
-                ? { ...readyData, certificate_url: data.certificate_url }
-                : school
-            )
-          );
-        } catch (error) {
-          console.error("Failed to toggle ready status:", error);
-          // Still update certificate even if ready toggle fails
-          setTableData((prev) =>
-            prev.map((school) => (school.id === schoolId ? data : school))
-          );
-          throw error;
-        }
-      } else {
-        // Update local state with just certificate
-        setTableData((prev) =>
-          prev.map((school) => (school.id === schoolId ? data : school))
-        );
-      }
+      // Update local state with new certificate info (no readiness coupling)
+      setTableData((prev) =>
+        prev.map((school) => (school.id === schoolId ? data : school))
+      );
     } catch (error) {
       throw error; // Re-throw to let dialog handle error display
     }
@@ -787,7 +752,7 @@ const PsuSelectionForm = ({
               <thead className="text-purple-800 bg-purple-50 dark:bg-gray-800 dark:text-purple-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
-                    ID
+                    S.No.
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                     State
@@ -824,6 +789,9 @@ const PsuSelectionForm = ({
               </thead>
               <tbody>
                 {paginatedData.map((row, index) => {
+                  // Calculate enumerated ID based on page and position
+                  const enumeratedId =
+                    (currentPage - 1) * recordsPerPage + index + 1;
                   const dispatchDetails = DispatchDetailsRow({
                     school: row,
                     onUploadDeliveryProof: handleUploadDeliveryProof,
@@ -854,7 +822,7 @@ const PsuSelectionForm = ({
                     `}
                       >
                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                          {row.id}
+                          {enumeratedId}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                           {row.state}
@@ -867,20 +835,13 @@ const PsuSelectionForm = ({
                         </td>
 
                         <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
-                          <label
-                            className={`inline-flex items-center ${
-                              row.certificate_url
-                                ? "cursor-not-allowed opacity-60"
-                                : "cursor-pointer"
-                            }`}
-                          >
+                          <label className="inline-flex items-center cursor-pointer">
                             <input
                               type="checkbox"
                               checked={row.is_ready}
                               onChange={() =>
                                 handleToggleReady(row.id, row.is_ready)
                               }
-                              disabled={!!row.certificate_url}
                               className="sr-only peer"
                             />
                             <div
@@ -901,26 +862,41 @@ const PsuSelectionForm = ({
                           </label>
                         </td>
                         <td className="px-6 py-4 text-sm">
-                          {row.certificate_url ? (
-                            <a
-                              href={row.certificate_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
-                            >
-                              <FileCheck className="h-4 w-4" />
-                              View
-                            </a>
-                          ) : (
-                            <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                              {row.is_ready
-                                ? "Certificate required"
-                                : "Mark ready first"}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {row.certificate_url ? (
+                              // When certificate exists, show only "View"
+                              <a
+                                href={row.certificate_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-green-600 dark:text-green-400 hover:underline"
+                              >
+                                <FileCheck className="h-4 w-4" />
+                                <span>View</span>
+                              </a>
+                            ) : row.is_ready ? (
+                              // When ready but no certificate, show only "Add Certificate" button
+                              <button
+                                onClick={() =>
+                                  setCertificateDialog({
+                                    isOpen: true,
+                                    school: row,
+                                  })
+                                }
+                                className="px-2 py-1 text-xs font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:text-purple-300 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                              >
+                                Add Certificate
+                              </button>
+                            ) : (
+                              // When not ready, just show info text and no button
+                              <span className="text-gray-400 dark:text-gray-500 text-xs italic">
+                                Mark ready to add certificate
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-sm">
-                          {row.is_ready && row.certificate_url ? (
+                          {row.is_ready ? (
                             <button
                               onClick={() =>
                                 setDispatchDialog({ isOpen: true, school: row })
@@ -932,9 +908,7 @@ const PsuSelectionForm = ({
                             </button>
                           ) : (
                             <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                              {!row.is_ready
-                                ? "Not ready"
-                                : "Certificate needed"}
+                              Not ready
                             </span>
                           )}
                         </td>
@@ -1089,12 +1063,9 @@ const PsuSelectionForm = ({
       <CertificateUploadDialog
         isOpen={certificateDialog.isOpen}
         onClose={() => {
-          // If this was from a toggle and user closes without uploading,
-          // the ready status remains false (which is correct)
           setCertificateDialog({
             isOpen: false,
             school: null,
-            pendingToggle: false,
           });
         }}
         school={certificateDialog.school}

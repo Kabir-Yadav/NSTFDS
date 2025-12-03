@@ -39,11 +39,6 @@ const AddSpaceLabSchoolDialog = ({
         [field]: value,
       };
 
-      // When readiness is toggled on, automatically require certificate
-      if (field === "readiness" && value === true) {
-        newData.requires_certificate = true;
-      }
-
       return newData;
     });
 
@@ -106,16 +101,6 @@ const AddSpaceLabSchoolDialog = ({
       newErrors.unit_cost = "Unit cost must be greater than 0";
     }
 
-    // If readiness is true, certificate is mandatory
-    if (
-      formData.readiness &&
-      !selectedFile &&
-      !formData.readiness_certificate_url
-    ) {
-      newErrors.certificate =
-        "Certificate is required when marking school as ready. Please upload a certificate.";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -129,26 +114,20 @@ const AddSpaceLabSchoolDialog = ({
     try {
       let certificateUrl = formData.readiness_certificate_url;
 
-      // Upload certificate file if provided (required when readiness is true)
-      if (formData.readiness) {
-        if (selectedFile) {
-          const { data: uploadedUrl, error: uploadError } =
-            await uploadCertificateFile({
-              file: selectedFile,
-              projectName: projectName || "Space Lab",
-              schoolName: formData.school_name.trim(),
-            });
-          if (uploadError || !uploadedUrl) {
-            throw new Error(
-              uploadError?.message || "Failed to upload certificate"
-            );
-          }
-          certificateUrl = uploadedUrl;
-        } else if (!formData.readiness_certificate_url) {
+      // Upload certificate file if provided (optional)
+      if (selectedFile) {
+        const { data: uploadedUrl, error: uploadError } =
+          await uploadCertificateFile({
+            file: selectedFile,
+            projectName: projectName || "Space Lab",
+            schoolName: formData.school_name.trim(),
+          });
+        if (uploadError || !uploadedUrl) {
           throw new Error(
-            "Certificate is required when marking school as ready"
+            uploadError?.message || "Failed to upload certificate"
           );
         }
+        certificateUrl = uploadedUrl;
       }
 
       // Call the database function
@@ -156,7 +135,8 @@ const AddSpaceLabSchoolDialog = ({
         school_name: formData.school_name.trim(),
         unit_cost: parseFloat(formData.unit_cost),
         readiness: formData.readiness,
-        requires_certificate: formData.readiness, // Set to true if readiness is true
+        // Readiness certificate is optional; this flag is informational only
+        requires_certificate: !!certificateUrl,
         readiness_certificate_url: certificateUrl,
         remarks: formData.remarks.trim() || null,
         project_name: projectName,
@@ -310,21 +290,16 @@ const AddSpaceLabSchoolDialog = ({
               </label>
             </div>
 
-            {/* Certificate Upload - Show when readiness is true */}
+            {/* Certificate Upload - Show when readiness is true (Optional) */}
             {formData.readiness && (
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <FileCheck className="h-4 w-4" />
-                  Readiness Certificate <span className="text-red-500">*</span>
+                  Readiness Certificate{" "}
+                  <span className="text-gray-500 dark:text-gray-400 text-xs">
+                    (Optional)
+                  </span>
                 </label>
-                {!selectedFile && !formData.readiness_certificate_url && (
-                  <div className="mb-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <p className="text-sm text-yellow-800 dark:text-yellow-200 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Certificate is required when marking school as ready.
-                    </p>
-                  </div>
-                )}
                 <div className="space-y-2">
                   <input
                     type="file"
