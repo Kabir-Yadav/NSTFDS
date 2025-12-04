@@ -398,7 +398,7 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
               Dispatch Details
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">
-              Dispatch #{dispatch.id} • {components.length} Component
+              Dispatch #{dispatch.dispatch_no} • {components.length} Component
               {components.length !== 1 ? "s" : ""}
               {(isEditing
                 ? editData.expected_delivery_date
