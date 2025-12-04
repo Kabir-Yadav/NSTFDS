@@ -235,12 +235,12 @@ const PsuSelectionForm = ({
       );
     });
 
-    // Sort by school name
-    filtered.sort((a, b) =>
-      sortAsc
-        ? a.school_name.localeCompare(b.school_name)
-        : b.school_name.localeCompare(a.school_name)
-    );
+    // Sort by created_at (newest first by default)
+    filtered.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return sortAsc ? dateA - dateB : dateB - dateA;
+    });
     setFilteredData(filtered);
   };
 
@@ -776,10 +776,10 @@ const PsuSelectionForm = ({
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                     Dispatches
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase" style={{ minWidth: "180px" }}>
                     Training
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase" style={{ minWidth: "180px" }}>
                     Handover
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">

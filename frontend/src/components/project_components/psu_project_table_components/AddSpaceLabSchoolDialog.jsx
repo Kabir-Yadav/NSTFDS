@@ -6,6 +6,7 @@ import {
   FileCheck,
   AlertCircle,
   CheckCircle,
+  IndianRupeeIcon,
 } from "lucide-react";
 import {
   createSpaceLabSchoolProject,
@@ -244,7 +245,7 @@ const AddSpaceLabSchoolDialog = ({
             {/* Unit Cost */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <DollarSign className="h-4 w-4" />
+                <IndianRupeeIcon className="h-4 w-4" />
                 Unit Cost <span className="text-red-500">*</span>
               </label>
               <input

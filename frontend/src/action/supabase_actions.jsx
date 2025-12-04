@@ -582,9 +582,7 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
             dispatch_no: dispatch.dispatch_no,
             components: componentsArray,
             expected_delivery_date: dispatchInfo.expected_delivery_date || null,
-            dispatch_date: dispatch.created_at
-              ? new Date(dispatch.created_at).toISOString().split("T")[0]
-              : null,
+            dispatch_date: dispatchInfo.dispatch_date || null,
             dispatch_status: dispatch.dispatch_status || "pending_dispatch",
             delivery_proof_url: dispatchInfo.delivery_proof_url || null,
             installation_proof_url: dispatchInfo.installation_proof_url || null,
@@ -628,6 +626,7 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
         expected_handover_date: project.expected_handover_date || null,
         handover_certificate_url: project.handover_certificate_url || null,
         remarks: project.remarks || null,
+        created_at: project.created_at || null,
         dispatches: projectDispatches,
       };
     });
@@ -914,6 +913,7 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
     const dispatchInfo = {
       components: componentsArray,
       expected_delivery_date: dispatchData.expected_delivery_date || null,
+      dispatch_date: dispatchData.dispatch_date || null,
       delivery_proof_url: null,
       installation_proof_url: null,
       tracking_number: null,
@@ -927,9 +927,10 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
       contact_phone: null,
       remarks: null,
       ...dispatchData, // Override with any provided data
-      // Ensure components and expected_delivery_date are set correctly after spread
+      // Ensure components, expected_delivery_date, and dispatch_date are set correctly after spread
       components: componentsArray,
       expected_delivery_date: dispatchData.expected_delivery_date || null,
+      dispatch_date: dispatchData.dispatch_date || null,
     };
 
     // Insert dispatch and update components_left in a transaction-like manner
@@ -969,9 +970,7 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
       dispatch_no: data.dispatch_no,
       components: dispatchInfo.components || [],
       expected_delivery_date: dispatchInfo.expected_delivery_date || null,
-      dispatch_date: data.created_at
-        ? new Date(data.created_at).toISOString().split("T")[0]
-        : null,
+      dispatch_date: dispatchInfo.dispatch_date || null,
       dispatch_status: data.dispatch_status || "pending_dispatch",
       delivery_proof_url: dispatchInfo.delivery_proof_url || null,
       installation_proof_url: dispatchInfo.installation_proof_url || null,
@@ -1050,9 +1049,7 @@ export async function updateSpaceLabDispatch(dispatchId, updates) {
       dispatch_no: data.dispatch_no,
       components: updatedInfo.components || [],
       expected_delivery_date: updatedInfo.expected_delivery_date || null,
-      dispatch_date: data.created_at
-        ? new Date(data.created_at).toISOString().split("T")[0]
-        : null,
+      dispatch_date: updatedInfo.dispatch_date || null,
       dispatch_status: data.dispatch_status || "pending_dispatch",
       delivery_proof_url: updatedInfo.delivery_proof_url || null,
       installation_proof_url: updatedInfo.installation_proof_url || null,

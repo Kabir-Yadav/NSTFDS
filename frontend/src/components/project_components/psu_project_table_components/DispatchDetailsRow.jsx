@@ -77,7 +77,7 @@ const DispatchDetailsRow = ({
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Package className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <Package className="h-7 w-7 text-purple-600 dark:text-purple-400" />
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {dispatchedCount} Component{dispatchedCount !== 1 ? "s" : ""}{" "}
               Dispatched
@@ -162,8 +162,8 @@ const DispatchDetailsRow = ({
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {components.length} Component
-                      {components.length !== 1 ? "s" : ""} •{" "}
-                      {dispatch.dispatch_date}
+                      {components.length !== 1 ? "s" : ""}
+                      {dispatch.dispatch_date && ` • ${dispatch.dispatch_date}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

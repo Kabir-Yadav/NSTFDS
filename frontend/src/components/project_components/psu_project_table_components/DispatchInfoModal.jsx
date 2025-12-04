@@ -47,6 +47,7 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
         contact_phone: dispatch.contact_phone || "",
         remarks: dispatch.remarks || "",
         expected_delivery_date: dispatch.expected_delivery_date || "",
+        dispatch_date: dispatch.dispatch_date || "",
       });
     }
   }, [isEditing, dispatch]);
@@ -293,9 +294,24 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
                   <p className="text-gray-600 dark:text-gray-400 text-[10px] sm:text-xs">
                     Dispatch Date
                   </p>
-                  <p className="font-medium text-gray-900 dark:text-white mt-0.5 sm:mt-1">
-                    {dispatch.dispatch_date}
-                  </p>
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      value={editData.dispatch_date || ""}
+                      onChange={(e) =>
+                        handleEditChange("dispatch_date", e.target.value)
+                      }
+                      className="w-full mt-0.5 sm:mt-1 px-2 py-1 text-xs sm:text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                    />
+                  ) : (
+                    <p className="font-medium text-gray-900 dark:text-white mt-0.5 sm:mt-1">
+                      {dispatch.dispatch_date || (
+                        <span className="text-gray-400 dark:text-gray-500 italic text-xs">
+                          No date added
+                        </span>
+                      )}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <p className="text-gray-600 dark:text-gray-400 text-[10px] sm:text-xs">

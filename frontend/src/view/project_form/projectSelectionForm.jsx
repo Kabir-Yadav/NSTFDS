@@ -148,12 +148,12 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
       );
     });
 
-    // Sort by school name
-    filtered.sort((a, b) =>
-      sortAsc
-        ? a.school_name.localeCompare(b.school_name)
-        : b.school_name.localeCompare(a.school_name)
-    );
+    // Sort by created_at (newest first by default)
+    filtered.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return sortAsc ? dateA - dateB : dateB - dateA;
+    });
     setFilteredData(filtered);
   };
 

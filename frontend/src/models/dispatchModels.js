@@ -63,9 +63,8 @@ export class DispatchComponent {
             errors.push("Unit cost must be greater than 0");
         }
 
-        if (!this.expected_delivery_date) {
-            errors.push("Expected delivery date is required");
-        } else {
+        // Expected delivery date is optional, but if provided, validate it's not in the past
+        if (this.expected_delivery_date) {
             const selectedDate = new Date(this.expected_delivery_date);
             const today = new Date();
             today.setHours(0, 0, 0, 0);

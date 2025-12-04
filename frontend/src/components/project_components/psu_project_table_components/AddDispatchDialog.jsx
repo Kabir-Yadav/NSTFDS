@@ -26,6 +26,7 @@ const AddDispatchDialog = ({
 }) => {
   const [selectedComponents, setSelectedComponents] = useState([]);
   const [expectedDeliveryDate, setExpectedDeliveryDate] = useState("");
+  const [dispatchDate, setDispatchDate] = useState("");
   const [showAdditionalInfo, setShowAdditionalInfo] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -82,9 +83,8 @@ const AddDispatchDialog = ({
       newErrors.components = "Please select at least one component";
     }
 
-    if (!expectedDeliveryDate) {
-      newErrors.expectedDeliveryDate = "Expected delivery date is required";
-    } else {
+    // Expected delivery date is optional, but if provided, validate it's not in the past
+    if (expectedDeliveryDate) {
       const selectedDate = new Date(expectedDeliveryDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -114,8 +114,17 @@ const AddDispatchDialog = ({
       // Prepare dispatch data with additional info (only include non-empty fields)
       const dispatchData = {
         components: selectedComponents,
-        expected_delivery_date: expectedDeliveryDate,
       };
+
+      // Add expected delivery date only if provided
+      if (expectedDeliveryDate && expectedDeliveryDate.trim() !== "") {
+        dispatchData.expected_delivery_date = expectedDeliveryDate;
+      }
+
+      // Add dispatch date only if provided
+      if (dispatchDate && dispatchDate.trim() !== "") {
+        dispatchData.dispatch_date = dispatchDate;
+      }
 
       // Add additional info fields (only if they have values)
       Object.keys(additionalInfo).forEach((key) => {
@@ -129,6 +138,7 @@ const AddDispatchDialog = ({
       // Reset form
       setSelectedComponents([]);
       setExpectedDeliveryDate("");
+      setDispatchDate("");
       setAdditionalInfo({
         tracking_number: "",
         vendor_name: "",
@@ -154,6 +164,7 @@ const AddDispatchDialog = ({
   const handleClose = () => {
     setSelectedComponents([]);
     setExpectedDeliveryDate("");
+    setDispatchDate("");
     setAdditionalInfo({
       tracking_number: "",
       vendor_name: "",
@@ -276,11 +287,49 @@ const AddDispatchDialog = ({
                 )}
               </div>
 
+              {/* Dispatch Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <Calendar className="inline h-4 w-4 mr-1" />
+                  Dispatch Date{" "}
+                  <span className="text-gray-500 dark:text-gray-400 text-xs font-normal">
+                    (Optional)
+                  </span>
+                </label>
+                <input
+                  type="date"
+                  value={dispatchDate}
+                  onChange={(e) => {
+                    setDispatchDate(e.target.value);
+                    if (errors.dispatchDate) {
+                      setErrors((prev) => {
+                        const newErrors = { ...prev };
+                        delete newErrors.dispatchDate;
+                        return newErrors;
+                      });
+                    }
+                  }}
+                  className={`w-full px-4 py-2.5 bg-white dark:bg-gray-900 border ${
+                    errors.dispatchDate
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white`}
+                />
+                {errors.dispatchDate && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.dispatchDate}
+                  </p>
+                )}
+              </div>
+
               {/* Expected Delivery Date */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="inline h-4 w-4 mr-1" />
-                  Expected Delivery Date
+                  Expected Delivery Date{" "}
+                  <span className="text-gray-500 dark:text-gray-400 text-xs font-normal">
+                    (Optional)
+                  </span>
                 </label>
                 <input
                   type="date"
