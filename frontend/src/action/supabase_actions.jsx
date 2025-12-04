@@ -575,6 +575,25 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
               })
             : [];
 
+          // Normalize delivery proofs to an array for multi-proof support
+          const rawDeliveryProof = dispatchInfo.delivery_proof_url || null;
+          const rawDeliveryProofs = dispatchInfo.delivery_proof_urls;
+          const deliveryProofUrls = Array.isArray(rawDeliveryProofs)
+            ? rawDeliveryProofs
+            : rawDeliveryProof
+            ? [rawDeliveryProof]
+            : [];
+
+          // Normalize installation proofs to an array for multi-proof support
+          const rawInstallationProof =
+            dispatchInfo.installation_proof_url || null;
+          const rawInstallationProofs = dispatchInfo.installation_proof_urls;
+          const installationProofUrls = Array.isArray(rawInstallationProofs)
+            ? rawInstallationProofs
+            : rawInstallationProof
+            ? [rawInstallationProof]
+            : [];
+
           return {
             id: dispatch.id,
             school_id: project.id, // Use school_project_id as school_id for frontend
@@ -584,8 +603,12 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
             expected_delivery_date: dispatchInfo.expected_delivery_date || null,
             dispatch_date: dispatchInfo.dispatch_date || null,
             dispatch_status: dispatch.dispatch_status || "pending_dispatch",
-            delivery_proof_url: dispatchInfo.delivery_proof_url || null,
-            installation_proof_url: dispatchInfo.installation_proof_url || null,
+            // For backward compatibility keep single URL fields as the first proof
+            delivery_proof_url: deliveryProofUrls[0] || null,
+            installation_proof_url: installationProofUrls[0] || null,
+            // New multi-proof arrays
+            delivery_proof_urls: deliveryProofUrls,
+            installation_proof_urls: installationProofUrls,
             tracking_number: dispatchInfo.tracking_number || null,
             vendor_name: dispatchInfo.vendor_name || null,
             purchase_order: dispatchInfo.purchase_order || null,
@@ -914,6 +937,10 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
       components: componentsArray,
       expected_delivery_date: dispatchData.expected_delivery_date || null,
       dispatch_date: dispatchData.dispatch_date || null,
+      // Proofs are stored as arrays to support multiple documents
+      delivery_proof_urls: [],
+      installation_proof_urls: [],
+      // Backward compatible single-url fields (first element of arrays)
       delivery_proof_url: null,
       installation_proof_url: null,
       tracking_number: null,
@@ -972,8 +999,20 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
       expected_delivery_date: dispatchInfo.expected_delivery_date || null,
       dispatch_date: dispatchInfo.dispatch_date || null,
       dispatch_status: data.dispatch_status || "pending_dispatch",
-      delivery_proof_url: dispatchInfo.delivery_proof_url || null,
-      installation_proof_url: dispatchInfo.installation_proof_url || null,
+      // Multi-proof fields
+      delivery_proof_urls: dispatchInfo.delivery_proof_urls || [],
+      installation_proof_urls: dispatchInfo.installation_proof_urls || [],
+      // Backward compatible single-url fields
+      delivery_proof_url:
+        (dispatchInfo.delivery_proof_urls &&
+          dispatchInfo.delivery_proof_urls[0]) ||
+        dispatchInfo.delivery_proof_url ||
+        null,
+      installation_proof_url:
+        (dispatchInfo.installation_proof_urls &&
+          dispatchInfo.installation_proof_urls[0]) ||
+        dispatchInfo.installation_proof_url ||
+        null,
       tracking_number: dispatchInfo.tracking_number || null,
       vendor_name: dispatchInfo.vendor_name || null,
       purchase_order: dispatchInfo.purchase_order || null,
@@ -1051,6 +1090,20 @@ export async function updateSpaceLabDispatch(dispatchId, updates) {
       expected_delivery_date: updatedInfo.expected_delivery_date || null,
       dispatch_date: updatedInfo.dispatch_date || null,
       dispatch_status: data.dispatch_status || "pending_dispatch",
+      // Multi-proof fields (normalize to arrays)
+      delivery_proof_urls: Array.isArray(updatedInfo.delivery_proof_urls)
+        ? updatedInfo.delivery_proof_urls
+        : updatedInfo.delivery_proof_url
+        ? [updatedInfo.delivery_proof_url]
+        : [],
+      installation_proof_urls: Array.isArray(
+        updatedInfo.installation_proof_urls
+      )
+        ? updatedInfo.installation_proof_urls
+        : updatedInfo.installation_proof_url
+        ? [updatedInfo.installation_proof_url]
+        : [],
+      // Backward compatible single-url fields
       delivery_proof_url: updatedInfo.delivery_proof_url || null,
       installation_proof_url: updatedInfo.installation_proof_url || null,
       tracking_number: updatedInfo.tracking_number || null,
@@ -1110,16 +1163,39 @@ export async function uploadDispatchDeliveryProof(
       };
     }
 
-    // Update dispatch_info with delivery_proof_url
+    // Fetch current dispatch_info to append to existing proofs (if any)
+    const { data: currentDispatch, error: fetchError } = await supabase
+      .from("space_lab_dispatches")
+      .select("dispatch_info")
+      .eq("id", dispatchId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching current dispatch for proofs:", fetchError);
+      return { data: null, error: fetchError };
+    }
+
+    const currentInfo = currentDispatch?.dispatch_info || {};
+    const existingProofs = Array.isArray(currentInfo.delivery_proof_urls)
+      ? currentInfo.delivery_proof_urls
+      : currentInfo.delivery_proof_url
+      ? [currentInfo.delivery_proof_url]
+      : [];
+
+    const updatedProofs = [...existingProofs, url];
+
+    // Update dispatch_info with new proofs array and back-compat single field
     const updateResult = await updateSpaceLabDispatch(dispatchId, {
-      delivery_proof_url: url,
+      delivery_proof_urls: updatedProofs,
+      delivery_proof_url: updatedProofs[0] || null,
     });
 
     if (updateResult.error) {
       return { data: null, error: updateResult.error };
     }
 
-    return { data: url, error: null };
+    // Return the fully updated dispatch object
+    return { data: updateResult.data, error: null };
   } catch (error) {
     console.error("Error uploading delivery proof:", error);
     return { data: null, error };
@@ -1164,16 +1240,39 @@ export async function uploadDispatchInstallationProof(
       };
     }
 
-    // Update dispatch_info with installation_proof_url
+    // Fetch current dispatch_info to append to existing proofs (if any)
+    const { data: currentDispatch, error: fetchError } = await supabase
+      .from("space_lab_dispatches")
+      .select("dispatch_info")
+      .eq("id", dispatchId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching current dispatch for proofs:", fetchError);
+      return { data: null, error: fetchError };
+    }
+
+    const currentInfo = currentDispatch?.dispatch_info || {};
+    const existingProofs = Array.isArray(currentInfo.installation_proof_urls)
+      ? currentInfo.installation_proof_urls
+      : currentInfo.installation_proof_url
+      ? [currentInfo.installation_proof_url]
+      : [];
+
+    const updatedProofs = [...existingProofs, url];
+
+    // Update dispatch_info with new proofs array and back-compat single field
     const updateResult = await updateSpaceLabDispatch(dispatchId, {
-      installation_proof_url: url,
+      installation_proof_urls: updatedProofs,
+      installation_proof_url: updatedProofs[0] || null,
     });
 
     if (updateResult.error) {
       return { data: null, error: updateResult.error };
     }
 
-    return { data: url, error: null };
+    // Return the fully updated dispatch object
+    return { data: updateResult.data, error: null };
   } catch (error) {
     console.error("Error uploading installation proof:", error);
     return { data: null, error };

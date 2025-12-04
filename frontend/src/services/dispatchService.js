@@ -321,12 +321,8 @@ export async function uploadDeliveryProof(schoolId, dispatchId, file, schoolData
             return { data: null, error: result.error.message || "Failed to upload delivery proof" };
         }
 
-        // Return updated dispatch
-        const { data: updatedDispatch } = await updateSpaceLabDispatch(dispatchId, {
-            delivery_proof_url: result.data,
-        });
-
-        return { data: updatedDispatch?.data || { delivery_proof_url: result.data }, error: null };
+        // Result already contains the fully updated dispatch object (with proofs array)
+        return { data: result.data, error: null };
     } catch (error) {
         console.error("Error uploading delivery proof:", error);
         return { data: null, error: error.message || "Failed to upload delivery proof" };
@@ -376,12 +372,8 @@ export async function uploadInstallationProof(schoolId, dispatchId, file, school
             return { data: null, error: result.error.message || "Failed to upload installation proof" };
         }
 
-        // Return updated dispatch
-        const { data: updatedDispatch } = await updateSpaceLabDispatch(dispatchId, {
-            installation_proof_url: result.data,
-        });
-
-        return { data: updatedDispatch?.data || { installation_proof_url: result.data }, error: null };
+        // Result already contains the fully updated dispatch object (with proofs array)
+        return { data: result.data, error: null };
     } catch (error) {
         console.error("Error uploading installation proof:", error);
         return { data: null, error: error.message || "Failed to upload installation proof" };

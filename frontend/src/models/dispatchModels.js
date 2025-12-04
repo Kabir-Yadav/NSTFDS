@@ -105,8 +105,10 @@ export class DispatchComponent {
  * @property {string} dispatch_date - Date when dispatch was created (ISO format)
  * @property {string} delivery_status - Current delivery status
  * @property {string} installation_status - Current installation status
- * @property {string|null} delivery_proof_url - URL to delivery proof document
- * @property {string|null} installation_proof_url - URL to installation proof document
+ * @property {string|null} delivery_proof_url - URL to first delivery proof document (backward compatible)
+ * @property {string[]|null} delivery_proof_urls - Array of URLs to all delivery proof documents
+ * @property {string|null} installation_proof_url - URL to first installation proof document (backward compatible)
+ * @property {string[]|null} installation_proof_urls - Array of URLs to all installation proof documents
  * @property {boolean} is_installed - Whether installation is complete
  * @property {string|null} tracking_number - Tracking number for the dispatch
  * @property {string|null} vendor_name - Name of the vendor
@@ -128,7 +130,9 @@ export class Dispatch {
         delivery_status = "Pending",
         installation_status = "Not Started",
         delivery_proof_url = null,
+        delivery_proof_urls = null,
         installation_proof_url = null,
+        installation_proof_urls = null,
         is_installed = false,
         tracking_number = null,
         vendor_name = null,
@@ -151,8 +155,20 @@ export class Dispatch {
         this.dispatch_date = dispatch_date;
         this.delivery_status = delivery_status;
         this.installation_status = installation_status;
-        this.delivery_proof_url = delivery_proof_url;
-        this.installation_proof_url = installation_proof_url;
+        // Multi-proof support: always keep arrays while maintaining single URL fields
+        this.delivery_proof_urls = Array.isArray(delivery_proof_urls)
+            ? delivery_proof_urls
+            : delivery_proof_url
+                ? [delivery_proof_url]
+                : [];
+        this.installation_proof_urls = Array.isArray(installation_proof_urls)
+            ? installation_proof_urls
+            : installation_proof_url
+                ? [installation_proof_url]
+                : [];
+
+        this.delivery_proof_url = this.delivery_proof_urls[0] || null;
+        this.installation_proof_url = this.installation_proof_urls[0] || null;
         this.is_installed = is_installed;
         this.tracking_number = tracking_number;
         this.vendor_name = vendor_name;
@@ -250,8 +266,11 @@ export class Dispatch {
             dispatch_date: this.dispatch_date,
             delivery_status: this.delivery_status,
             installation_status: this.installation_status,
+            // Multi-proof support
             delivery_proof_url: this.delivery_proof_url,
+            delivery_proof_urls: this.delivery_proof_urls,
             installation_proof_url: this.installation_proof_url,
+            installation_proof_urls: this.installation_proof_urls,
             is_installed: this.is_installed,
             tracking_number: this.tracking_number,
             vendor_name: this.vendor_name,

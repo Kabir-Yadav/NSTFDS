@@ -85,9 +85,22 @@ export function validateStatusChange(newStatus, dispatch) {
         return { isValid: true, error: null };
     }
 
-    // "delivered" requires delivery_proof_url
+    // Normalize proof fields to handle both single URL and arrays
+    const deliveryProofs = Array.isArray(dispatch.delivery_proof_urls)
+        ? dispatch.delivery_proof_urls
+        : dispatch.delivery_proof_url
+            ? [dispatch.delivery_proof_url]
+            : [];
+
+    const installationProofs = Array.isArray(dispatch.installation_proof_urls)
+        ? dispatch.installation_proof_urls
+        : dispatch.installation_proof_url
+            ? [dispatch.installation_proof_url]
+            : [];
+
+    // "delivered" requires at least one delivery proof
     if (newStatus === DISPATCH_STATUS_ENUM.DELIVERED) {
-        if (!dispatch.delivery_proof_url) {
+        if (deliveryProofs.length === 0) {
             return {
                 isValid: false,
                 error: "Delivery proof must be uploaded before changing status to 'Delivered'",
@@ -95,13 +108,13 @@ export function validateStatusChange(newStatus, dispatch) {
         }
     }
 
-    // "installed" requires both delivery_proof_url and installation_proof_url
+    // "installed" requires both delivery and installation proofs
     if (newStatus === DISPATCH_STATUS_ENUM.INSTALLED) {
         const missingProofs = [];
-        if (!dispatch.delivery_proof_url) {
+        if (deliveryProofs.length === 0) {
             missingProofs.push("delivery proof");
         }
-        if (!dispatch.installation_proof_url) {
+        if (installationProofs.length === 0) {
             missingProofs.push("installation proof");
         }
 
@@ -465,7 +478,9 @@ export function createDispatchFromData(dispatchData) {
         delivery_status: dispatchData.delivery_status || "Pending",
         installation_status: dispatchData.installation_status || "Not Started",
         delivery_proof_url: dispatchData.delivery_proof_url || null,
+        delivery_proof_urls: dispatchData.delivery_proof_urls || null,
         installation_proof_url: dispatchData.installation_proof_url || null,
+        installation_proof_urls: dispatchData.installation_proof_urls || null,
         is_installed: dispatchData.is_installed || false,
         tracking_number: dispatchData.tracking_number || null,
         vendor_name: dispatchData.vendor_name || null,

@@ -24,13 +24,19 @@ import {
   DISPATCH_STATUS_ENUM,
   DISPATCH_STATUS_OPTIONS,
 } from "../../../utils/dispatchUtils";
-import { updateDispatch } from "../../../services/dispatchService";
+import {
+  updateDispatch,
+  uploadDeliveryProof,
+  uploadInstallationProof,
+} from "../../../services/dispatchService";
 
 const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [uploadingDelivery, setUploadingDelivery] = useState(false);
+  const [uploadingInstallation, setUploadingInstallation] = useState(false);
 
   // Initialize edit data when dispatch changes or edit mode is enabled
   useEffect(() => {
@@ -66,6 +72,19 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
   // Normalize dispatch to support both new and legacy formats
   const normalizedDispatch = normalizeDispatch(dispatch);
   const components = normalizedDispatch.components || [];
+
+  // Normalize proof fields to arrays for multi-proof support
+  const deliveryProofUrls = Array.isArray(dispatch.delivery_proof_urls)
+    ? dispatch.delivery_proof_urls
+    : dispatch.delivery_proof_url
+    ? [dispatch.delivery_proof_url]
+    : [];
+
+  const installationProofUrls = Array.isArray(dispatch.installation_proof_urls)
+    ? dispatch.installation_proof_urls
+    : dispatch.installation_proof_url
+    ? [dispatch.installation_proof_url]
+    : [];
 
   // Combined status flow steps based on dispatch_enum (in correct order)
   const statusSteps = [
@@ -104,6 +123,16 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
   const currentStatus =
     dispatch.dispatch_status || DISPATCH_STATUS_ENUM.PENDING_DISPATCH;
   const statusStepIndex = getCurrentStepIndex(statusSteps, currentStatus);
+
+  // Allow uploads only once status is at/after "Delivered"
+  const currentStatusIndex = DISPATCH_STATUS_OPTIONS.indexOf(currentStatus);
+  const deliveredStatusIndex = DISPATCH_STATUS_OPTIONS.indexOf(
+    DISPATCH_STATUS_ENUM.DELIVERED
+  );
+  const canUploadProofs =
+    currentStatusIndex >= 0 &&
+    deliveredStatusIndex >= 0 &&
+    currentStatusIndex >= deliveredStatusIndex;
 
   const handleEditChange = (field, value) => {
     setEditData((prev) => ({
@@ -156,6 +185,152 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
     setIsEditing(false);
     setEditData({});
     setError(null);
+  };
+
+  const handleAddDeliveryProof = async (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length || !school) return;
+
+    setUploadingDelivery(true);
+    setError(null);
+    try {
+      for (const file of files) {
+        // Upload each file and update parent state with latest dispatch
+        // eslint-disable-next-line no-await-in-loop
+        const { data, error: uploadError } = await uploadDeliveryProof(
+          school.id,
+          dispatch.id,
+          file
+        );
+        if (uploadError) {
+          throw new Error(uploadError);
+        }
+        if (onUpdate && data) {
+          onUpdate(dispatch.id, data);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to upload delivery proof(s):", err);
+      setError(
+        err.message || "Failed to upload delivery proof. Please try again."
+      );
+    } finally {
+      setUploadingDelivery(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleAddInstallationProof = async (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length || !school) return;
+
+    setUploadingInstallation(true);
+    setError(null);
+    try {
+      for (const file of files) {
+        // Upload each file and update parent state with latest dispatch
+        // eslint-disable-next-line no-await-in-loop
+        const { data, error: uploadError } = await uploadInstallationProof(
+          school.id,
+          dispatch.id,
+          file
+        );
+        if (uploadError) {
+          throw new Error(uploadError);
+        }
+        if (onUpdate && data) {
+          onUpdate(dispatch.id, data);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to upload installation proof(s):", err);
+      setError(
+        err.message || "Failed to upload installation proof. Please try again."
+      );
+    } finally {
+      setUploadingInstallation(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleDeleteDeliveryProof = async (index) => {
+    const current = Array.isArray(dispatch.delivery_proof_urls)
+      ? dispatch.delivery_proof_urls
+      : dispatch.delivery_proof_url
+      ? [dispatch.delivery_proof_url]
+      : [];
+    if (index < 0 || index >= current.length) return;
+
+    const updated = current.filter((_, i) => i !== index);
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const { data, error: updateError } = await updateDispatch(
+        school?.id,
+        dispatch.id,
+        {
+          delivery_proof_urls: updated,
+          delivery_proof_url: updated[0] || null,
+        }
+      );
+
+      if (updateError) {
+        throw new Error(updateError);
+      }
+
+      if (onUpdate && data) {
+        onUpdate(dispatch.id, data);
+      }
+    } catch (err) {
+      setError(
+        err.message || "Failed to delete delivery proof. Please try again."
+      );
+      console.error("Failed to delete delivery proof:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteInstallationProof = async (index) => {
+    const current = Array.isArray(dispatch.installation_proof_urls)
+      ? dispatch.installation_proof_urls
+      : dispatch.installation_proof_url
+      ? [dispatch.installation_proof_url]
+      : [];
+    if (index < 0 || index >= current.length) return;
+
+    const updated = current.filter((_, i) => i !== index);
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const { data, error: updateError } = await updateDispatch(
+        school?.id,
+        dispatch.id,
+        {
+          installation_proof_urls: updated,
+          installation_proof_url: updated[0] || null,
+        }
+      );
+
+      if (updateError) {
+        throw new Error(updateError);
+      }
+
+      if (onUpdate && data) {
+        onUpdate(dispatch.id, data);
+      }
+    } catch (err) {
+      setError(
+        err.message || "Failed to delete installation proof. Please try again."
+      );
+      console.error("Failed to delete installation proof:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const StepIndicator = ({ step, index, currentIndex, isLast }) => {
@@ -676,19 +851,60 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
                   <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5 sm:mb-2">
                     Delivery Proof
                   </p>
-                  {dispatch.delivery_proof_url ? (
-                    <a
-                      href={dispatch.delivery_proof_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1"
-                    >
-                      View Document →
-                    </a>
+                  {deliveryProofUrls.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {deliveryProofUrls.map((url, index) => (
+                        <div
+                          key={url}
+                          className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full"
+                        >
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                          >
+                            File {index + 1} →
+                          </a>
+                          {isEditing && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDeliveryProof(index)}
+                              className="ml-1 text-red-500 hover:text-red-600 text-[10px] sm:text-xs"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">
                       Not uploaded
                     </p>
+                  )}
+                  {isEditing && (
+                    <div className="mt-2">
+                      <label
+                        htmlFor={`delivery-proof-upload-${dispatch.id}`}
+                        className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-white ${
+                          uploadingDelivery || !canUploadProofs
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                        }`}
+                      >
+                        {uploadingDelivery ? "Uploading..." : "Add Proof"}
+                      </label>
+                      <input
+                        id={`delivery-proof-upload-${dispatch.id}`}
+                        type="file"
+                        multiple
+                        accept="image/*,.pdf"
+                        className="hidden"
+                        onChange={handleAddDeliveryProof}
+                        disabled={uploadingDelivery || !canUploadProofs}
+                      />
+                    </div>
                   )}
                 </div>
 
@@ -697,19 +913,62 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
                   <p className="text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5 sm:mb-2">
                     Installation Proof
                   </p>
-                  {dispatch.installation_proof_url ? (
-                    <a
-                      href={dispatch.installation_proof_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1"
-                    >
-                      View Document →
-                    </a>
+                  {installationProofUrls.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {installationProofUrls.map((url, index) => (
+                        <div
+                          key={url}
+                          className="inline-flex items-center gap-1 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full"
+                        >
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 hover:underline"
+                          >
+                            File {index + 1} →
+                          </a>
+                          {isEditing && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleDeleteInstallationProof(index)
+                              }
+                              className="ml-1 text-red-500 hover:text-red-600 text-[10px] sm:text-xs"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 italic">
                       Not uploaded
                     </p>
+                  )}
+                  {isEditing && (
+                    <div className="mt-2">
+                      <label
+                        htmlFor={`installation-proof-upload-${dispatch.id}`}
+                        className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-white ${
+                          uploadingInstallation || !canUploadProofs
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                        }`}
+                      >
+                        {uploadingInstallation ? "Uploading..." : "Add Proof"}
+                      </label>
+                      <input
+                        id={`installation-proof-upload-${dispatch.id}`}
+                        type="file"
+                        multiple
+                        accept="image/*,.pdf"
+                        className="hidden"
+                        onChange={handleAddInstallationProof}
+                        disabled={uploadingInstallation || !canUploadProofs}
+                      />
+                    </div>
                   )}
                 </div>
               </div>

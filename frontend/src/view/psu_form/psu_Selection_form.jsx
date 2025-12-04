@@ -357,17 +357,16 @@ const PsuSelectionForm = ({
       );
       if (error) throw new Error(error);
 
-      // Update local state immediately without refreshing whole table
-      if (data && data.delivery_proof_url) {
+      // Update local state immediately without refreshing whole table.
+      // `data` is the updated dispatch object (including proof arrays).
+      if (data) {
         setTableData((prev) =>
           prev.map((s) => {
             if (s.id === schoolId) {
               return {
                 ...s,
                 dispatches: s.dispatches.map((d) =>
-                  d.id === dispatchId
-                    ? { ...d, delivery_proof_url: data.delivery_proof_url }
-                    : d
+                  d.id === dispatchId ? { ...d, ...data } : d
                 ),
               };
             }
@@ -407,20 +406,16 @@ const PsuSelectionForm = ({
       );
       if (error) throw new Error(error);
 
-      // Update local state immediately without refreshing whole table
-      if (data && data.installation_proof_url) {
+      // Update local state immediately without refreshing whole table.
+      // `data` is the updated dispatch object (including proof arrays).
+      if (data) {
         setTableData((prev) =>
           prev.map((s) => {
             if (s.id === schoolId) {
               return {
                 ...s,
                 dispatches: s.dispatches.map((d) =>
-                  d.id === dispatchId
-                    ? {
-                        ...d,
-                        installation_proof_url: data.installation_proof_url,
-                      }
-                    : d
+                  d.id === dispatchId ? { ...d, ...data } : d
                 ),
               };
             }
@@ -776,10 +771,16 @@ const PsuSelectionForm = ({
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                     Dispatches
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase" style={{ minWidth: "180px" }}>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold uppercase"
+                    style={{ minWidth: "180px" }}
+                  >
                     Training
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase" style={{ minWidth: "180px" }}>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold uppercase"
+                    style={{ minWidth: "180px" }}
+                  >
                     Handover
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">

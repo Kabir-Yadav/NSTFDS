@@ -54,15 +54,31 @@ const DispatchDetailsRow = ({
   }
 
   const handleDeliveryProofUpload = async (dispatchId, e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    await onUploadDeliveryProof(school.id, dispatchId, file);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    // Upload each selected file sequentially to preserve ordering
+    for (const file of files) {
+      // eslint-disable-next-line no-await-in-loop
+      await onUploadDeliveryProof(school.id, dispatchId, file);
+    }
+
+    // Reset input so the same file(s) can be selected again if needed
+    e.target.value = "";
   };
 
   const handleInstallationProofUpload = async (dispatchId, e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    await onUploadInstallationProof(school.id, dispatchId, file);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    // Upload each selected file sequentially to preserve ordering
+    for (const file of files) {
+      // eslint-disable-next-line no-await-in-loop
+      await onUploadInstallationProof(school.id, dispatchId, file);
+    }
+
+    // Reset input
+    e.target.value = "";
   };
 
   // Calculate counts using utility functions
@@ -149,6 +165,23 @@ const DispatchDetailsRow = ({
             );
             const canUploadProofs = currentStatusOrder >= deliveredOrder;
 
+            // Normalize proof fields to arrays for multi-proof support
+            const deliveryProofUrls = Array.isArray(
+              dispatch.delivery_proof_urls
+            )
+              ? dispatch.delivery_proof_urls
+              : dispatch.delivery_proof_url
+              ? [dispatch.delivery_proof_url]
+              : [];
+
+            const installationProofUrls = Array.isArray(
+              dispatch.installation_proof_urls
+            )
+              ? dispatch.installation_proof_urls
+              : dispatch.installation_proof_url
+              ? [dispatch.installation_proof_url]
+              : [];
+
             return (
               <div
                 key={dispatch.id}
@@ -158,7 +191,7 @@ const DispatchDetailsRow = ({
                 <div className="flex items-start justify-between gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-gray-900 dark:text-white text-sm">
-                      Dispatch #{dispatch.id}
+                      Dispatch #{dispatch.dispatch_no}
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       {components.length} Component
@@ -342,16 +375,21 @@ const DispatchDetailsRow = ({
                           <span className="ml-1 text-red-500">*</span>
                         )}
                     </span>
-                    {dispatch.delivery_proof_url ? (
-                      <a
-                        href={dispatch.delivery_proof_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:underline"
-                      >
-                        <Eye className="h-3 w-3" />
-                        View
-                      </a>
+                    {deliveryProofUrls.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {deliveryProofUrls.map((url, index) => (
+                          <a
+                            key={url}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:underline bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full"
+                          >
+                            <Eye className="h-3 w-3" />
+                            <span>File {index + 1}</span>
+                          </a>
+                        ))}
+                      </div>
                     ) : (
                       <label
                         htmlFor={`delivery-${dispatch.id}`}
@@ -377,6 +415,8 @@ const DispatchDetailsRow = ({
                           ? "Uploading..."
                           : !canUploadProofs
                           ? "Upload"
+                          : deliveryProofUrls.length > 0
+                          ? "Add More"
                           : "Upload"}
                       </label>
                     )}
@@ -384,6 +424,7 @@ const DispatchDetailsRow = ({
                       type="file"
                       id={`delivery-${dispatch.id}`}
                       accept="image/*,.pdf"
+                      multiple
                       onChange={(e) =>
                         handleDeliveryProofUpload(dispatch.id, e)
                       }
@@ -393,7 +434,7 @@ const DispatchDetailsRow = ({
                       }
                     />
                   </div>
-                  {!dispatch.delivery_proof_url && (
+                  {deliveryProofUrls.length === 0 && (
                     <p
                       className={`text-xs italic ${
                         editingDispatch === dispatch.id &&
@@ -450,23 +491,28 @@ const DispatchDetailsRow = ({
                           <span className="ml-1 text-red-500">*</span>
                         )}
                     </span>
-                    {dispatch.installation_proof_url ? (
-                      <a
-                        href={dispatch.installation_proof_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:underline"
-                      >
-                        <Eye className="h-3 w-3" />
-                        View
-                      </a>
+                    {installationProofUrls.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {installationProofUrls.map((url, index) => (
+                          <a
+                            key={url}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 hover:underline bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full"
+                          >
+                            <Eye className="h-3 w-3" />
+                            <span>File {index + 1}</span>
+                          </a>
+                        ))}
+                      </div>
                     ) : (
                       <label
                         htmlFor={`installation-${dispatch.id}`}
                         className={`flex items-center gap-1 text-xs ${
                           !canUploadProofs ||
                           uploadingInstallation === dispatch.id ||
-                          !dispatch.delivery_proof_url
+                          deliveryProofUrls.length === 0
                             ? "text-gray-400 cursor-not-allowed"
                             : editingDispatch === dispatch.id &&
                               (editFormData.dispatch_status ===
@@ -483,7 +529,7 @@ const DispatchDetailsRow = ({
                           ? "Uploading..."
                           : !canUploadProofs
                           ? "Upload"
-                          : !dispatch.delivery_proof_url
+                          : deliveryProofUrls.length === 0
                           ? "Upload (Delivery proof required first)"
                           : "Upload"}
                       </label>
@@ -492,6 +538,7 @@ const DispatchDetailsRow = ({
                       type="file"
                       id={`installation-${dispatch.id}`}
                       accept="image/*,.pdf"
+                      multiple
                       onChange={(e) =>
                         handleInstallationProofUpload(dispatch.id, e)
                       }
@@ -499,11 +546,11 @@ const DispatchDetailsRow = ({
                       disabled={
                         !canUploadProofs ||
                         uploadingInstallation === dispatch.id ||
-                        !dispatch.delivery_proof_url
+                        deliveryProofUrls.length === 0
                       }
                     />
                   </div>
-                  {!dispatch.installation_proof_url && (
+                  {installationProofUrls.length === 0 && (
                     <p
                       className={`text-xs italic ${
                         editingDispatch === dispatch.id &&
@@ -515,7 +562,7 @@ const DispatchDetailsRow = ({
                           : "text-gray-500 dark:text-gray-400"
                       }`}
                     >
-                      {dispatch.delivery_proof_url
+                      {deliveryProofUrls.length > 0
                         ? "No proof uploaded yet"
                         : "Upload delivery proof first"}
                     </p>
