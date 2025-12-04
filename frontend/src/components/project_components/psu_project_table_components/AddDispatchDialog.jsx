@@ -83,17 +83,7 @@ const AddDispatchDialog = ({
       newErrors.components = "Please select at least one component";
     }
 
-    // Expected delivery date is optional, but if provided, validate it's not in the past
-    if (expectedDeliveryDate) {
-      const selectedDate = new Date(expectedDeliveryDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate < today) {
-        newErrors.expectedDeliveryDate =
-          "Expected delivery date cannot be in the past";
-      }
-    }
+    // Expected delivery date is optional - no validation needed
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -344,7 +334,6 @@ const AddDispatchDialog = ({
                       });
                     }
                   }}
-                  min={new Date().toISOString().split("T")[0]}
                   className={`w-full px-4 py-2.5 bg-white dark:bg-gray-900 border ${
                     errors.expectedDeliveryDate
                       ? "border-red-500"
