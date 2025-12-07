@@ -138,7 +138,6 @@ export async function fetchHierarchicalData() {
       console.error("Error fetching hierarchical data:", error);
       return [];
     }
-    console.log("Hierarchical data fetched successfully:", data);
     return data;
   } catch (error) {
     console.error("Error in fetchHierarchicalData:", error);
@@ -254,7 +253,6 @@ export async function fetchPsuProjectBudgetsByState(psuName, stateName) {
     console.error("Error fetching PSU-project budgets by state:", error);
     return [];
   }
-  console.log(data);
   return data;
 }
 
@@ -287,6 +285,33 @@ export async function fetchPsuStateDistrictStats(psu, state) {
 
 //-----------------------------------------------------------------------------------------------------
 
+export async function fetchDashboardOnlyPSUData(psuName) {
+  const { data, error } = await supabase.rpc("dashboard_all_states", {
+    psu_input: psuName,
+  });
+  if (error) {
+    console.error("Error fetching dashboard all states:", error);
+    return null;
+  }
+  return data;
+}
+
+//-----------------------------------------------------------------------------------------------------
+
+export async function fetchDashboardBothStatePSUData(psuName, stateName) {
+  const { data, error } = await supabase.rpc("dashboard_state", {
+    psu_input: psuName,
+    state_input: stateName,
+  });
+  if (error) {
+    console.error("Error fetching dashboard state:", error);
+    return null;
+  }
+  return data;
+}
+
+//-----------------------------------------------------------------------------------------------------
+
 // export async function fetchDistrictProgressByState(stateName, options = {}) {
 //   return [];
 // }
@@ -302,7 +327,6 @@ export async function fetchTableData({ selectedProject }) {
     console.error("Error fetching device procurements:", error);
     return [];
   }
-  console.log("Fetched table data:", data);
   return data || [];
 }
 
@@ -610,6 +634,7 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
             delivery_proof_urls: deliveryProofUrls,
             installation_proof_urls: installationProofUrls,
             tracking_number: dispatchInfo.tracking_number || null,
+            tracking_url: dispatchInfo.tracking_url || null,
             vendor_name: dispatchInfo.vendor_name || null,
             purchase_order: dispatchInfo.purchase_order || null,
             invoice_number: dispatchInfo.invoice_number || null,
@@ -650,6 +675,8 @@ export async function fetchSpaceLabSchoolProjects(projectName = "Space Lab") {
         handover_certificate_url: project.handover_certificate_url || null,
         remarks: project.remarks || null,
         created_at: project.created_at || null,
+        delivery_installation_status:
+          project.delivery_installation_status || "not_started",
         dispatches: projectDispatches,
       };
     });
@@ -944,6 +971,7 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
       delivery_proof_url: null,
       installation_proof_url: null,
       tracking_number: null,
+      tracking_url: null,
       vendor_name: null,
       purchase_order: null,
       invoice_number: null,
@@ -1014,6 +1042,7 @@ export async function addSpaceLabDispatch(schoolProjectId, dispatchData) {
         dispatchInfo.installation_proof_url ||
         null,
       tracking_number: dispatchInfo.tracking_number || null,
+      tracking_url: dispatchInfo.tracking_url || null,
       vendor_name: dispatchInfo.vendor_name || null,
       purchase_order: dispatchInfo.purchase_order || null,
       invoice_number: dispatchInfo.invoice_number || null,

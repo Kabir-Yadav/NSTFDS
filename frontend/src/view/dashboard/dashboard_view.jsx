@@ -7,6 +7,12 @@ import {
   fetchHierarchicalData,
   fetchProjectsAndPsu,
   useStatsWithStateFilter,
+  fetchDashboardOnlyPSUData,
+  fetchDashboardBothStatePSUData,
+  fetchBudgetUtilization,
+  fetchProjectCompletionRate,
+  fetchSchoolImplementationRate,
+  fetchDistrictCompletionRate,
 } from "../../action/supabase_actions";
 import { BarChartSection } from "../../components/dashboard_components/BarChart";
 import {
@@ -100,6 +106,267 @@ const DashboardView = () => {
 
   const { stats, loading, statesList, selectedState, setSelectedState } =
     useStatsWithStateFilter();
+  const [psuStats, setPsuStats] = useState(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardOnlyPSUData, setDashboardOnlyPSUData] = useState(null);
+  const [dashboardBothStatePSUData, setDashboardBothStatePSUData] =
+    useState(null);
+  const [filteredStatesList, setFilteredStatesList] = useState([]);
+
+  // Chart metrics data (for when no PSU is selected)
+  const [chartMetrics, setChartMetrics] = useState({
+    completionRate: 0,
+    budgetUtilization: 0,
+    implementationRate: 0,
+    budgetData: {
+      total_spent: 0,
+      allocated_budget: 0,
+      budget_utilization_pct: 0,
+    },
+  });
+
+  // Bar chart data
+  const [barChartData, setBarChartData] = useState({
+    data: [],
+    keys: ["progress"],
+  });
+
+  // Fetch all dashboard data (PSU stats, chart metrics, bar chart data)
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      // Only fetch when on main dashboard (no project selected)
+      if (selectedProject || selectedPsuProject) {
+        setPsuStats(null);
+        setDashboardOnlyPSUData(null);
+        setDashboardBothStatePSUData(null);
+        setFilteredStatesList([]);
+        setChartMetrics({
+          completionRate: 0,
+          budgetUtilization: 0,
+          implementationRate: 0,
+          budgetData: {
+            total_spent: 0,
+            allocated_budget: 0,
+            budget_utilization_pct: 0,
+          },
+        });
+        setBarChartData({ data: [], keys: ["progress"] });
+        return;
+      }
+
+      setDashboardLoading(true);
+      try {
+        // When PSU is selected
+        if (psu) {
+          if (selectedState && selectedState !== "") {
+            // Both PSU and state selected
+            const data = await fetchDashboardBothStatePSUData(
+              psu,
+              selectedState
+            );
+            setDashboardBothStatePSUData(data);
+            setDashboardOnlyPSUData(null);
+
+            if (data && data.top_stats) {
+              setPsuStats({
+                totalStates: 1,
+                totalDistricts: data.top_stats.total_districts || 0,
+                totalSchools: data.top_stats.total_schools || 0,
+                totalPSUs: 1,
+                activeProjects: data.top_stats.active_projects || 0,
+              });
+            } else {
+              setPsuStats(null);
+            }
+
+            // Set bar chart data from budget_by_project
+            if (data && data.budget_by_project) {
+              setBarChartData({
+                data: data.budget_by_project.map(
+                  ({ project_name, allocated_budget, used_budget }) => ({
+                    project: project_name,
+                    allocatedBudget: allocated_budget,
+                    usedBudget: used_budget,
+                  })
+                ),
+                keys: ["allocatedBudget", "usedBudget"],
+              });
+            } else {
+              console.error(
+                `Error: budget_by_project data not available for PSU: ${psu}, State: ${selectedState}`
+              );
+              setBarChartData({
+                data: [],
+                keys: ["allocatedBudget", "usedBudget"],
+              });
+            }
+          } else {
+            // Only PSU selected
+            const data = await fetchDashboardOnlyPSUData(psu);
+            setDashboardOnlyPSUData(data);
+            setDashboardBothStatePSUData(null);
+
+            if (data && data.top_stats) {
+              setPsuStats({
+                totalStates: data.top_stats.total_states || 0,
+                totalDistricts: data.top_stats.total_districts || 0,
+                totalSchools: data.top_stats.total_schools || 0,
+                totalPSUs: 1,
+                activeProjects: data.top_stats.active_projects || 0,
+              });
+
+              // Extract states from budget_by_state to filter the state dropdown
+              if (data.budget_by_state && Array.isArray(data.budget_by_state)) {
+                const psuStates = data.budget_by_state.map(
+                  (item) => item.state
+                );
+                setFilteredStatesList(psuStates);
+
+                if (selectedState && !psuStates.includes(selectedState)) {
+                  setSelectedState("");
+                }
+              } else {
+                setFilteredStatesList([]);
+              }
+
+              // Set bar chart data from budget_by_state
+              if (data.budget_by_state) {
+                setBarChartData({
+                  data: data.budget_by_state.map(
+                    ({ state, allocated_budget, used_budget }) => ({
+                      state: state,
+                      allocatedBudget: allocated_budget,
+                      usedBudget: used_budget,
+                    })
+                  ),
+                  keys: ["allocatedBudget", "usedBudget"],
+                });
+              }
+            } else {
+              setPsuStats(null);
+              setDashboardOnlyPSUData(null);
+              setFilteredStatesList([]);
+              setBarChartData({
+                data: [],
+                keys: ["allocatedBudget", "usedBudget"],
+              });
+            }
+          }
+        } else {
+          // No PSU selected - fetch chart metrics and bar chart data
+          const stateParam =
+            selectedState && selectedState !== "" ? selectedState : null;
+
+          // Fetch chart metrics
+          const [completionData, budgetData, implData] = await Promise.all([
+            fetchProjectCompletionRate(stateParam),
+            fetchBudgetUtilization(stateParam),
+            fetchSchoolImplementationRate(stateParam),
+          ]);
+
+          // Process completion rate
+          let completionRate = 0;
+          if (completionData.length > 0) {
+            if (stateParam) {
+              completionRate = Number(completionData[0].completion_rate);
+            } else {
+              const totalRate = completionData.reduce(
+                (sum, state) => sum + Number(state.completion_rate),
+                0
+              );
+              completionRate = Number(
+                (totalRate / completionData.length).toFixed(2)
+              );
+            }
+          }
+
+          // Process budget data
+          const budgetUtilization = budgetData[0]
+            ? Number(budgetData[0].budget_utilization_pct)
+            : 0;
+          const budgetDataFormatted = budgetData[0]
+            ? {
+                total_spent: budgetData[0].total_spent || 0,
+                allocated_budget: budgetData[0].allocated_budget || 0,
+                budget_utilization_pct: budgetUtilization,
+              }
+            : {
+                total_spent: 0,
+                allocated_budget: 0,
+                budget_utilization_pct: 0,
+              };
+
+          // Process implementation rate
+          const implementationRate = implData[0]
+            ? Number(implData[0].implementation_rate)
+            : 0;
+
+          setChartMetrics({
+            completionRate,
+            budgetUtilization,
+            implementationRate,
+            budgetData: budgetDataFormatted,
+          });
+
+          // Fetch bar chart data
+          if (stateParam) {
+            // State selected - fetch district completion rates
+            const districtData = await fetchDistrictCompletionRate(stateParam);
+            setBarChartData({
+              data: districtData.map(({ district_name, completion_rate }) => ({
+                district: district_name,
+                progress: completion_rate,
+              })),
+              keys: ["progress"],
+            });
+          } else {
+            // No state selected - use completion data for states
+            setBarChartData({
+              data: completionData.map(({ state_name, completion_rate }) => ({
+                state: state_name,
+                progress: completion_rate,
+              })),
+              keys: ["progress"],
+            });
+          }
+
+          // Clear PSU-related data
+          setPsuStats(null);
+          setDashboardOnlyPSUData(null);
+          setDashboardBothStatePSUData(null);
+          setFilteredStatesList([]);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setPsuStats(null);
+        setDashboardOnlyPSUData(null);
+        setDashboardBothStatePSUData(null);
+        setFilteredStatesList([]);
+        setChartMetrics({
+          completionRate: 0,
+          budgetUtilization: 0,
+          implementationRate: 0,
+          budgetData: {
+            total_spent: 0,
+            allocated_budget: 0,
+            budget_utilization_pct: 0,
+          },
+        });
+        setBarChartData({ data: [], keys: ["progress"] });
+      } finally {
+        setDashboardLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [psu, selectedState, selectedProject, selectedPsuProject]);
+
+  // Reset filtered states when PSU is cleared
+  useEffect(() => {
+    if (!psu) {
+      setFilteredStatesList([]);
+    }
+  }, [psu]);
 
   useEffect(() => {
     let isMounted = true;
@@ -296,7 +563,10 @@ const DashboardView = () => {
                 <option value="" className="bg-white dark:bg-gray-800">
                   All States
                 </option>
-                {statesList.map((state) => (
+                {(filteredStatesList.length > 0
+                  ? filteredStatesList
+                  : statesList
+                ).map((state) => (
                   <option
                     key={state}
                     value={state}
@@ -317,6 +587,8 @@ const DashboardView = () => {
                       setPsu(selectedPsu.name);
                     } else {
                       setPsu("");
+                      // Clear selected state when PSU is cleared
+                      setSelectedState("");
                     }
                   }
                 }}
@@ -381,8 +653,8 @@ const DashboardView = () => {
               <>
                 <div className="mb-4 md:mb-6 mt-2">
                   <SummaryCards
-                    stats={stats}
-                    loading={loading}
+                    stats={psu ? psuStats || stats : stats}
+                    loading={dashboardLoading || loading}
                     selectedState={selectedState}
                   />
                 </div>
@@ -392,11 +664,17 @@ const DashboardView = () => {
                     selectedPSU={psu}
                     hierarchicalData={hierarchicalData}
                     projectsData={projects}
+                    dashboardBothStatePSUData={dashboardBothStatePSUData}
+                    dashboardOnlyPSUData={dashboardOnlyPSUData}
+                    chartMetrics={chartMetrics}
+                    isLoading={dashboardLoading}
                   />
                   <BarChartSection
                     stateList={statesList}
                     selectedState={selectedState}
                     selectedPsu={psu}
+                    barChartData={barChartData}
+                    isLoading={dashboardLoading}
                   />
                 </div>
               </>

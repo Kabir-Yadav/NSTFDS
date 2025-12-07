@@ -13,6 +13,7 @@ import {
   User,
   Phone,
   MessageSquare,
+  Link,
 } from "lucide-react";
 import { useProjectComponents } from "../../../models/projectComponents";
 import { getAvailableComponentsForSchool } from "../../../services/dispatchService";
@@ -32,6 +33,7 @@ const AddDispatchDialog = ({
   const [submitting, setSubmitting] = useState(false);
   const [additionalInfo, setAdditionalInfo] = useState({
     tracking_number: "",
+    tracking_url: "",
     vendor_name: "",
     purchase_order: "",
     invoice_number: "",
@@ -131,6 +133,7 @@ const AddDispatchDialog = ({
       setDispatchDate("");
       setAdditionalInfo({
         tracking_number: "",
+        tracking_url: "",
         vendor_name: "",
         purchase_order: "",
         invoice_number: "",
@@ -157,6 +160,7 @@ const AddDispatchDialog = ({
     setDispatchDate("");
     setAdditionalInfo({
       tracking_number: "",
+      tracking_url: "",
       vendor_name: "",
       purchase_order: "",
       invoice_number: "",
@@ -173,7 +177,10 @@ const AddDispatchDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      style={{ marginTop: "0px" }}
+    >
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4 overflow-hidden max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
@@ -405,7 +412,25 @@ const AddDispatchDialog = ({
                           placeholder="Enter tracking number"
                         />
                       </div>
-
+                      {/* Tracking URL */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <Link className="inline h-4 w-4 mr-1" />
+                          Tracking URL
+                        </label>
+                        <input
+                          type="text"
+                          value={additionalInfo.tracking_url}
+                          onChange={(e) =>
+                            handleAdditionalInfoChange(
+                              "tracking_url",
+                              e.target.value
+                            )
+                          }
+                          className="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900 dark:text-white"
+                          placeholder="Enter tracking URL"
+                        />
+                      </div>
                       {/* Vendor Name */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

@@ -3,6 +3,7 @@ import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
 import StatesPieChart from "./states_piechart";
 
 const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
+  console.log("districtData", districtData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -23,12 +24,21 @@ const DistrictDropdownView = ({ districtData, formatBudget, projectData }) => {
     return district?.projects || [];
   };
 
-  // Set the first district as default selected when component mounts
+  // Reset and set the first district when districtData changes
   useEffect(() => {
-    if (districtData && districtData.length > 0 && !selectedDistrict) {
+    // Reset all filter states when districtData changes
+    setSearchTerm("");
+    setSelectedProject(null);
+    setIsDropdownOpen(false);
+    setIsProjectDropdownOpen(false);
+
+    // Set the first district as default when districtData changes
+    if (districtData && districtData.length > 0) {
       setSelectedDistrict(districtData[0]);
+    } else {
+      setSelectedDistrict(null);
     }
-    setFilteredDistricts(districtData);
+    setFilteredDistricts(districtData || []);
   }, [districtData]);
 
   // Filter districts and projects based on search term
@@ -363,7 +373,6 @@ const StateAffected = ({
   stateData,
   projectData,
 }) => {
-  console.log(districtData);
   return (
     <div
       className="

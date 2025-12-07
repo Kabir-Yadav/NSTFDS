@@ -11,6 +11,7 @@ const TableFilters = ({
   selectedReady,
   selectedTraining,
   selectedHandover,
+  selectedDispatchStatus,
   setEndDate,
   setStartDate,
   setSelectedPsu,
@@ -22,6 +23,7 @@ const TableFilters = ({
   setSelectedReady,
   setSelectedTraining,
   setSelectedHandover,
+  setSelectedDispatchStatus,
   psuOptions = [],
   categories = [],
   stateOptions = [],
@@ -433,6 +435,39 @@ const TableFilters = ({
             <option value="not_started">Not Started</option>
             <option value="in_progress">In Progress</option>
             <option value="complete">Complete</option>
+          </select>
+        </div>
+      )}
+
+      {setSelectedDispatchStatus && (
+        <div>
+          <label
+            className="
+              block
+              mb-2
+              text-sm font-medium text-[var(--color-primary)]
+            "
+          >
+            Delivery & Installation
+          </label>
+          <select
+            value={selectedDispatchStatus}
+            onChange={(e) => setSelectedDispatchStatus(e.target.value)}
+            className="
+              w-full
+              px-3 py-2
+              text-black
+              bg-white
+              border border-gray-300 rounded-lg
+              dark:border-gray-500 dark:bg-gray-900 dark:text-white
+            "
+          >
+            <option value="">All</option>
+            <option value="all_installed">All Installed</option>
+            <option value="partially_installed">Partially Installed</option>
+            <option value="in_progress">In Progress</option>
+            <option value="pending">Pending</option>
+            <option value="no_dispatches">No Dispatches</option>
           </select>
         </div>
       )}

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { BarChart3, FileCheck } from "lucide-react";
+import { BarChart3, FileCheck, InfoIcon } from "lucide-react";
 import ImageUploadModal from "../../components/project_components/ImageUploadModal";
+import AllDispatchesModal from "../../components/project_components/AllDispatchesModal";
 import HeaderButtons from "../../components/table_components/header_buttons";
 import TableFilters from "../../components/table_components/table_filters";
 import TablePageNavButton from "../../components/table_components/table_pageNav_button";
@@ -30,6 +31,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
   const [selectedReady, setSelectedReady] = useState("");
   const [selectedTraining, setSelectedTraining] = useState("");
   const [selectedHandover, setSelectedHandover] = useState("");
+  const [selectedDispatchStatus, setSelectedDispatchStatus] = useState("");
   const [sortAsc, setsortAsc] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 20;
@@ -51,6 +53,12 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
     row: null,
     type: null,
   });
+  const [dispatchModal, setDispatchModal] = useState({
+    isOpen: false,
+    dispatches: [],
+    schoolName: "",
+  });
+
   useEffect(() => {
     fetchData();
   }, [selectedProject]);
@@ -96,6 +104,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
     selectedReady,
     selectedTraining,
     selectedHandover,
+    selectedDispatchStatus,
     tableData,
     sortAsc,
   ]);
@@ -137,6 +146,15 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
         !selectedHandover ||
         (item.handover_status || "not_started") === selectedHandover;
 
+      // Dispatch status filter - use delivery_installation_status from database
+      const deliveryInstallationStatus =
+        item.delivery_installation_status || "no_dispatches";
+      let matchesDispatchStatus = !selectedDispatchStatus;
+      if (selectedDispatchStatus) {
+        matchesDispatchStatus =
+          deliveryInstallationStatus === selectedDispatchStatus;
+      }
+
       return (
         matchesDate &&
         matchesState &&
@@ -144,7 +162,8 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
         matchesSchool &&
         matchesReady &&
         matchesTraining &&
-        matchesHandover
+        matchesHandover &&
+        matchesDispatchStatus
       );
     });
 
@@ -197,9 +216,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
       row.school_name || "",
       row.is_ready ? "Yes" : "No",
       row.certificate_url ? "Uploaded" : "Not uploaded",
-      row.dispatches && row.dispatches.length > 0
-        ? getCumulativeDispatchStatus(row.dispatches)
-        : "No dispatches",
+      getCumulativeDispatchStatus(row),
       getSimpleStatusDisplay(row.training_status || "not_started"),
       getSimpleStatusDisplay(row.handover_status || "not_started"),
       row.handover_certificate_url ? "Uploaded" : "Not uploaded",
@@ -241,9 +258,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
       row.school_name || "",
       row.is_ready ? "Yes" : "No",
       row.certificate_url ? "Uploaded" : "Not uploaded",
-      row.dispatches && row.dispatches.length > 0
-        ? getCumulativeDispatchStatus(row.dispatches)
-        : "No dispatches",
+      getCumulativeDispatchStatus(row),
       getSimpleStatusDisplay(row.training_status || "not_started"),
       getSimpleStatusDisplay(row.handover_status || "not_started"),
       row.handover_certificate_url ? "Uploaded" : "Not uploaded",
@@ -296,7 +311,6 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
         ).sort()
       : [];
 
-  console.log(selectedProject);
   return (
     <div className="space-y-6">
       {/* Overview Section */}
@@ -353,6 +367,8 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
             setSelectedTraining={setSelectedTraining}
             selectedHandover={selectedHandover}
             setSelectedHandover={setSelectedHandover}
+            selectedDispatchStatus={selectedDispatchStatus}
+            setSelectedDispatchStatus={setSelectedDispatchStatus}
             stateOptions={stateOptions}
             districtOptions={districtOptions}
             schoolOptions={schoolOptions}
@@ -401,6 +417,7 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                   <th className="px-6 py-4 text-left text-xs font-semibold uppercase">
                     Handover Certificate
                   </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase"></th>
                 </tr>
               </thead>
               <tbody>
@@ -476,19 +493,13 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-center">
-                        {row.dispatches && row.dispatches.length > 0 ? (
-                          <span
-                            className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getCumulativeDispatchStatusColor(
-                              row.dispatches
-                            )}`}
-                          >
-                            {getCumulativeDispatchStatus(row.dispatches)}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 dark:text-gray-500 text-xs italic">
-                            No dispatches
-                          </span>
-                        )}
+                        <span
+                          className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getCumulativeDispatchStatusColor(
+                            row
+                          )}`}
+                        >
+                          {getCumulativeDispatchStatus(row)}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <div className="space-y-1">
@@ -548,6 +559,21 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                           </span>
                         )}
                       </td>
+                      <td className="px-6 py-4 text-sm">
+                        <button
+                          onClick={() =>
+                            setDispatchModal({
+                              isOpen: true,
+                              dispatches: row.dispatches || [],
+                              schoolName: row.school_name,
+                            })
+                          }
+                          className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                          title="View dispatch details"
+                        >
+                          <InfoIcon className="h-5 w-5" />
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -582,6 +608,16 @@ const ProjectSelectionForm = ({ selectedProject, projectdata, isAdmin }) => {
                 : "stage2_proof_url"
             ]
           }
+        />
+
+        {/* All Dispatches Modal */}
+        <AllDispatchesModal
+          isOpen={dispatchModal.isOpen}
+          onClose={() =>
+            setDispatchModal({ isOpen: false, dispatches: [], schoolName: "" })
+          }
+          dispatches={dispatchModal.dispatches}
+          schoolName={dispatchModal.schoolName}
         />
       </div>
     </div>

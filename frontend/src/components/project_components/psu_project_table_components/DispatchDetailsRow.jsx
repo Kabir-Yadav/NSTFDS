@@ -289,8 +289,10 @@ const DispatchDetailsRow = ({
                           ))}
                         </select>
                         {/* Show error message if status requires proof but proof isn't uploaded */}
-                        {editFormData.dispatch_status ===
-                          DISPATCH_STATUS_ENUM.DELIVERED &&
+                        {(editFormData.dispatch_status ===
+                          DISPATCH_STATUS_ENUM.DELIVERED ||
+                          editFormData.dispatch_status ===
+                            DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS) &&
                           !dispatch.delivery_proof_url && (
                             <p className="text-xs text-red-500 mt-1 font-medium">
                               ⚠️ Please upload delivery proof before saving this
@@ -333,11 +335,9 @@ const DispatchDetailsRow = ({
                     editingDispatch === dispatch.id &&
                     (editFormData.dispatch_status ===
                       DISPATCH_STATUS_ENUM.DELIVERED ||
-                      dispatch.dispatch_status ===
-                        DISPATCH_STATUS_ENUM.DELIVERED ||
                       editFormData.dispatch_status ===
-                        DISPATCH_STATUS_ENUM.INSTALLED ||
-                      dispatch.dispatch_status ===
+                        DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS ||
+                      editFormData.dispatch_status ===
                         DISPATCH_STATUS_ENUM.INSTALLED) &&
                     !dispatch.delivery_proof_url
                       ? "border-red-300 dark:border-red-700"
@@ -350,11 +350,9 @@ const DispatchDetailsRow = ({
                         editingDispatch === dispatch.id &&
                         (editFormData.dispatch_status ===
                           DISPATCH_STATUS_ENUM.DELIVERED ||
-                          dispatch.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.DELIVERED ||
                           editFormData.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.INSTALLED ||
-                          dispatch.dispatch_status ===
+                            DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS ||
+                          editFormData.dispatch_status ===
                             DISPATCH_STATUS_ENUM.INSTALLED) &&
                         !dispatch.delivery_proof_url
                           ? "text-red-600 dark:text-red-400"
@@ -365,11 +363,9 @@ const DispatchDetailsRow = ({
                       {editingDispatch === dispatch.id &&
                         (editFormData.dispatch_status ===
                           DISPATCH_STATUS_ENUM.DELIVERED ||
-                          dispatch.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.DELIVERED ||
                           editFormData.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.INSTALLED ||
-                          dispatch.dispatch_status ===
+                            DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS ||
+                          editFormData.dispatch_status ===
                             DISPATCH_STATUS_ENUM.INSTALLED) &&
                         !dispatch.delivery_proof_url && (
                           <span className="ml-1 text-red-500">*</span>
@@ -399,11 +395,9 @@ const DispatchDetailsRow = ({
                             : editingDispatch === dispatch.id &&
                               (editFormData.dispatch_status ===
                                 DISPATCH_STATUS_ENUM.DELIVERED ||
-                                dispatch.dispatch_status ===
-                                  DISPATCH_STATUS_ENUM.DELIVERED ||
                                 editFormData.dispatch_status ===
-                                  DISPATCH_STATUS_ENUM.INSTALLED ||
-                                dispatch.dispatch_status ===
+                                  DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS ||
+                                editFormData.dispatch_status ===
                                   DISPATCH_STATUS_ENUM.INSTALLED) &&
                               !dispatch.delivery_proof_url
                             ? "text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer"
@@ -440,11 +434,9 @@ const DispatchDetailsRow = ({
                         editingDispatch === dispatch.id &&
                         (editFormData.dispatch_status ===
                           DISPATCH_STATUS_ENUM.DELIVERED ||
-                          dispatch.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.DELIVERED ||
                           editFormData.dispatch_status ===
-                            DISPATCH_STATUS_ENUM.INSTALLED ||
-                          dispatch.dispatch_status ===
+                            DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS ||
+                          editFormData.dispatch_status ===
                             DISPATCH_STATUS_ENUM.INSTALLED)
                           ? "text-red-500 dark:text-red-400"
                           : "text-gray-500 dark:text-gray-400"

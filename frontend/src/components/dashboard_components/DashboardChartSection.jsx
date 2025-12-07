@@ -1,14 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
 import { useTheme } from "../../context/ThemeContext";
-import {
-  fetchBudgetUtilization,
-  fetchSchoolImplementationRate,
-  fetchProjectCompletionRate,
-  fetchPsuProjectBudgets,
-  fetchPsuStateBudgets,
-  fetchPsuProjectBudgetsByState,
-  fetchPsuStateDistrictStats,
-} from "../../action/supabase_actions";
 import { SchoolCard, ImplementationSummary } from "../charts/school_card";
 import { BudgetCard, BudgetPSUCard } from "../charts/budget_card";
 import CompletionCard from "../charts/completion_card";
@@ -20,21 +10,149 @@ const DashboardChartSection = ({
   selectedPSU,
   hierarchicalData,
   projectsData,
+  dashboardBothStatePSUData, // For when both PSU and state are selected
+  dashboardOnlyPSUData, // For when only PSU is selected
+  chartMetrics, // Chart metrics when no PSU is selected
+  isLoading,
 }) => {
   const { isDarkMode } = useTheme();
-  const [loading, setLoading] = useState(true);
-  const [completionRate, setCompletionRate] = useState(0);
-  const [budgetUtilization, setBudgetUtilization] = useState(0);
-  const [implementationRate, setImplementationRate] = useState(0);
-  const [psuBudgetData, setPsuBudgetData] = useState([
-    {
-      total_spent: 0,
-      allocated_budget: 0,
-      budget_utilization_pct: 0,
-    },
-  ]);
-  const [stateDataforPie, setStateDataforPie] = useState([]);
-  const [districDataforPie, setDistricDataforPie] = useState([]);
+
+  //------------------------------------DATA TRANSFORMATION------------------------------------------------------------
+
+  // Transform data based on selected PSU/state
+  const getBudgetData = () => {
+    if (selectedPSU) {
+      if (selectedState && dashboardBothStatePSUData) {
+        const budget = dashboardBothStatePSUData.budget || {};
+        return {
+          allocated_budget: budget.allocated_budget || 0,
+          total_spent: budget.used_budget || 0,
+          budget_utilization_pct: budget.allocated_budget
+            ? Number(
+                ((budget.used_budget / budget.allocated_budget) * 100).toFixed(
+                  2
+                )
+              )
+            : 0,
+        };
+      } else if (dashboardOnlyPSUData) {
+        const budget = dashboardOnlyPSUData.budget || {};
+        return {
+          allocated_budget: budget.allocated_budget || 0,
+          total_spent: budget.used_budget || 0,
+          budget_utilization_pct: budget.allocated_budget
+            ? Number(
+                ((budget.used_budget / budget.allocated_budget) * 100).toFixed(
+                  2
+                )
+              )
+            : 0,
+        };
+      }
+    }
+    return (
+      chartMetrics?.budgetData || {
+        total_spent: 0,
+        allocated_budget: 0,
+        budget_utilization_pct: 0,
+      }
+    );
+  };
+
+  const getStateDataforPie = () => {
+    if (selectedPSU && dashboardOnlyPSUData && !selectedState) {
+      return (dashboardOnlyPSUData.budget_by_state || []).map((stateItem) => ({
+        id: stateItem.state,
+        label: stateItem.state,
+        value: stateItem.allocated_budget,
+        color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`,
+      }));
+    }
+    return [];
+  };
+
+  const getDistrictDataforPie = () => {
+    if (selectedPSU && selectedState && dashboardBothStatePSUData) {
+      if (dashboardBothStatePSUData.district_project_implementation) {
+        const districtMap = new Map();
+        dashboardBothStatePSUData.district_project_implementation.forEach(
+          (item) => {
+            if (!districtMap.has(item.district)) {
+              districtMap.set(item.district, {
+                name: item.district,
+                projects: [],
+                schoolsTotal: 0,
+                schoolsCompleted: 0,
+                budget: 0,
+                activeProjects: 0,
+              });
+            }
+
+            const district = districtMap.get(item.district);
+            const project = {
+              name: item.project_name,
+              schoolsTotal: item.total_schools || 0,
+              schoolsCompleted: item.completed_schools || 0,
+              budget: 123, // Budget not available in district_project_implementation
+            };
+
+            district.projects.push(project);
+            district.schoolsTotal += item.total_schools || 0;
+            district.schoolsCompleted += item.completed_schools || 0;
+            district.activeProjects += 1;
+          }
+        );
+        return Array.from(districtMap.values());
+      }
+    }
+    return [];
+  };
+
+  const getSchoolImplementationData = () => {
+    if (selectedPSU) {
+      if (selectedState && dashboardBothStatePSUData?.state_implementation) {
+        return {
+          total_schools:
+            dashboardBothStatePSUData.state_implementation.total_schools || 0,
+          completed_schools:
+            dashboardBothStatePSUData.state_implementation.completed_schools ||
+            0,
+          implementation_pct:
+            dashboardBothStatePSUData.state_implementation.implementation_pct ||
+            0,
+        };
+      } else if (dashboardOnlyPSUData?.school_implementation) {
+        return {
+          total_schools:
+            dashboardOnlyPSUData.school_implementation.total_schools || 0,
+          completed_schools:
+            dashboardOnlyPSUData.school_implementation.completed_schools || 0,
+          implementation_pct:
+            dashboardOnlyPSUData.school_implementation.implementation_pct || 0,
+        };
+      }
+    }
+    // When no PSU, we don't show school implementation summary, but we need the rate for the chart
+    return {
+      total_schools: 0,
+      completed_schools: 0,
+      implementation_pct: chartMetrics?.implementationRate || 0,
+    };
+  };
+
+  const budgetData = getBudgetData();
+  const stateDataforPie = getStateDataforPie();
+  const districDataforPie = getDistrictDataforPie();
+  const schoolImplementationData = getSchoolImplementationData();
+
+  // Get rates for chart config
+  const completionRate = selectedPSU ? 0 : chartMetrics?.completionRate || 0;
+  const budgetUtilization = selectedPSU
+    ? budgetData.budget_utilization_pct
+    : chartMetrics?.budgetUtilization || 0;
+  const implementationRate = selectedPSU
+    ? Number(schoolImplementationData.implementation_pct)
+    : chartMetrics?.implementationRate || 0;
 
   const {
     pieChartProps,
@@ -50,105 +168,6 @@ const DashboardChartSection = ({
     budgetUtilization,
     implementationRate,
   });
-
-  //------------------------------------API CALLS------------------------------------------------------------
-
-  const loadMetrics = async (state, psu) => {
-    setLoading(true);
-    try {
-      if (psu) {
-        const budgetData = await fetchPsuStateBudgets(psu);
-        if (budgetData.length > 0) {
-          if (state) {
-            // If state is selected, show state-specific budget data
-            let data = budgetData.find((item) => item.state_name === state);
-            if (data) {
-              setPsuBudgetData([
-                {
-                  allocated_budget: data.allocated_budget,
-                  total_spent: data.used_budget,
-                  budget_utilization_pct: Number(
-                    ((data.used_budget / data.allocated_budget) * 100).toFixed(
-                      2
-                    )
-                  ),
-                },
-              ]);
-            }
-            const districtdata = await fetchPsuStateDistrictStats(psu, state);
-            setDistricDataforPie(districtdata);
-          } else {
-            // If no state is selected, calculate total budget statistics for the PSU
-            const totalAllocated = budgetData.reduce(
-              (sum, state) => sum + state.allocated_budget,
-              0
-            );
-            const totalUsed = budgetData.reduce(
-              (sum, state) => sum + state.used_budget,
-              0
-            );
-            setPsuBudgetData([
-              {
-                allocated_budget: totalAllocated,
-                total_spent: totalUsed,
-                budget_utilization_pct: Number(
-                  ((totalUsed / totalAllocated) * 100).toFixed(2)
-                ),
-              },
-            ]);
-
-            setStateDataforPie(
-              budgetData.map((state) => ({
-                id: state.state_name,
-                label: state.state_name,
-                value: state.allocated_budget,
-                color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`,
-              }))
-            );
-          }
-        }
-      }
-      // If no state is selected, pass null to fetch overall stats.
-      const stateParam = state && state !== "" ? state : null;
-      const digitalData = await fetchProjectCompletionRate(stateParam);
-      console.log(digitalData, "digitalData");
-      if (digitalData.length > 0) {
-        if (stateParam) {
-          // If a state is selected, show that state's completion rate
-          setCompletionRate(Number(digitalData[0].completion_rate));
-        } else {
-          // If no state is selected, calculate cumulative completion rate
-          const totalRate = digitalData.reduce(
-            (sum, state) => sum + Number(state.completion_rate),
-            0
-          );
-          const averageRate = Number(
-            (totalRate / digitalData.length).toFixed(2)
-          );
-          setCompletionRate(averageRate);
-        }
-      } else {
-        setCompletionRate(0);
-      }
-      // Fetch Budget Utilization Data
-      if (!psu) {
-        const budgetData = await fetchBudgetUtilization(stateParam);
-        console.log(budgetData, "budgetData");
-        setBudgetUtilization(Number(budgetData[0].budget_utilization_pct));
-      }
-
-      // Fetch School Implementation Rate Data
-      const implData = await fetchSchoolImplementationRate(stateParam);
-      setImplementationRate(Number(implData[0].implementation_rate));
-    } catch (err) {
-      console.error("Error loading metrics:", err);
-    }
-    setLoading(false);
-  };
-  // Load metrics on initial mount (for all states) and when selectedState changes.
-  useEffect(() => {
-    loadMetrics(selectedState, selectedPSU);
-  }, [selectedState, selectedPSU]);
 
   //------------------------------------DATA TRANSFORMATION------------------------------------------------------------
 
@@ -169,7 +188,7 @@ const DashboardChartSection = ({
     <>
       {/* Circular Charts Row */}
       <div className="grid grid-cols-1 mb-8 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {loading ? (
+        {isLoading ? (
           <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse"></div>
         ) : (
           <div className={`${elevatedCardClass}`}>
@@ -180,9 +199,9 @@ const DashboardChartSection = ({
             </div>
             {selectedPSU ? (
               <BudgetPSUCard
-                StateBudget={psuBudgetData[0].total_spent}
-                totalBudget={psuBudgetData[0].allocated_budget}
-                budgetPercentage={psuBudgetData[0].budget_utilization_pct}
+                StateBudget={budgetData.total_spent}
+                totalBudget={budgetData.allocated_budget}
+                budgetPercentage={budgetData.budget_utilization_pct}
                 formatBudget={formatBudget}
               />
             ) : (
@@ -197,7 +216,7 @@ const DashboardChartSection = ({
           </div>
         )}
 
-        {loading ? (
+        {isLoading ? (
           <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse"></div>
         ) : (
           <div className={` ${elevatedCardClass} `}>
@@ -207,7 +226,11 @@ const DashboardChartSection = ({
                   text-lg font-outfit font-medium text-[var(--color-text)]
                 "
               >
-                {selectedPSU ? "States Affected" : "Budget Utilization"}
+                {selectedPSU
+                  ? selectedState
+                    ? "Districts Affected"
+                    : "States Affected"
+                  : "Budget Utilization"}
               </h3>
             </div>
             {selectedPSU ? (
@@ -228,7 +251,7 @@ const DashboardChartSection = ({
           </div>
         )}
 
-        {loading ? (
+        {isLoading ? (
           <div className="h-64 bg-[var(--color-surface-hover)] rounded-xl animate-pulse col-span-1 sm:col-span-2 lg:col-span-1"></div>
         ) : (
           <div
@@ -240,7 +263,11 @@ const DashboardChartSection = ({
               </h3>
             </div>
             {selectedPSU ? (
-              <ImplementationSummary implementationRate={implementationRate} />
+              <ImplementationSummary
+                totalSchools={schoolImplementationData.total_schools}
+                completedSchools={schoolImplementationData.completed_schools}
+                implementationPct={schoolImplementationData.implementation_pct}
+              />
             ) : (
               <SchoolCard
                 implementationRate={implementationRate}

@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ResponsiveBar } from "@nivo/bar";
 import { useTheme } from "../../context/ThemeContext";
-import {
-  fetchDistrictCompletionRate,
-  fetchProjectCompletionRate,
-  fetchPsuProjectBudgetsByState,
-  fetchPsuStateBudgets,
-} from "../../action/supabase_actions";
 import { motion, AnimatePresence } from "framer-motion";
 
-const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
+const BarChartSection = ({
+  stateList,
+  selectedState,
+  selectedPsu,
+  barChartData, // Data passed from parent: { data: [], keys: [] }
+  isLoading,
+}) => {
   const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -74,68 +74,44 @@ const BarChartSection = ({ stateList, selectedState, selectedPsu }) => {
     updateChartWidth();
   }, [data]);
 
-  //------------------------------------API CALLS------------------------------------------------------------
+  //------------------------------------DATA LOADING------------------------------------------------------------
 
-  // Load appropriate dataset based on selection
+  // Use data from props only - no fallback API calls
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        if (!selectedState && !selectedPsu) {
-          const progress = await fetchProjectCompletionRate();
-          const transformedData = progress.map(
-            ({ state_name, completion_rate }) => ({
-              state: state_name,
-              progress: completion_rate,
-            })
-          );
-          setData(transformedData);
-          setKeys(["progress"]);
-        } else if (!selectedState && selectedPsu) {
-          const budgetData = await fetchPsuStateBudgets(selectedPsu);
-          // Transform data to match chart format
-          const transformedData = budgetData.map(
-            ({ state_name, allocated_budget, used_budget }) => ({
-              state: state_name,
-              allocatedBudget: allocated_budget,
-              usedBudget: used_budget,
-            })
-          );
-          setData(transformedData);
-          setKeys(["allocatedBudget", "usedBudget"]);
-        } else if (selectedState && !selectedPsu) {
-          const progress = await fetchDistrictCompletionRate(selectedState);
-          const transformedData = progress.map(
-            ({ district_name, completion_rate }) => ({
-              district: district_name,
-              progress: completion_rate,
-            })
-          );
-          setData(transformedData);
-          setKeys(["progress"]);
-        } else {
-          const budgetData = await fetchPsuProjectBudgetsByState(
-            selectedPsu,
-            selectedState
-          );
-          const transformedData = budgetData.map(
-            ({ project_name, allocated_budget, used_budget }) => ({
-              project: project_name,
-              allocatedBudget: allocated_budget,
-              usedBudget: used_budget,
-            })
-          );
-          setData(transformedData);
-          setKeys(["allocatedBudget", "usedBudget"]);
-        }
-      } catch (err) {
-        console.error("Error loading chart data:", err);
-      } finally {
-        setLoading(false);
+    // Use data from props if available
+    if (barChartData && barChartData.data && barChartData.data.length > 0) {
+      setData(barChartData.data);
+      setKeys(barChartData.keys || ["progress"]);
+      setLoading(false);
+    } else {
+      // No data available - log error and show empty state
+      if (selectedState && selectedPsu) {
+        console.error(
+          `Error: Bar chart data not available for PSU: ${selectedPsu}, State: ${selectedState}`
+        );
+      } else if (selectedPsu) {
+        console.error(
+          `Error: Bar chart data not available for PSU: ${selectedPsu}`
+        );
+      } else if (selectedState) {
+        console.error(
+          `Error: Bar chart data not available for State: ${selectedState}`
+        );
+      } else {
+        console.error("Error: Bar chart data not available");
       }
-    };
-    loadData();
-  }, [selectedState, selectedPsu, stateList]);
+      setData([]);
+      setKeys(barChartData?.keys || ["progress"]);
+      setLoading(false);
+    }
+  }, [barChartData, selectedState, selectedPsu]);
+
+  // Sync loading state with parent
+  useEffect(() => {
+    if (isLoading !== undefined) {
+      setLoading(isLoading);
+    }
+  }, [isLoading]);
 
   //------------------------------------DATA TRANSFORMATION------------------------------------------------------------
 

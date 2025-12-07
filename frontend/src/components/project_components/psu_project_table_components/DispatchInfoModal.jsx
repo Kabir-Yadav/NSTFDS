@@ -16,6 +16,7 @@ import {
   User,
   Phone,
   MessageSquare,
+  Link,
 } from "lucide-react";
 import {
   normalizeDispatch,
@@ -43,6 +44,7 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
     if (isEditing && dispatch) {
       setEditData({
         tracking_number: dispatch.tracking_number || "",
+        tracking_url: dispatch.tracking_url || "",
         vendor_name: dispatch.vendor_name || "",
         purchase_order: dispatch.purchase_order || "",
         invoice_number: dispatch.invoice_number || "",
@@ -609,6 +611,42 @@ const DispatchInfoModal = ({ isOpen, onClose, dispatch, school, onUpdate }) => {
                         <p className="text-xs sm:text-sm text-gray-900 dark:text-white break-all">
                           {dispatch.tracking_number || "--"}
                         </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tracking URL */}
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 sm:mb-1.5 md:mb-2 uppercase">
+                      <Link className="inline h-3 w-3 mr-1" />
+                      Tracking URL
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editData.tracking_url || ""}
+                        onChange={(e) =>
+                          handleEditChange("tracking_url", e.target.value)
+                        }
+                        className="w-full px-2.5 py-2 sm:px-3 sm:py-2 md:px-4 md:py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-xs sm:text-sm text-gray-900 dark:text-white"
+                        placeholder="Enter tracking URL"
+                      />
+                    ) : (
+                      <div className="px-2.5 py-2 sm:px-3 sm:py-2 md:px-4 md:py-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        {dispatch.tracking_url ? (
+                          <a
+                            href={dispatch.tracking_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:underline break-all"
+                          >
+                            {dispatch.tracking_url}
+                          </a>
+                        ) : (
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                            --
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>

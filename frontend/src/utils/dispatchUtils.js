@@ -283,88 +283,85 @@ export function getInstalledDispatchCount(dispatches) {
 }
 
 /**
- * Get cumulative dispatch status for all dispatches
- * Returns the overall status based on all dispatches:
- * - "All Installed" if all dispatches are installed
- * - "Partially Installed" if some are installed but not all
- * - "In Progress" if any dispatch is in progress (delivered, installation_in_progress)
- * - "Pending" if all dispatches are pending or dispatched
- * - "No Dispatches" if there are no dispatches
- * @param {Array} dispatches - Array of dispatch objects
- * @returns {string} Cumulative status string
+ * Delivery and Installation Status enum values from database
  */
-export function getCumulativeDispatchStatus(dispatches) {
-    if (!dispatches || !Array.isArray(dispatches) || dispatches.length === 0) {
-        return "No Dispatches";
+export const DELIVERY_INSTALLATION_STATUS_ENUM = {
+    NO_DISPATCHES: "no_dispatches",
+    PENDING: "pending",
+    IN_PROGRESS: "in_progress",
+    PARTIALLY_INSTALLED: "partially_installed",
+    ALL_INSTALLED: "all_installed",
+};
+
+/**
+ * Map delivery_installation_status enum values to user-friendly display names
+ */
+export const DELIVERY_INSTALLATION_STATUS_DISPLAY = {
+    [DELIVERY_INSTALLATION_STATUS_ENUM.NO_DISPATCHES]: "No Dispatches",
+    [DELIVERY_INSTALLATION_STATUS_ENUM.PENDING]: "Pending",
+    [DELIVERY_INSTALLATION_STATUS_ENUM.IN_PROGRESS]: "In Progress",
+    [DELIVERY_INSTALLATION_STATUS_ENUM.PARTIALLY_INSTALLED]: "Partially Installed",
+    [DELIVERY_INSTALLATION_STATUS_ENUM.ALL_INSTALLED]: "All Installed",
+};
+
+/**
+ * Get cumulative dispatch status for a school
+ * Now uses the delivery_installation_status field from the database
+ * @param {Object|string} schoolOrStatus - School object with delivery_installation_status field, or the status enum string directly
+ * @returns {string} User-friendly status string
+ */
+export function getCumulativeDispatchStatus(schoolOrStatus) {
+    // Handle both school object and direct status string
+    let statusEnum;
+    if (typeof schoolOrStatus === "string") {
+        statusEnum = schoolOrStatus;
+    } else if (schoolOrStatus && schoolOrStatus.delivery_installation_status) {
+        statusEnum = schoolOrStatus.delivery_installation_status;
+    } else {
+        // Fallback for legacy code or missing status
+        statusEnum = DELIVERY_INSTALLATION_STATUS_ENUM.NO_DISPATCHES;
     }
 
-    const statusCounts = {
-        installed: 0,
-        inProgress: 0,
-        pending: 0,
-    };
-
-    dispatches.forEach((dispatch) => {
-        const status = dispatch.dispatch_status || DISPATCH_STATUS_ENUM.PENDING_DISPATCH;
-
-        if (status === DISPATCH_STATUS_ENUM.INSTALLED) {
-            statusCounts.installed++;
-        } else if (
-            status === DISPATCH_STATUS_ENUM.DELIVERED ||
-            status === DISPATCH_STATUS_ENUM.INSTALLATION_IN_PROGRESS
-        ) {
-            statusCounts.inProgress++;
-        } else {
-            statusCounts.pending++;
-        }
-    });
-
-    const total = dispatches.length;
-
-    // All installed
-    if (statusCounts.installed === total) {
-        return "All Installed";
-    }
-
-    // Some installed
-    if (statusCounts.installed > 0) {
-        return `Partially Installed (${statusCounts.installed}/${total})`;
-    }
-
-    // Some in progress
-    if (statusCounts.inProgress > 0) {
-        return "In Progress";
-    }
-
-    // All pending
-    return "Pending";
+    // Return display text for the enum value
+    return DELIVERY_INSTALLATION_STATUS_DISPLAY[statusEnum] || "No Dispatches";
 }
 
 /**
  * Get cumulative dispatch status color classes
- * @param {Array} dispatches - Array of dispatch objects
+ * Now uses the delivery_installation_status field from the database
+ * @param {Object|string} schoolOrStatus - School object with delivery_installation_status field, or the status enum string directly
  * @returns {string} Tailwind CSS classes for status badge
  */
-export function getCumulativeDispatchStatusColor(dispatches) {
-    if (!dispatches || !Array.isArray(dispatches) || dispatches.length === 0) {
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-300";
+export function getCumulativeDispatchStatusColor(schoolOrStatus) {
+    // Handle both school object and direct status string
+    let statusEnum;
+    if (typeof schoolOrStatus === "string") {
+        statusEnum = schoolOrStatus;
+    } else if (schoolOrStatus && schoolOrStatus.delivery_installation_status) {
+        statusEnum = schoolOrStatus.delivery_installation_status;
+    } else {
+        // Fallback for legacy code or missing status
+        statusEnum = DELIVERY_INSTALLATION_STATUS_ENUM.NO_DISPATCHES;
     }
 
-    const status = getCumulativeDispatchStatus(dispatches);
+    // Return color classes based on enum value
+    switch (statusEnum) {
+        case DELIVERY_INSTALLATION_STATUS_ENUM.ALL_INSTALLED:
+            return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300";
 
-    if (status === "All Installed") {
-        return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300";
+        case DELIVERY_INSTALLATION_STATUS_ENUM.PARTIALLY_INSTALLED:
+            return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300";
+
+        case DELIVERY_INSTALLATION_STATUS_ENUM.IN_PROGRESS:
+            return "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300";
+
+        case DELIVERY_INSTALLATION_STATUS_ENUM.PENDING:
+            return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300";
+
+        case DELIVERY_INSTALLATION_STATUS_ENUM.NO_DISPATCHES:
+        default:
+            return "bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-300";
     }
-
-    if (status.startsWith("Partially Installed")) {
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300";
-    }
-
-    if (status === "In Progress") {
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300";
-    }
-
-    return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300";
 }
 
 /**

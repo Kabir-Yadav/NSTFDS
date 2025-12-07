@@ -84,9 +84,12 @@ const SchoolCard = ({
   );
 };
 
-const ImplementationSummary = ({ implementationRate }) => {
-  const completedSchools = Math.round((implementationRate * 38) / 100);
-  const remainingSchools = Math.round(((100 - implementationRate) * 38) / 100);
+const ImplementationSummary = ({
+  totalSchools = 0,
+  completedSchools = 0,
+  implementationPct = 0,
+}) => {
+  const remainingSchools = totalSchools - completedSchools;
   return (
     <div
       className="
@@ -110,7 +113,7 @@ const ImplementationSummary = ({ implementationRate }) => {
               text-5xl font-bold text-[var(--color-warning)]
             "
         >
-          {implementationRate}%
+          {implementationPct.toFixed(1)}%
         </div>
         <div
           className="
@@ -161,7 +164,7 @@ const ImplementationSummary = ({ implementationRate }) => {
                   text-sm text-[var(--color-text)]
                 "
             >
-              of 38 schools
+              of {totalSchools} schools
             </div>
           </div>
           <div

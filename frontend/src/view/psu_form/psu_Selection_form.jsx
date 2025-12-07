@@ -288,9 +288,18 @@ const PsuSelectionForm = ({
       const { data, error } = await toggleSchoolReady(schoolId, !currentStatus);
       if (error) throw new Error(error);
 
-      // Update local state
+      // Update local state while preserving original created_at to maintain sort position
       setTableData((prev) =>
-        prev.map((school) => (school.id === schoolId ? data : school))
+        prev.map((school) => {
+          if (school.id === schoolId) {
+            // Preserve the original created_at timestamp to maintain sort order
+            return {
+              ...data,
+              created_at: school.created_at || data.created_at,
+            };
+          }
+          return school;
+        })
       );
     } catch (error) {
       console.error("Failed to toggle ready status:", error);
@@ -316,8 +325,17 @@ const PsuSelectionForm = ({
       });
       if (error) throw new Error(error);
       // Update local state with new certificate info (no readiness coupling)
+      // Preserve original created_at to maintain sort position
       setTableData((prev) =>
-        prev.map((school) => (school.id === schoolId ? data : school))
+        prev.map((school) => {
+          if (school.id === schoolId) {
+            return {
+              ...data,
+              created_at: school.created_at || data.created_at,
+            };
+          }
+          return school;
+        })
       );
     } catch (error) {
       throw error; // Re-throw to let dialog handle error display
